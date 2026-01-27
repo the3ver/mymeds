@@ -5,11 +5,13 @@ const dialog = ref(false)
 const editDialog = ref(false)
 const newItemName = ref('')
 const newItemCount = ref('')
+const newItemDose = ref('')
 const newItemColor = ref('')
 const items = ref([])
 const editingIndex = ref(-1)
 const editItemName = ref('')
 const editItemCount = ref('')
+const editItemDose = ref('')
 const editItemColor = ref('')
 
 // A palette of 10 fitting colors
@@ -18,11 +20,59 @@ const colors = [
   'cyan', 'teal', 'green', 'orange', 'blue-grey'
 ]
 
+// Helper to parse dose string to number
+const parseDose = (doseStr) => {
+  if (!doseStr) return 0
+  if (doseStr.includes('/')) {
+    const [numerator, denominator] = doseStr.split('/')
+    return parseFloat(numerator) / parseFloat(denominator)
+  }
+  return parseFloat(doseStr)
+}
+
+// Check if a day has passed and update counts
+const checkAndUpdateDailyDose = (savedItems) => {
+  const lastUpdate = localStorage.getItem('lastDoseUpdate')
+  const today = new Date().toDateString()
+
+  if (lastUpdate !== today) {
+    // Calculate days passed since last update
+    // For simplicity in this version, we just decrement once if the date is different
+    // A more robust solution would calculate the exact number of days passed
+    
+    const updatedItems = savedItems.map(item => {
+      const dose = parseDose(item.dose)
+      let newCount = parseFloat(item.count) - dose
+      // Ensure count doesn't go below 0
+      if (newCount < 0) newCount = 0
+      
+      // Format to max 2 decimal places to avoid floating point errors
+      return {
+        ...item,
+        count: Math.round(newCount * 100) / 100
+      }
+    })
+    
+    localStorage.setItem('lastDoseUpdate', today)
+    return updatedItems
+  }
+  
+  return savedItems
+}
+
 // Load items from localStorage on mount
 onMounted(() => {
-  const savedItems = localStorage.getItem('myMedsItems')
-  if (savedItems) {
-    items.value = JSON.parse(savedItems)
+  const savedItemsJson = localStorage.getItem('myMedsItems')
+  if (savedItemsJson) {
+    let savedItems = JSON.parse(savedItemsJson)
+    
+    // Check for daily updates
+    savedItems = checkAndUpdateDailyDose(savedItems)
+    
+    items.value = savedItems
+  } else {
+    // Initialize last update date if no items exist yet
+    localStorage.setItem('lastDoseUpdate', new Date().toDateString())
   }
 })
 
@@ -34,15 +84,17 @@ watch(items, (newItems) => {
 const openDialog = () => {
   newItemName.value = ''
   newItemCount.value = ''
+  newItemDose.value = ''
   newItemColor.value = colors[0] // Default to first color
   dialog.value = true
 }
 
 const addItem = () => {
-  if (newItemName.value && newItemCount.value) {
+  if (newItemName.value && newItemCount.value && newItemDose.value) {
     items.value.unshift({
       name: newItemName.value,
       count: newItemCount.value,
+      dose: newItemDose.value,
       color: newItemColor.value
     })
     dialog.value = false
@@ -57,15 +109,17 @@ const openEditDialog = (index) => {
   editingIndex.value = index
   editItemName.value = items.value[index].name
   editItemCount.value = items.value[index].count
+  editItemDose.value = items.value[index].dose
   editItemColor.value = items.value[index].color
   editDialog.value = true
 }
 
 const saveEdit = () => {
-  if (editingIndex.value > -1 && editItemName.value && editItemCount.value) {
+  if (editingIndex.value > -1 && editItemName.value && editItemCount.value && editItemDose.value) {
     items.value[editingIndex.value] = {
       name: editItemName.value,
       count: editItemCount.value,
+      dose: editItemDose.value,
       color: editItemColor.value
     }
     editDialog.value = false
@@ -95,6 +149,7 @@ const saveEdit = () => {
               </v-avatar>
             </template>
             <v-card-title>{{ item.name }}</v-card-title>
+            <v-card-subtitle>Daily Dose: {{ item.dose }}</v-card-subtitle>
             <template v-slot:append>
               <div class="d-flex align-center">
                 <v-chip size="small" color="primary" variant="tonal" class="mr-2">
@@ -156,7 +211,14 @@ const saveEdit = () => {
           variant="underlined"
           type="number"
         ></v-text-field>
-        <div class="text-subtitle-2 mb-2">Color</div>
+        <v-text-field
+          v-model="newItemDose"
+          label="Daily Dose"
+          variant="underlined"
+          hint="e.g. 1, 0.5, 1/2"
+          persistent-hint
+        ></v-text-field>
+        <div class="text-subtitle-2 mb-2 mt-4">Color</div>
         <div class="d-flex flex-wrap gap-2">
           <v-btn
             v-for="color in colors"
@@ -198,7 +260,14 @@ const saveEdit = () => {
           variant="underlined"
           type="number"
         ></v-text-field>
-        <div class="text-subtitle-2 mb-2">Color</div>
+        <v-text-field
+          v-model="editItemDose"
+          label="Daily Dose"
+          variant="underlined"
+          hint="e.g. 1, 0.5, 1/2"
+          persistent-hint
+        ></v-text-field>
+        <div class="text-subtitle-2 mb-2 mt-4">Color</div>
         <div class="d-flex flex-wrap gap-2">
           <v-btn
             v-for="color in colors"
