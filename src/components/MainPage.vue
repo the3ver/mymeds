@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const dialog = ref(false)
 const editDialog = ref(false)
@@ -17,6 +17,19 @@ const colors = [
   'red', 'pink', 'purple', 'indigo', 'blue',
   'cyan', 'teal', 'green', 'orange', 'blue-grey'
 ]
+
+// Load items from localStorage on mount
+onMounted(() => {
+  const savedItems = localStorage.getItem('myMedsItems')
+  if (savedItems) {
+    items.value = JSON.parse(savedItems)
+  }
+})
+
+// Watch for changes in items and save to localStorage
+watch(items, (newItems) => {
+  localStorage.setItem('myMedsItems', JSON.stringify(newItems))
+}, { deep: true })
 
 const openDialog = () => {
   newItemName.value = ''
