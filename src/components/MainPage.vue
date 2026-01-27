@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { checkAndUpdateDailyDose } from '../utils/medUtils'
 
 const dialog = ref(false)
 const editDialog = ref(false)
@@ -20,56 +21,21 @@ const colors = [
   'cyan', 'teal', 'green', 'orange', 'blue-grey'
 ]
 
-// Helper to parse dose string to number
-const parseDose = (doseStr) => {
-  if (!doseStr) return 0
-  if (doseStr.includes('/')) {
-    const [numerator, denominator] = doseStr.split('/')
-    return parseFloat(numerator) / parseFloat(denominator)
-  }
-  return parseFloat(doseStr)
-}
-
-// Check if a day has passed and update counts
-const checkAndUpdateDailyDose = (savedItems) => {
-  const lastUpdate = localStorage.getItem('lastDoseUpdate')
-  const today = new Date().toDateString()
-
-  if (lastUpdate !== today) {
-    // Calculate days passed since last update
-    // For simplicity in this version, we just decrement once if the date is different
-    // A more robust solution would calculate the exact number of days passed
-    
-    const updatedItems = savedItems.map(item => {
-      const dose = parseDose(item.dose)
-      let newCount = parseFloat(item.count) - dose
-      // Ensure count doesn't go below 0
-      if (newCount < 0) newCount = 0
-      
-      // Format to max 2 decimal places to avoid floating point errors
-      return {
-        ...item,
-        count: Math.round(newCount * 100) / 100
-      }
-    })
-    
-    localStorage.setItem('lastDoseUpdate', today)
-    return updatedItems
-  }
-  
-  return savedItems
-}
-
 // Load items from localStorage on mount
 onMounted(() => {
   const savedItemsJson = localStorage.getItem('myMedsItems')
   if (savedItemsJson) {
     let savedItems = JSON.parse(savedItemsJson)
+    const lastUpdate = localStorage.getItem('lastDoseUpdate')
     
     // Check for daily updates
-    savedItems = checkAndUpdateDailyDose(savedItems)
+    const result = checkAndUpdateDailyDose(savedItems, lastUpdate)
     
-    items.value = savedItems
+    if (result.updated) {
+      localStorage.setItem('lastDoseUpdate', result.newDate)
+    }
+    
+    items.value = result.updatedItems
   } else {
     // Initialize last update date if no items exist yet
     localStorage.setItem('lastDoseUpdate', new Date().toDateString())
