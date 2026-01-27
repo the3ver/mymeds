@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#42b883"/>
-  <text x="50%" y="50%" font-family="Arial" font-size="120" fill="white" text-anchor="middle" dy=".3em">512</text>
+  <g transform="rotate(45 256 256)">
+    <!-- Top Half: Red -->
+    <path d="M156,256 L156,156 A100,100 0 0,1 356,156 L356,256 Z" fill="#F44336"/>
+    <!-- Bottom Half: White -->
+    <path d="M156,256 L356,256 L356,356 A100,100 0 0,1 156,356 Z" fill="#FFFFFF"/>
+    <!-- Border -->
+    <rect x="156" y="56" width="200" height="400" rx="100" ry="100" fill="none" stroke="#2c3e50" stroke-width="10"/>
+  </g>
 </svg>
