@@ -1,9 +1,13 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useTheme } from 'vuetify'
 import { checkAndUpdateDailyDose } from '../utils/medUtils'
 
+const theme = useTheme()
+const drawer = ref(false)
 const dialog = ref(false)
 const editDialog = ref(false)
+const aboutDialog = ref(false)
 const newItemName = ref('')
 const newItemCount = ref('')
 const newItemDose = ref('')
@@ -40,12 +44,23 @@ onMounted(() => {
     // Initialize last update date if no items exist yet
     localStorage.setItem('lastDoseUpdate', new Date().toDateString())
   }
+
+  // Load theme preference
+  const savedTheme = localStorage.getItem('myMedsTheme')
+  if (savedTheme) {
+    theme.global.name.value = savedTheme
+  }
 })
 
 // Watch for changes in items and save to localStorage
 watch(items, (newItems) => {
   localStorage.setItem('myMedsItems', JSON.stringify(newItems))
 }, { deep: true })
+
+const toggleTheme = () => {
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+  localStorage.setItem('myMedsTheme', theme.global.name.value)
+}
 
 const openDialog = () => {
   newItemName.value = ''
@@ -95,7 +110,31 @@ const saveEdit = () => {
 </script>
 
 <template>
+  <v-navigation-drawer v-model="drawer" temporary>
+    <v-list>
+      <v-list-item title="Settings" subtitle="App Preferences"></v-list-item>
+      <v-divider></v-divider>
+      <v-list-item @click="toggleTheme">
+        <template v-slot:prepend>
+          <v-icon>{{ theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+        </template>
+        <v-list-item-title>
+          {{ theme.global.current.value.dark ? 'Light Mode' : 'Dark Mode' }}
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="aboutDialog = true">
+        <template v-slot:prepend>
+          <v-icon>mdi-information</v-icon>
+        </template>
+        <v-list-item-title>About</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
+
   <v-app-bar color="primary" density="compact">
+    <template v-slot:prepend>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+    </template>
     <v-app-bar-title>MyMeds</v-app-bar-title>
   </v-app-bar>
 
@@ -254,6 +293,35 @@ const saveEdit = () => {
         <v-spacer></v-spacer>
         <v-btn color="primary" text @click="editDialog = false">Cancel</v-btn>
         <v-btn color="primary" text @click="saveEdit">Save</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- About Dialog -->
+  <v-dialog v-model="aboutDialog" max-width="500px">
+    <v-card>
+      <v-card-title>About MyMeds</v-card-title>
+      <v-card-text>
+        <p class="mb-4">MyMeds is a simple application to help you track your medication inventory.</p>
+        
+        <v-list density="compact">
+          <v-list-item
+            prepend-icon="mdi-github"
+            title="GitHub Repository"
+            href="https://github.com/the3ver/mymeds"
+            target="_blank"
+          ></v-list-item>
+          <v-list-item
+            prepend-icon="mdi-license"
+            title="License"
+            href="https://github.com/the3ver/mymeds/blob/main/LICENSE"
+            target="_blank"
+          ></v-list-item>
+        </v-list>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" text @click="aboutDialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
