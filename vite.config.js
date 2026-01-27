@@ -15,6 +15,9 @@ export default defineConfig({
         short_name: 'MyMeds',
         description: 'MyMeds Application',
         theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '.',
         icons: [
           {
             src: 'pwa-192x192.svg',
