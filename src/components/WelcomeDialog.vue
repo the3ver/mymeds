@@ -1,5 +1,6 @@
 <script setup>
 import { useTheme } from 'vuetify'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   modelValue: Boolean
@@ -8,10 +9,16 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const theme = useTheme()
+const { t, locale } = useI18n()
 
 const setTheme = (mode) => {
   theme.global.name.value = mode
   localStorage.setItem('myMedsTheme', mode)
+}
+
+const setLanguage = (lang) => {
+  locale.value = lang
+  localStorage.setItem('myMedsLocale', lang)
 }
 
 const close = () => {
@@ -22,11 +29,29 @@ const close = () => {
 <template>
   <v-dialog :model-value="modelValue" max-width="400px" persistent>
     <v-card>
-      <v-card-title class="text-h5 text-center pt-4">Welcome to MyMeds!</v-card-title>
+      <v-card-title class="text-h5 text-center pt-4">{{ t('welcome.title') }}</v-card-title>
       <v-card-text class="text-center">
-        <p class="mb-4">Thank you for installing the app.</p>
-        <p class="mb-6">Please choose your preferred theme:</p>
+        <p class="mb-4">{{ t('welcome.thankYou') }}</p>
         
+        <p class="mb-2 font-weight-bold">{{ t('welcome.chooseLanguage') }}</p>
+        <div class="d-flex justify-center gap-4 mb-6">
+          <v-btn
+            variant="outlined"
+            :color="locale === 'en' ? 'primary' : ''"
+            @click="setLanguage('en')"
+          >
+            English
+          </v-btn>
+          <v-btn
+            variant="outlined"
+            :color="locale === 'de' ? 'primary' : ''"
+            @click="setLanguage('de')"
+          >
+            Deutsch
+          </v-btn>
+        </div>
+
+        <p class="mb-2 font-weight-bold">{{ t('welcome.chooseTheme') }}</p>
         <div class="d-flex justify-center gap-4 mb-2">
           <v-card
             variant="outlined"
@@ -36,7 +61,7 @@ const close = () => {
             width="120"
           >
             <v-icon size="large" class="mb-2">mdi-weather-sunny</v-icon>
-            <span>Light</span>
+            <span>{{ t('welcome.light') }}</span>
           </v-card>
           
           <v-card
@@ -47,7 +72,7 @@ const close = () => {
             width="120"
           >
             <v-icon size="large" class="mb-2">mdi-weather-night</v-icon>
-            <span>Dark</span>
+            <span>{{ t('welcome.dark') }}</span>
           </v-card>
         </div>
       </v-card-text>
@@ -59,7 +84,7 @@ const close = () => {
           @click="close"
           class="px-8"
         >
-          Get Started
+          {{ t('welcome.getStarted') }}
         </v-btn>
       </v-card-actions>
     </v-card>

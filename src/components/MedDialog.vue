@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DoseInput from './DoseInput.vue'
 
 const props = defineProps({
@@ -19,6 +20,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
+const { t } = useI18n()
 
 const localMed = ref({ ...props.med })
 
@@ -58,25 +60,25 @@ const save = () => {
       <v-card-text>
         <v-text-field
           v-model="localMed.name"
-          label="Name"
+          :label="t('med.name')"
           variant="underlined"
           autofocus
         ></v-text-field>
         <v-text-field
           v-model="localMed.ingredient"
-          label="Active Ingredient (optional)"
+          :label="t('med.ingredient')"
           variant="underlined"
         ></v-text-field>
         <v-text-field
           v-model="localMed.count"
-          label="Pill Count"
+          :label="t('med.count')"
           variant="underlined"
           type="number"
         ></v-text-field>
         
-        <DoseInput v-model="localMed.dose" />
+        <DoseInput v-model="localMed.dose" :label="t('med.dose')" />
         
-        <div class="text-subtitle-2 mb-2 mt-4">Color</div>
+        <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.color') }}</div>
         <div class="d-flex flex-wrap gap-2">
           <v-btn
             v-for="color in colors"
@@ -95,7 +97,7 @@ const save = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="close">Cancel</v-btn>
+        <v-btn color="primary" text @click="close">{{ t('dialog.cancel') }}</v-btn>
         <v-btn color="primary" text @click="save">{{ confirmText }}</v-btn>
       </v-card-actions>
     </v-card>

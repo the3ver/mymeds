@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import MedCard from './MedCard.vue'
 
 const props = defineProps({
@@ -9,6 +10,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['edit', 'delete'])
+const { t } = useI18n()
 </script>
 
 <template>
@@ -22,7 +24,7 @@ const emit = defineEmits(['edit', 'delete'])
     />
   </div>
   <div v-else class="text-center mt-10 text-grey">
-    No meds added yet
+    {{ t('app.noMeds') }}
   </div>
 </template>
 

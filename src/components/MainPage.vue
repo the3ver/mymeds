@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
+import { useI18n } from 'vue-i18n'
 import { checkAndUpdateDailyDose } from '../utils/medUtils'
 import MedDialog from './MedDialog.vue'
 import NavDrawer from './NavDrawer.vue'
@@ -8,6 +9,7 @@ import MedList from './MedList.vue'
 import WelcomeDialog from './WelcomeDialog.vue'
 
 const theme = useTheme()
+const { t } = useI18n()
 const drawer = ref(false)
 const dialog = ref(false)
 const editDialog = ref(false)
@@ -99,7 +101,7 @@ const saveEdit = (med) => {
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
-    <v-app-bar-title>MyMeds</v-app-bar-title>
+    <v-app-bar-title>{{ t('app.title') }}</v-app-bar-title>
   </v-app-bar>
 
   <v-main>
@@ -125,8 +127,8 @@ const saveEdit = (med) => {
   <!-- Add Dialog -->
   <MedDialog
     v-model="dialog"
-    title="Add New Med"
-    confirm-text="Add"
+    :title="t('dialog.addTitle')"
+    :confirm-text="t('dialog.add')"
     @confirm="addItem"
   />
 
@@ -134,8 +136,8 @@ const saveEdit = (med) => {
   <MedDialog
     v-model="editDialog"
     :med="currentEditMed"
-    title="Edit Med"
-    confirm-text="Save"
+    :title="t('dialog.editTitle')"
+    :confirm-text="t('dialog.save')"
     @confirm="saveEdit"
   />
 

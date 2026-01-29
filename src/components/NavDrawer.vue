@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   modelValue: Boolean
@@ -9,6 +10,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const theme = useTheme()
+const { t } = useI18n()
 const aboutDialog = ref(false)
 
 const toggleTheme = () => {
@@ -24,21 +26,21 @@ const toggleTheme = () => {
     temporary
   >
     <v-list>
-      <v-list-item title="Settings" subtitle="App Preferences"></v-list-item>
+      <v-list-item :title="t('app.settings')" :subtitle="t('app.preferences')"></v-list-item>
       <v-divider></v-divider>
       <v-list-item @click="toggleTheme">
         <template v-slot:prepend>
           <v-icon>{{ theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
         </template>
         <v-list-item-title>
-          {{ theme.global.current.value.dark ? 'Light Mode' : 'Dark Mode' }}
+          {{ theme.global.current.value.dark ? t('app.lightMode') : t('app.darkMode') }}
         </v-list-item-title>
       </v-list-item>
       <v-list-item @click="aboutDialog = true">
         <template v-slot:prepend>
           <v-icon>mdi-information</v-icon>
         </template>
-        <v-list-item-title>About</v-list-item-title>
+        <v-list-item-title>{{ t('app.about') }}</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -46,20 +48,20 @@ const toggleTheme = () => {
   <!-- About Dialog -->
   <v-dialog v-model="aboutDialog" max-width="500px">
     <v-card>
-      <v-card-title>About MyMeds</v-card-title>
+      <v-card-title>{{ t('about.title') }}</v-card-title>
       <v-card-text>
-        <p class="mb-4">MyMeds is a simple application to help you track your medication inventory.</p>
+        <p class="mb-4">{{ t('about.description') }}</p>
         
         <v-list density="compact">
           <v-list-item
             prepend-icon="mdi-github"
-            title="GitHub Repository"
+            :title="t('about.github')"
             href="https://github.com/the3ver/mymeds"
             target="_blank"
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-license"
-            title="License"
+            :title="t('about.license')"
             href="https://github.com/the3ver/mymeds/blob/main/LICENSE"
             target="_blank"
           ></v-list-item>
@@ -67,7 +69,7 @@ const toggleTheme = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="aboutDialog = false">Close</v-btn>
+        <v-btn color="primary" text @click="aboutDialog = false">{{ t('about.close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
