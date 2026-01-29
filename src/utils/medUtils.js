@@ -1,11 +1,30 @@
 // Helper to parse dose string to number
 export const parseDose = (doseStr) => {
   if (!doseStr) return 0
-  if (doseStr.includes('/')) {
-    const [numerator, denominator] = doseStr.split('/')
+  
+  // Handle pattern like "1-0-1" or "1-0-0-1"
+  if (doseStr.includes('-')) {
+    const parts = doseStr.split('-')
+    let sum = 0
+    for (const part of parts) {
+      sum += parseSingleDose(part.trim())
+    }
+    return sum
+  }
+  
+  return parseSingleDose(doseStr)
+}
+
+// Helper to parse a single number, fraction or decimal
+const parseSingleDose = (val) => {
+  if (!val) return 0
+  if (val.includes('/')) {
+    const [numerator, denominator] = val.split('/')
     return parseFloat(numerator) / parseFloat(denominator)
   }
-  return parseFloat(doseStr)
+  // Replace comma with dot for decimal parsing
+  const normalized = val.replace(',', '.')
+  return parseFloat(normalized) || 0
 }
 
 // Check if a day has passed and update counts

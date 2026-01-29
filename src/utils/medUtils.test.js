@@ -11,12 +11,27 @@ describe('medUtils', () => {
     it('should parse decimal strings', () => {
       expect(parseDose('0.5')).toBe(0.5)
       expect(parseDose('1.5')).toBe(1.5)
+      expect(parseDose('0,5')).toBe(0.5) // Test comma support
     })
 
     it('should parse fraction strings', () => {
       expect(parseDose('1/2')).toBe(0.5)
       expect(parseDose('1/4')).toBe(0.25)
       expect(parseDose('3/4')).toBe(0.75)
+    })
+
+    it('should parse dose patterns (M-N-E-N)', () => {
+      expect(parseDose('1-0-1')).toBe(2)
+      expect(parseDose('1-0-1-0')).toBe(2)
+      expect(parseDose('0.5-0-0.5')).toBe(1)
+      expect(parseDose('1/2-0-1/2')).toBe(1)
+      expect(parseDose('1-1-1-1')).toBe(4)
+      expect(parseDose('2-0-0')).toBe(2)
+    })
+
+    it('should handle mixed patterns', () => {
+      expect(parseDose('1-0.5-0')).toBe(1.5)
+      expect(parseDose('1-1/2-0')).toBe(1.5)
     })
 
     it('should return 0 for empty or invalid input', () => {
@@ -45,7 +60,8 @@ describe('medUtils', () => {
       const items = [
         { name: 'Med A', count: 10, dose: '1' },
         { name: 'Med B', count: 5, dose: '0.5' },
-        { name: 'Med C', count: 2, dose: '1/4' }
+        { name: 'Med C', count: 2, dose: '1/4' },
+        { name: 'Med D', count: 10, dose: '1-0-1' } // New pattern test
       ]
       
       const result = checkAndUpdateDailyDose(items, yesterday)
@@ -56,6 +72,7 @@ describe('medUtils', () => {
       expect(result.updatedItems[0].count).toBe(9)   // 10 - 1
       expect(result.updatedItems[1].count).toBe(4.5) // 5 - 0.5
       expect(result.updatedItems[2].count).toBe(1.75) // 2 - 0.25
+      expect(result.updatedItems[3].count).toBe(8)    // 10 - 2 (1+0+1)
     })
 
     it('should not reduce count below zero', () => {

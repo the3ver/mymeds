@@ -1,11 +1,12 @@
 <script setup>
 import { ref, watch } from 'vue'
+import DoseInput from './DoseInput.vue'
 
 const props = defineProps({
   modelValue: Boolean,
   med: {
     type: Object,
-    default: () => ({ name: '', count: '', dose: '', color: '' })
+    default: () => ({ name: '', ingredient: '', count: '', dose: '', color: '' })
   },
   title: {
     type: String,
@@ -62,18 +63,19 @@ const save = () => {
           autofocus
         ></v-text-field>
         <v-text-field
+          v-model="localMed.ingredient"
+          label="Active Ingredient (optional)"
+          variant="underlined"
+        ></v-text-field>
+        <v-text-field
           v-model="localMed.count"
           label="Pill Count"
           variant="underlined"
           type="number"
         ></v-text-field>
-        <v-text-field
-          v-model="localMed.dose"
-          label="Daily Dose"
-          variant="underlined"
-          hint="e.g. 1, 0.5, 1/2"
-          persistent-hint
-        ></v-text-field>
+        
+        <DoseInput v-model="localMed.dose" />
+        
         <div class="text-subtitle-2 mb-2 mt-4">Color</div>
         <div class="d-flex flex-wrap gap-2">
           <v-btn
