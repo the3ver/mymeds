@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { parseDose } from '../utils/medUtils'
 
 const props = defineProps({
@@ -10,6 +11,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['edit', 'delete'])
+const { t } = useI18n()
 
 const isExpanded = ref(false)
 
@@ -97,16 +99,16 @@ const emptyDate = computed(() => {
         <v-divider></v-divider>
         <v-card-text>
           <div class="d-flex justify-space-between mb-2">
-            <span class="text-grey">Daily Dose:</span>
+            <span class="text-grey">{{ t('med.dose') }}:</span>
             <span class="font-weight-medium">{{ dailyDoseTotal }}</span>
           </div>
           <div class="d-flex justify-space-between mb-2">
-            <span class="text-grey">Days remaining:</span>
-            <span class="font-weight-medium">{{ daysRemaining !== null ? daysRemaining : 'N/A' }} days</span>
+            <span class="text-grey">{{ t('med.daysRemaining') }}:</span>
+            <span class="font-weight-medium">{{ daysRemaining !== null ? daysRemaining : t('med.na') }}</span>
           </div>
           <div class="d-flex justify-space-between mb-4">
-            <span class="text-grey">Estimated empty date:</span>
-            <span class="font-weight-medium">{{ emptyDate !== null ? emptyDate : 'N/A' }}</span>
+            <span class="text-grey">{{ t('med.emptyDate') }}:</span>
+            <span class="font-weight-medium">{{ emptyDate !== null ? emptyDate : t('med.na') }}</span>
           </div>
           
           <div class="d-flex justify-end gap-2">
@@ -116,7 +118,7 @@ const emptyDate = computed(() => {
               prepend-icon="mdi-pencil"
               @click.stop="emit('edit')"
             >
-              Edit
+              {{ t('dialog.edit') }}
             </v-btn>
             <v-btn
               variant="text"
@@ -124,7 +126,7 @@ const emptyDate = computed(() => {
               prepend-icon="mdi-delete"
               @click.stop="emit('delete')"
             >
-              Delete
+              {{ t('dialog.delete') }}
             </v-btn>
           </div>
         </v-card-text>

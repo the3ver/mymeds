@@ -86,7 +86,7 @@ const onInput = (field, val) => {
 
 <template>
   <div class="dose-input-container">
-    <div class="text-caption text-grey mb-1">{{ label }} (M-N-E-N)</div>
+    <div class="text-caption text-grey mb-1">{{ label }}</div>
     <div class="d-flex align-center gap-2">
       <v-text-field
         v-model="morning"
@@ -122,7 +122,7 @@ const onInput = (field, val) => {
         v-model="night"
         variant="underlined"
         density="compact"
-        placeholder="Night"
+        placeholder="N"
         hide-details
         class="centered-input"
         @update:model-value="v => onInput('night', v)"
