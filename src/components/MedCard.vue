@@ -20,20 +20,30 @@ const dailyDoseTotal = computed(() => {
 const displayPlan = computed(() => {
   const dose = props.item.dose || ''
   // Handle legacy or empty data
-  if (!dose) return '0-0-0-0'
+  if (!dose) return '0-0-0'
   
   // If it's a pattern
   if (dose.includes('-')) {
     const parts = dose.split('-')
-    // Ensure 4 parts for display (M-N-E-N)
-    while (parts.length < 4) {
+    // Ensure at least 3 parts (M-N-E)
+    while (parts.length < 3) {
       parts.push('0')
     }
-    return parts.join('-')
+    
+    // Check if 4th part (Night) exists and is not 0
+    if (parts.length >= 4) {
+      const nightDose = parts[3]
+      if (nightDose && nightDose !== '0' && nightDose !== '') {
+        return parts.slice(0, 4).join('-')
+      }
+    }
+    
+    // Return only first 3 parts
+    return parts.slice(0, 3).join('-')
   }
   
-  // If it's a single number, assume it's the morning dose (as per DoseInput logic)
-  return `${dose}-0-0-0`
+  // If it's a single number, assume it's the morning dose
+  return `${dose}-0-0`
 })
 
 const daysRemaining = computed(() => {
@@ -65,42 +75,19 @@ const emptyDate = computed(() => {
         </v-avatar>
       </template>
       
-      <v-card-title>
-        {{ item.name }}
-        <div v-if="item.ingredient" class="text-caption text-grey">
-          ({{ item.ingredient }})
+      <v-card-title class="text-wrap" style="line-height: 1.2;">
+        <div class="text-h6 font-weight-bold mb-1">{{ item.name }}</div>
+        <div class="d-flex flex-wrap align-center gap-2 text-body-2 text-grey">
+          <span v-if="item.ingredient">({{ item.ingredient }})</span>
+          <span class="text-high-emphasis font-weight-bold ml-1">{{ displayPlan }}</span>
         </div>
       </v-card-title>
       
       <template v-slot:append>
-        <div class="d-flex align-center">
-          <div class="d-flex flex-column align-end mr-3">
-             <span class="text-caption text-grey mb-1">Plan</span>
-             <span class="text-body-2 font-weight-bold">{{ displayPlan }}</span>
-          </div>
-          
+        <div class="d-flex align-center pl-2">
           <v-chip color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
             {{ item.count }}
           </v-chip>
-          <v-menu>
-            <template v-slot:activator="{ props }">
-              <v-btn
-                icon="mdi-dots-vertical"
-                variant="text"
-                density="comfortable"
-                v-bind="props"
-                @click.stop
-              ></v-btn>
-            </template>
-            <v-list>
-              <v-list-item @click="emit('edit')">
-                <v-list-item-title>Edit</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="emit('delete')">
-                <v-list-item-title class="text-red">Delete</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
         </div>
       </template>
     </v-card-item>
@@ -117,9 +104,28 @@ const emptyDate = computed(() => {
             <span class="text-grey">Days remaining:</span>
             <span class="font-weight-medium">{{ daysRemaining !== null ? daysRemaining : 'N/A' }} days</span>
           </div>
-          <div class="d-flex justify-space-between">
+          <div class="d-flex justify-space-between mb-4">
             <span class="text-grey">Estimated empty date:</span>
             <span class="font-weight-medium">{{ emptyDate !== null ? emptyDate : 'N/A' }}</span>
+          </div>
+          
+          <div class="d-flex justify-end gap-2">
+            <v-btn
+              variant="text"
+              color="primary"
+              prepend-icon="mdi-pencil"
+              @click.stop="emit('edit')"
+            >
+              Edit
+            </v-btn>
+            <v-btn
+              variant="text"
+              color="error"
+              prepend-icon="mdi-delete"
+              @click.stop="emit('delete')"
+            >
+              Delete
+            </v-btn>
           </div>
         </v-card-text>
       </div>
@@ -128,4 +134,10 @@ const emptyDate = computed(() => {
 </template>
 
 <style scoped>
+.text-wrap {
+  white-space: normal !important;
+}
+.gap-2 {
+  gap: 8px;
+}
 </style>
