@@ -5,11 +5,13 @@ import { checkAndUpdateDailyDose } from '../utils/medUtils'
 import MedDialog from './MedDialog.vue'
 import NavDrawer from './NavDrawer.vue'
 import MedList from './MedList.vue'
+import WelcomeDialog from './WelcomeDialog.vue'
 
 const theme = useTheme()
 const drawer = ref(false)
 const dialog = ref(false)
 const editDialog = ref(false)
+const welcomeDialog = ref(false)
 const items = ref([])
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
@@ -39,7 +41,25 @@ onMounted(() => {
   if (savedTheme) {
     theme.global.name.value = savedTheme
   }
+
+  // Check for first run after installation
+  checkFirstRun()
 })
+
+const checkFirstRun = () => {
+  // Check if running in standalone mode (installed PWA)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone || 
+                       document.referrer.includes('android-app://');
+
+  if (isStandalone) {
+    const hasRunBefore = localStorage.getItem('pwa_first_run_completed')
+    if (!hasRunBefore) {
+      welcomeDialog.value = true
+      localStorage.setItem('pwa_first_run_completed', 'true')
+    }
+  }
+}
 
 // Watch for changes in items and save to localStorage
 watch(items, (newItems) => {
@@ -118,6 +138,9 @@ const saveEdit = (med) => {
     confirm-text="Save"
     @confirm="saveEdit"
   />
+
+  <!-- Welcome Dialog -->
+  <WelcomeDialog v-model="welcomeDialog" />
 </template>
 
 <style scoped>
