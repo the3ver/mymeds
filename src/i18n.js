@@ -9,7 +9,10 @@ const messages = {
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
       about: 'About',
-      noMeds: 'No meds added yet'
+      noMeds: 'No meds added yet',
+      displayMode: 'Display Mode',
+      showPills: 'Show Pills',
+      showDays: 'Show Days'
     },
     med: {
       name: 'Name',
@@ -21,7 +24,9 @@ const messages = {
       plan: 'Plan',
       daysRemaining: 'Days remaining',
       emptyDate: 'Estimated empty date',
-      na: 'N/A'
+      na: 'N/A',
+      unitPills: 'pcs',
+      unitDays: 'd'
     },
     dialog: {
       addTitle: 'Add New Med',
@@ -57,7 +62,10 @@ const messages = {
       lightMode: 'Heller Modus',
       darkMode: 'Dunkler Modus',
       about: 'Über',
-      noMeds: 'Noch keine Medikamente hinzugefügt'
+      noMeds: 'Noch keine Medikamente hinzugefügt',
+      displayMode: 'Anzeigemodus',
+      showPills: 'Tabletten anzeigen',
+      showDays: 'Tage anzeigen'
     },
     med: {
       name: 'Name',
@@ -69,7 +77,9 @@ const messages = {
       plan: 'Plan',
       daysRemaining: 'Verbleibende Tage',
       emptyDate: 'Voraussichtlich leer am',
-      na: 'n.v.'
+      na: 'n.v.',
+      unitPills: 'Stk.',
+      unitDays: 't'
     },
     dialog: {
       addTitle: 'Neues Medikament',

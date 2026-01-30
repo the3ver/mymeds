@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parseDose } from '../utils/medUtils'
 
@@ -14,6 +14,23 @@ const emit = defineEmits(['edit', 'delete'])
 const { t } = useI18n()
 
 const isExpanded = ref(false)
+const displayMode = ref('pills') // 'pills' or 'days'
+
+const updateDisplayMode = () => {
+  const savedMode = localStorage.getItem('myMedsDisplayMode')
+  if (savedMode) {
+    displayMode.value = savedMode
+  }
+}
+
+onMounted(() => {
+  updateDisplayMode()
+  window.addEventListener('storage-display-mode-changed', updateDisplayMode)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage-display-mode-changed', updateDisplayMode)
+})
 
 const dailyDoseTotal = computed(() => {
   return parseDose(props.item.dose)
@@ -88,7 +105,12 @@ const emptyDate = computed(() => {
       <template v-slot:append>
         <div class="d-flex align-center pl-2">
           <v-chip color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
-            {{ item.count }}
+            <template v-if="displayMode === 'pills'">
+              {{ item.count }} {{ t('med.unitPills') }}
+            </template>
+            <template v-else>
+              {{ daysRemaining !== null ? daysRemaining : '-' }} {{ t('med.unitDays') }}
+            </template>
           </v-chip>
         </div>
       </template>
@@ -97,7 +119,7 @@ const emptyDate = computed(() => {
     <v-expand-transition>
       <div v-if="isExpanded">
         <v-divider></v-divider>
-        <v-card-text>
+        <v-card-text class="text-body-1">
           <div class="d-flex justify-space-between mb-2">
             <span class="text-grey">{{ t('med.dose') }}:</span>
             <span class="font-weight-medium">{{ dailyDoseTotal }}</span>
