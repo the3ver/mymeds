@@ -13,11 +13,17 @@ const theme = useTheme()
 const { t, locale } = useI18n()
 const aboutDialog = ref(false)
 const displayMode = ref('pills') // 'pills' or 'days'
+const sortMode = ref('added') // 'added', 'name', 'days'
 
 onMounted(() => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
   if (savedMode) {
     displayMode.value = savedMode
+  }
+  
+  const savedSort = localStorage.getItem('myMedsSortMode')
+  if (savedSort) {
+    sortMode.value = savedSort
   }
 })
 
@@ -35,8 +41,22 @@ const toggleLanguage = () => {
 const toggleDisplayMode = () => {
   displayMode.value = displayMode.value === 'pills' ? 'days' : 'pills'
   localStorage.setItem('myMedsDisplayMode', displayMode.value)
-  // Dispatch a custom event so other components can react immediately
   window.dispatchEvent(new Event('storage-display-mode-changed'))
+}
+
+const cycleSortMode = () => {
+  if (sortMode.value === 'added') sortMode.value = 'name'
+  else if (sortMode.value === 'name') sortMode.value = 'days'
+  else sortMode.value = 'added'
+  
+  localStorage.setItem('myMedsSortMode', sortMode.value)
+  window.dispatchEvent(new Event('storage-sort-mode-changed'))
+}
+
+const getSortModeLabel = () => {
+  if (sortMode.value === 'added') return t('app.sortAdded')
+  if (sortMode.value === 'name') return t('app.sortName')
+  return t('app.sortDays')
 }
 </script>
 
@@ -75,6 +95,16 @@ const toggleDisplayMode = () => {
         <v-list-item-title>
           {{ displayMode === 'pills' ? t('app.showDays') : t('app.showPills') }}
         </v-list-item-title>
+      </v-list-item>
+
+      <v-list-item @click="cycleSortMode">
+        <template v-slot:prepend>
+          <v-icon>mdi-sort</v-icon>
+        </template>
+        <v-list-item-title>
+          {{ getSortModeLabel() }}
+        </v-list-item-title>
+        <v-list-item-subtitle>{{ t('app.sortMode') }}</v-list-item-subtitle>
       </v-list-item>
 
       <v-list-item @click="aboutDialog = true">

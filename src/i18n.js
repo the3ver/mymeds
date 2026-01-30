@@ -12,7 +12,11 @@ const messages = {
       noMeds: 'No meds added yet',
       displayMode: 'Display Mode',
       showPills: 'Show Pills',
-      showDays: 'Show Days'
+      showDays: 'Show Days',
+      sortMode: 'Sort Order',
+      sortAdded: 'Added Date',
+      sortName: 'Name (A-Z)',
+      sortDays: 'Days Remaining'
     },
     med: {
       name: 'Name',
@@ -65,7 +69,11 @@ const messages = {
       noMeds: 'Noch keine Medikamente hinzugefügt',
       displayMode: 'Anzeigemodus',
       showPills: 'Tabletten anzeigen',
-      showDays: 'Tage anzeigen'
+      showDays: 'Tage anzeigen',
+      sortMode: 'Sortierung',
+      sortAdded: 'Hinzugefügt',
+      sortName: 'Name (A-Z)',
+      sortDays: 'Verbleibende Tage'
     },
     med: {
       name: 'Name',
