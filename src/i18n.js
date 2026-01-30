@@ -16,7 +16,11 @@ const messages = {
       sortMode: 'Sort Order',
       sortAdded: 'Added Date',
       sortName: 'Name (A-Z)',
-      sortDays: 'Days Remaining'
+      sortDays: 'Days Remaining',
+      uiScale: 'UI Size',
+      scaleSmall: 'Small',
+      scaleNormal: 'Normal',
+      scaleLarge: 'Large'
     },
     med: {
       name: 'Name',
@@ -73,7 +77,11 @@ const messages = {
       sortMode: 'Sortierung',
       sortAdded: 'Hinzugefügt',
       sortName: 'Name (A-Z)',
-      sortDays: 'Verbleibende Tage'
+      sortDays: 'Verbleibende Tage',
+      uiScale: 'Darstellungsgröße',
+      scaleSmall: 'Klein',
+      scaleNormal: 'Normal',
+      scaleLarge: 'Groß'
     },
     med: {
       name: 'Name',

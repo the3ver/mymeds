@@ -14,6 +14,7 @@ const { t, locale } = useI18n()
 const aboutDialog = ref(false)
 const displayMode = ref('pills') // 'pills' or 'days'
 const sortMode = ref('added') // 'added', 'name', 'days'
+const uiScale = ref('normal') // 'small', 'normal', 'large'
 
 onMounted(() => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -24,6 +25,12 @@ onMounted(() => {
   const savedSort = localStorage.getItem('myMedsSortMode')
   if (savedSort) {
     sortMode.value = savedSort
+  }
+
+  const savedScale = localStorage.getItem('myMedsUiScale')
+  if (savedScale) {
+    uiScale.value = savedScale
+    applyScale(savedScale)
   }
 })
 
@@ -53,10 +60,32 @@ const cycleSortMode = () => {
   window.dispatchEvent(new Event('storage-sort-mode-changed'))
 }
 
+const cycleUiScale = () => {
+  if (uiScale.value === 'small') uiScale.value = 'normal'
+  else if (uiScale.value === 'normal') uiScale.value = 'large'
+  else uiScale.value = 'small'
+  
+  localStorage.setItem('myMedsUiScale', uiScale.value)
+  applyScale(uiScale.value)
+}
+
+const applyScale = (scale) => {
+  const root = document.documentElement
+  if (scale === 'small') root.style.fontSize = '14px'
+  else if (scale === 'large') root.style.fontSize = '18px'
+  else root.style.fontSize = '16px' // normal
+}
+
 const getSortModeLabel = () => {
   if (sortMode.value === 'added') return t('app.sortAdded')
   if (sortMode.value === 'name') return t('app.sortName')
   return t('app.sortDays')
+}
+
+const getUiScaleLabel = () => {
+  if (uiScale.value === 'small') return t('app.scaleSmall')
+  if (uiScale.value === 'large') return t('app.scaleLarge')
+  return t('app.scaleNormal')
 }
 </script>
 
@@ -105,6 +134,16 @@ const getSortModeLabel = () => {
           {{ getSortModeLabel() }}
         </v-list-item-title>
         <v-list-item-subtitle>{{ t('app.sortMode') }}</v-list-item-subtitle>
+      </v-list-item>
+
+      <v-list-item @click="cycleUiScale">
+        <template v-slot:prepend>
+          <v-icon>mdi-format-size</v-icon>
+        </template>
+        <v-list-item-title>
+          {{ getUiScaleLabel() }}
+        </v-list-item-title>
+        <v-list-item-subtitle>{{ t('app.uiScale') }}</v-list-item-subtitle>
       </v-list-item>
 
       <v-list-item @click="aboutDialog = true">
