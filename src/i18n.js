@@ -9,6 +9,7 @@ const messages = {
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
       about: 'About',
+      help: 'Help / Manual',
       noMeds: 'No meds added yet',
       displayMode: 'Display Mode',
       showPills: 'Show Pills',
@@ -74,6 +75,33 @@ const messages = {
       github: 'GitHub Repository',
       license: 'License',
       close: 'Close'
+    },
+    help: {
+      title: 'User Manual',
+      intro: 'Welcome to the MyMeds User Manual. Here you can find information on how to use the app.',
+      sections: {
+        basics: {
+          title: 'Basics',
+          content: 'MyMeds helps you keep track of your medication stock. The app works offline and saves all data locally on your device.'
+        },
+        adding: {
+          title: 'Adding Medications',
+          content: 'Click the "+" button at the bottom right to add a new medication. Enter the name, current stock, and your daily dose.'
+        },
+        dose: {
+          title: 'Daily Dose',
+          content: 'You can enter the daily dose as a single number (e.g. "1") or as a schedule (Morning-Noon-Evening-Night, e.g. "1-0-1-0"). The app automatically calculates the total daily consumption.'
+        },
+        tracking: {
+          title: 'Automatic Tracking',
+          content: 'Every day you open the app, the daily dose is automatically deducted from the stock. You don\'t need to do anything manually.'
+        },
+        warnings: {
+          title: 'Warnings',
+          content: 'The app warns you when your stock is running low. You can customize the warning limits (yellow and red) in the settings.'
+        }
+      },
+      close: 'Close'
     }
   },
   de: {
@@ -84,6 +112,7 @@ const messages = {
       lightMode: 'Heller Modus',
       darkMode: 'Dunkler Modus',
       about: 'Über',
+      help: 'Hilfe / Handbuch',
       noMeds: 'Noch keine Medikamente hinzugefügt',
       displayMode: 'Anzeigemodus',
       showPills: 'Tabletten anzeigen',
@@ -148,6 +177,33 @@ const messages = {
       changelog: 'Änderungsprotokoll',
       github: 'GitHub Repository',
       license: 'Lizenz',
+      close: 'Schließen'
+    },
+    help: {
+      title: 'Benutzerhandbuch',
+      intro: 'Willkommen im MyMeds Benutzerhandbuch. Hier findest du Informationen zur Bedienung der App.',
+      sections: {
+        basics: {
+          title: 'Grundlagen',
+          content: 'MyMeds hilft dir, deinen Medikamentenvorrat im Blick zu behalten. Die App funktioniert offline und speichert alle Daten lokal auf deinem Gerät.'
+        },
+        adding: {
+          title: 'Medikamente hinzufügen',
+          content: 'Klicke auf den "+" Button unten rechts, um ein neues Medikament hinzuzufügen. Gib den Namen, den aktuellen Bestand und deine Tagesdosis ein.'
+        },
+        dose: {
+          title: 'Tagesdosis',
+          content: 'Du kannst die Tagesdosis als einzelne Zahl (z.B. "1") oder als Einnahmeplan (Morgens-Mittags-Abends-Nachts, z.B. "1-0-1-0") eingeben. Die App berechnet automatisch den täglichen Gesamtverbrauch.'
+        },
+        tracking: {
+          title: 'Automatische Verfolgung',
+          content: 'Jeden Tag, an dem du die App öffnest, wird automatisch die Tagesdosis vom Bestand abgezogen. Du musst nichts manuell austragen.'
+        },
+        warnings: {
+          title: 'Warnungen',
+          content: 'Die App warnt dich, wenn dein Vorrat zur Neige geht. Die Warngrenzen (gelb und rot) kannst du in den Einstellungen anpassen.'
+        }
+      },
       close: 'Schließen'
     }
   }

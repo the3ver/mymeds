@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
+import packageJson from '../../package.json'
+import HelpDialog from './HelpDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean
@@ -12,12 +14,14 @@ const emit = defineEmits(['update:modelValue'])
 const theme = useTheme()
 const { t, locale } = useI18n()
 const aboutDialog = ref(false)
+const helpDialog = ref(false)
 const displayMode = ref('pills') // 'pills', 'days', 'packages'
 const sortMode = ref('added') // 'added', 'name', 'days'
 const uiScale = ref('normal') // 'small', 'normal', 'large'
 const yellowLimit = ref(21)
 const redLimit = ref(7)
 const showOverview = ref(true)
+const appVersion = packageJson.version
 
 onMounted(() => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -232,6 +236,13 @@ const getDisplayModeIcon = () => {
 
       <v-divider></v-divider>
 
+      <v-list-item @click="helpDialog = true">
+        <template v-slot:prepend>
+          <v-icon>mdi-help-circle-outline</v-icon>
+        </template>
+        <v-list-item-title>{{ t('app.help') }}</v-list-item-title>
+      </v-list-item>
+
       <v-list-item @click="aboutDialog = true">
         <template v-slot:prepend>
           <v-icon>mdi-information</v-icon>
@@ -240,6 +251,9 @@ const getDisplayModeIcon = () => {
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
+
+  <!-- Help Dialog -->
+  <HelpDialog v-model="helpDialog" />
 
   <!-- About Dialog -->
   <v-dialog v-model="aboutDialog" max-width="500px">
@@ -253,7 +267,7 @@ const getDisplayModeIcon = () => {
           <v-list-item
             prepend-icon="mdi-tag-text-outline"
             :title="t('about.version')"
-            :subtitle="'__APP_VERSION__'"
+            :subtitle="appVersion"
           >
             <template v-slot:append>
               <v-btn
