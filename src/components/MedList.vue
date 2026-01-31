@@ -15,16 +15,12 @@ const emit = defineEmits(['edit', 'delete'])
 const { t, locale } = useI18n()
 
 const sortMode = ref('added')
-const showOverview = ref(true)
 const yellowLimit = ref(21)
 const redLimit = ref(7)
 
 const updateSettings = () => {
   const savedSort = localStorage.getItem('myMedsSortMode')
   if (savedSort) sortMode.value = savedSort
-
-  const savedOverview = localStorage.getItem('myMedsShowOverview')
-  if (savedOverview !== null) showOverview.value = savedOverview === 'true'
 
   const savedYellow = localStorage.getItem('myMedsYellowLimit')
   if (savedYellow) yellowLimit.value = parseInt(savedYellow)
@@ -36,13 +32,11 @@ const updateSettings = () => {
 onMounted(() => {
   updateSettings()
   window.addEventListener('storage-sort-mode-changed', updateSettings)
-  window.addEventListener('storage-overview-changed', updateSettings)
   window.addEventListener('storage-limits-changed', updateSettings)
 })
 
 onUnmounted(() => {
   window.removeEventListener('storage-sort-mode-changed', updateSettings)
-  window.removeEventListener('storage-overview-changed', updateSettings)
   window.removeEventListener('storage-limits-changed', updateSettings)
 })
 
@@ -111,7 +105,7 @@ const overviewData = computed(() => {
 <template>
   <div v-if="items.length > 0">
     <v-card 
-      v-if="showOverview && overviewData" 
+      v-if="overviewData" 
       class="mb-4" 
       :color="overviewData.status || 'success'"
       variant="tonal" 
