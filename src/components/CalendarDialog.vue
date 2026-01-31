@@ -17,7 +17,7 @@ const close = () => {
 
 const createEvent = () => {
   const title = t('app.calendarTitle')
-  const appUrl = window.location.href
+  const appUrl = 'https://the3ver.github.io/mymeds/'
   const description = `${t('app.calendarDesc')}\n\n${appUrl}`
   
   createCalendarEvent(title, description, props.rawDate, appUrl)
