@@ -29,7 +29,9 @@ const messages = {
       notification: 'Attention: {name} lasts only {days} days!',
       showOverview: 'Show Overview Card',
       overviewText: 'Meds last until {date}',
-      overviewTextCritical: 'Meds last only {days} days until {date}'
+      overviewTextCritical: 'Meds last only {days} days until {date}',
+      reset: 'Reset Settings',
+      resetConfirm: 'Are you sure you want to reset all settings to default?'
     },
     med: {
       name: 'Name',
@@ -54,7 +56,8 @@ const messages = {
       save: 'Save',
       cancel: 'Cancel',
       edit: 'Edit',
-      delete: 'Delete'
+      delete: 'Delete',
+      confirm: 'Confirm'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -121,7 +124,7 @@ const messages = {
       about: 'Über',
       help: 'Hilfe / Handbuch',
       noMeds: 'Noch keine Medikamente hinzugefügt',
-      displayMode: 'Anzeigemodus',
+      displayMode: 'Restanzeige',
       showPills: 'Tabletten anzeigen',
       showDays: 'Tage anzeigen',
       showPackages: 'Packungen anzeigen',
@@ -139,7 +142,9 @@ const messages = {
       notification: 'Achtung: {name} hält noch {days} Tage!',
       showOverview: 'Übersichtskarte anzeigen',
       overviewText: 'Meds reichen bis {date}',
-      overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}'
+      overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}',
+      reset: 'Einstellungen zurücksetzen',
+      resetConfirm: 'Möchtest du wirklich alle Einstellungen auf Standard zurücksetzen?'
     },
     med: {
       name: 'Name',
@@ -164,7 +169,8 @@ const messages = {
       save: 'Speichern',
       cancel: 'Abbrechen',
       edit: 'Bearbeiten',
-      delete: 'Löschen'
+      delete: 'Löschen',
+      confirm: 'Bestätigen'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',

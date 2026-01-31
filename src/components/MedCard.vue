@@ -123,20 +123,28 @@ const statusColor = computed(() => {
         <div class="d-flex align-center pl-2">
           <div v-if="displayMode === 'packages'" class="d-flex align-center gap-1">
             <template v-if="item.packageSize && item.packageSize > 0">
-              <v-icon 
+              <div 
                 v-for="n in Math.min(fullPackages, 5)" 
-                :key="n" 
-                icon="mdi-package-variant-closed" 
-                color="primary"
-                size="small"
-              ></v-icon>
-              <v-icon 
+                :key="n"
+                class="package-icon-wrapper"
+              >
+                <v-icon 
+                  icon="mdi-package-variant-closed" 
+                  color="primary"
+                  size="small"
+                ></v-icon>
+              </div>
+              <div 
                 v-if="hasPartialPackage && fullPackages < 5" 
-                icon="mdi-package-variant" 
-                color="primary"
-                size="small"
+                class="package-icon-wrapper"
                 style="opacity: 0.7;"
-              ></v-icon>
+              >
+                <v-icon 
+                  icon="mdi-package-variant" 
+                  color="primary"
+                  size="small"
+                ></v-icon>
+              </div>
               <span v-if="fullPackages >= 5" class="text-caption font-weight-bold ml-1">+{{ Math.floor(packagesRemaining) - 4 }}</span>
             </template>
             <span v-else class="text-caption text-grey">-</span>
@@ -217,5 +225,14 @@ const statusColor = computed(() => {
 }
 .gap-1 {
   gap: 4px;
+}
+.package-icon-wrapper {
+  background-color: rgba(var(--v-theme-primary), 0.1);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

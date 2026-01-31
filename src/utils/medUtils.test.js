@@ -53,7 +53,7 @@ describe('medUtils', () => {
       expect(result.newDate).toBe(today)
     })
 
-    it('should update counts if date is different', () => {
+    it('should update counts if date is different (1 day)', () => {
       const yesterday = new Date(Date.now() - 86400000).toDateString()
       const today = new Date().toDateString()
       
@@ -61,7 +61,7 @@ describe('medUtils', () => {
         { name: 'Med A', count: 10, dose: '1' },
         { name: 'Med B', count: 5, dose: '0.5' },
         { name: 'Med C', count: 2, dose: '1/4' },
-        { name: 'Med D', count: 10, dose: '1-0-1' } // New pattern test
+        { name: 'Med D', count: 10, dose: '1-0-1' }
       ]
       
       const result = checkAndUpdateDailyDose(items, yesterday)
@@ -73,6 +73,24 @@ describe('medUtils', () => {
       expect(result.updatedItems[1].count).toBe(4.5) // 5 - 0.5
       expect(result.updatedItems[2].count).toBe(1.75) // 2 - 0.25
       expect(result.updatedItems[3].count).toBe(8)    // 10 - 2 (1+0+1)
+    })
+
+    it('should update counts correctly for multiple days missed', () => {
+      const threeDaysAgo = new Date(Date.now() - (3 * 86400000)).toDateString()
+      const today = new Date().toDateString()
+      
+      const items = [
+        { name: 'Med A', count: 10, dose: '1' }, // Should deduct 3
+        { name: 'Med B', count: 5, dose: '2' }   // Should deduct 6 -> 0 (min)
+      ]
+      
+      const result = checkAndUpdateDailyDose(items, threeDaysAgo)
+      
+      expect(result.updated).toBe(true)
+      expect(result.newDate).toBe(today)
+      
+      expect(result.updatedItems[0].count).toBe(7) // 10 - 3*1
+      expect(result.updatedItems[1].count).toBe(0) // 5 - 3*2 = -1 -> 0
     })
 
     it('should not reduce count below zero', () => {

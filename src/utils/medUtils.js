@@ -29,23 +29,37 @@ const parseSingleDose = (val) => {
 
 // Check if a day has passed and update counts
 export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate = new Date()) => {
-  const today = currentDate.toDateString()
+  const todayStr = currentDate.toDateString()
 
-  if (lastUpdateDate !== today) {
-    const updatedItems = savedItems.map(item => {
-      const dose = parseDose(item.dose)
-      let newCount = parseFloat(item.count) - dose
-      // Ensure count doesn't go below 0
-      if (newCount < 0) newCount = 0
-      
-      // Format to max 2 decimal places to avoid floating point errors
-      return {
-        ...item,
-        count: Math.round(newCount * 100) / 100
-      }
-    })
+  if (lastUpdateDate !== todayStr) {
+    // Calculate days passed
+    const lastDate = new Date(lastUpdateDate)
+    const diffTime = Math.abs(currentDate - lastDate)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
     
-    return { updatedItems, newDate: today, updated: true }
+    // If diffDays is 0 (same day) or somehow negative/invalid, don't update
+    // But since we checked string equality first, diffDays should be at least 1 if dates differ
+    // However, to be safe and handle potential timezone edge cases or manual date manipulation:
+    // We only update if diffDays >= 1
+    
+    if (diffDays >= 1) {
+      const updatedItems = savedItems.map(item => {
+        const dose = parseDose(item.dose)
+        const totalDeduction = dose * diffDays
+        
+        let newCount = parseFloat(item.count) - totalDeduction
+        // Ensure count doesn't go below 0
+        if (newCount < 0) newCount = 0
+        
+        // Format to max 2 decimal places to avoid floating point errors
+        return {
+          ...item,
+          count: Math.round(newCount * 100) / 100
+        }
+      })
+      
+      return { updatedItems, newDate: todayStr, updated: true }
+    }
   }
   
   return { updatedItems: savedItems, newDate: lastUpdateDate, updated: false }
