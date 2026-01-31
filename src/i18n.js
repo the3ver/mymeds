@@ -102,6 +102,13 @@ const messages = {
         }
       },
       close: 'Close'
+    },
+    update: {
+      title: 'Update Available',
+      message: 'A new version of MyMeds has been installed.',
+      version: 'New Version:',
+      changelog: 'View Changelog',
+      close: 'Close'
     }
   },
   de: {
@@ -204,6 +211,13 @@ const messages = {
           content: 'Die App warnt dich, wenn dein Vorrat zur Neige geht. Die Warngrenzen (gelb und rot) kannst du in den Einstellungen anpassen.'
         }
       },
+      close: 'Schließen'
+    },
+    update: {
+      title: 'Update Verfügbar',
+      message: 'Eine neue Version von MyMeds wurde installiert.',
+      version: 'Neue Version:',
+      changelog: 'Änderungsprotokoll ansehen',
       close: 'Schließen'
     }
   }

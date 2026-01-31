@@ -7,6 +7,8 @@ import MedDialog from './MedDialog.vue'
 import NavDrawer from './NavDrawer.vue'
 import MedList from './MedList.vue'
 import WelcomeDialog from './WelcomeDialog.vue'
+import UpdateDialog from './UpdateDialog.vue'
+import packageJson from '../../package.json'
 
 const theme = useTheme()
 const { t } = useI18n()
@@ -14,6 +16,7 @@ const drawer = ref(false)
 const dialog = ref(false)
 const editDialog = ref(false)
 const welcomeDialog = ref(false)
+const updateDialog = ref(false)
 const items = ref([])
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
@@ -51,6 +54,9 @@ onMounted(() => {
 
   // Check for first run after installation
   checkFirstRun()
+  
+  // Check for updates
+  checkUpdate()
 })
 
 const checkWarnings = (meds) => {
@@ -95,6 +101,17 @@ const checkFirstRun = () => {
       localStorage.setItem('pwa_first_run_completed', 'true')
     }
   }
+}
+
+const checkUpdate = () => {
+  const lastVersion = localStorage.getItem('myMedsVersion')
+  const currentVersion = packageJson.version
+  
+  if (lastVersion && lastVersion !== currentVersion) {
+    updateDialog.value = true
+  }
+  
+  localStorage.setItem('myMedsVersion', currentVersion)
 }
 
 // Watch for changes in items and save to localStorage
@@ -177,6 +194,9 @@ const saveEdit = (med) => {
 
   <!-- Welcome Dialog -->
   <WelcomeDialog v-model="welcomeDialog" />
+
+  <!-- Update Dialog -->
+  <UpdateDialog v-model="updateDialog" />
 
   <!-- Notification Snackbar -->
   <v-snackbar
