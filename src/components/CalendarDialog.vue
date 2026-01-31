@@ -17,11 +17,10 @@ const close = () => {
 
 const createEvent = () => {
   const title = t('app.calendarTitle')
-  // Add link to app in description
   const appUrl = window.location.href
   const description = `${t('app.calendarDesc')}\n\n${appUrl}`
   
-  createCalendarEvent(title, description, props.rawDate)
+  createCalendarEvent(title, description, props.rawDate, appUrl)
   close()
 }
 </script>

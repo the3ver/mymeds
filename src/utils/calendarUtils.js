@@ -1,4 +1,4 @@
-export function createCalendarEvent(title, description, date) {
+export function createCalendarEvent(title, description, date, url) {
   // Format date to YYYYMMDD
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -17,9 +17,10 @@ export function createCalendarEvent(title, description, date) {
     `DTSTART;VALUE=DATE:${dateFormatted}`, // All day event
     `SUMMARY:${title}`,
     `DESCRIPTION:${description}`,
+    url ? `URL:${url}` : '',
     'END:VEVENT',
     'END:VCALENDAR'
-  ].join('\r\n')
+  ].filter(Boolean).join('\r\n')
 
   const file = new File([icsContent], 'mymeds_reminder.ics', { type: 'text/calendar' })
 
