@@ -23,14 +23,8 @@ export function createCalendarEvent(title, description, date) {
 
   const file = new File([icsContent], 'mymeds_reminder.ics', { type: 'text/calendar' })
 
-  // Try native sharing (mobile), fallback to download (desktop)
-  if (navigator.canShare && navigator.share) {
-    navigator.share({
-      files: [file],
-      title: title,
-      text: description
-    }).catch(console.error)
-  } else {
+  // Helper function for download fallback
+  const downloadFile = () => {
     const url = URL.createObjectURL(file)
     const anchor = document.createElement('a')
     anchor.href = url
@@ -39,5 +33,27 @@ export function createCalendarEvent(title, description, date) {
     anchor.click()
     document.body.removeChild(anchor)
     URL.revokeObjectURL(url)
+  }
+
+  // Try native sharing (mobile)
+  if (navigator.canShare && navigator.share) {
+    const shareData = {
+      files: [file],
+      title: title,
+      text: description
+    }
+    
+    if (navigator.canShare(shareData)) {
+      navigator.share(shareData).catch((err) => {
+        console.error('Share failed:', err)
+        // Fallback to download if share fails (e.g. user cancelled or not supported)
+        downloadFile()
+      })
+    } else {
+      downloadFile()
+    }
+  } else {
+    // Fallback for Desktop or browsers without share API
+    downloadFile()
   }
 }
