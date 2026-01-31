@@ -32,7 +32,10 @@ const messages = {
       overviewTextCritical: 'Meds last only {days} days until {date}',
       reset: 'Reset Settings',
       resetConfirm: 'Are you sure you want to reset all settings to default?',
-      addMed: 'Add Medication'
+      addMed: 'Add Medication',
+      calendar: 'Calendar Reminder',
+      calendarTitle: 'Meds are running low!',
+      calendarDesc: 'Your meds are running low, click here to check.'
     },
     med: {
       name: 'Name',
@@ -58,7 +61,8 @@ const messages = {
       cancel: 'Cancel',
       edit: 'Edit',
       delete: 'Delete',
-      confirm: 'Confirm'
+      confirm: 'Confirm',
+      create: 'Create'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -113,6 +117,11 @@ const messages = {
       version: 'New Version:',
       changelog: 'View Changelog',
       close: 'Close'
+    },
+    calendar: {
+      title: 'Create Calendar Reminder',
+      message: 'This will create a calendar event for {date} to remind you to restock your meds.',
+      close: 'Cancel'
     }
   },
   de: {
@@ -146,7 +155,10 @@ const messages = {
       overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}',
       reset: 'Einstellungen zurücksetzen',
       resetConfirm: 'Möchtest du wirklich alle Einstellungen auf Standard zurücksetzen?',
-      addMed: 'Medikament hinzufügen'
+      addMed: 'Medikament hinzufügen',
+      calendar: 'Kalender-Erinnerung',
+      calendarTitle: 'Meds sind bald alle!',
+      calendarDesc: 'Deine Meds gehen zur Neige, klicke hier um nachzusehen.'
     },
     med: {
       name: 'Name',
@@ -172,7 +184,8 @@ const messages = {
       cancel: 'Abbrechen',
       edit: 'Bearbeiten',
       delete: 'Löschen',
-      confirm: 'Bestätigen'
+      confirm: 'Bestätigen',
+      create: 'Erstellen'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',
@@ -227,6 +240,11 @@ const messages = {
       version: 'Neue Version:',
       changelog: 'Änderungsprotokoll ansehen',
       close: 'Schließen'
+    },
+    calendar: {
+      title: 'Kalender-Erinnerung erstellen',
+      message: 'Dies erstellt einen Kalendereintrag für den {date}, um dich an das Nachbestellen zu erinnern.',
+      close: 'Abbrechen'
     }
   }
 }

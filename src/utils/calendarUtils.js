@@ -6,12 +6,13 @@ export function createCalendarEvent(title, description, date) {
   const dateFormatted = `${year}${month}${day}`
 
   // Create ICS content
+  // Using a fixed UID allows calendar apps to identify this as an update to an existing event
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//MyMeds//NONSGML v1.0//EN',
     'BEGIN:VEVENT',
-    `UID:${Date.now()}@mymeds.app`,
+    `UID:restock-reminder@mymeds.app`,
     `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
     `DTSTART;VALUE=DATE:${dateFormatted}`, // All day event
     `SUMMARY:${title}`,

@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MedCard from './MedCard.vue'
+import CalendarDialog from './CalendarDialog.vue'
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils'
 
 const props = defineProps({
@@ -17,6 +18,7 @@ const { t, locale } = useI18n()
 const sortMode = ref('added')
 const yellowLimit = ref(21)
 const redLimit = ref(7)
+const calendarDialog = ref(false)
 
 const updateSettings = () => {
   const savedSort = localStorage.getItem('myMedsSortMode')
@@ -97,8 +99,45 @@ const overviewData = computed(() => {
     date: formattedDate,
     days: minDays,
     status: status,
-    isCritical: status !== null
+    isCritical: status !== null,
+    rawDate: date
   }
+})
+
+const calendarDate = computed(() => {
+  if (!overviewData.value) return null
+  
+  // Calculate date for yellow limit warning
+  // If we are already below yellow limit, use tomorrow
+  // Otherwise use the date when we hit the yellow limit
+  
+  // Actually, the requirement says: "Termin sollte zum Datum eingestellt werden das der gelben Warnstufe entspeicht"
+  // This means: Date when meds run out MINUS yellow limit days?
+  // Or simply the date when meds run out?
+  // Usually a reminder is set BEFORE it runs out.
+  // Let's set it to (Empty Date - Yellow Limit Days)
+  // But if that date is in the past, set it to tomorrow.
+  
+  const emptyDate = new Date(overviewData.value.rawDate)
+  const reminderDate = new Date(emptyDate)
+  reminderDate.setDate(reminderDate.getDate() - yellowLimit.value)
+  
+  const now = new Date()
+  if (reminderDate < now) {
+    // If reminder would be in the past, set it to tomorrow 9:00 AM
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(9, 0, 0, 0)
+    return tomorrow
+  }
+  
+  return reminderDate
+})
+
+const calendarDateFormatted = computed(() => {
+  if (!calendarDate.value) return ''
+  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
+  return calendarDate.value.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 })
 </script>
 
@@ -111,8 +150,16 @@ const overviewData = computed(() => {
       variant="tonal" 
       density="compact"
     >
-      <v-card-text class="text-center font-weight-bold py-2 d-flex align-center justify-center">
-        {{ overviewData.isCritical ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }) : t('app.overviewText', { date: overviewData.date }) }}
+      <v-card-text class="d-flex align-center justify-space-between py-1 pr-1">
+        <div class="text-center font-weight-bold flex-grow-1">
+          {{ overviewData.isCritical ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }) : t('app.overviewText', { date: overviewData.date }) }}
+        </div>
+        <v-btn
+          icon="mdi-calendar-plus"
+          variant="text"
+          density="compact"
+          @click="calendarDialog = true"
+        ></v-btn>
       </v-card-text>
     </v-card>
 
@@ -122,6 +169,13 @@ const overviewData = computed(() => {
       :item="item"
       @edit="emit('edit', item.originalIndex)"
       @delete="emit('delete', item.originalIndex)"
+    />
+    
+    <CalendarDialog 
+      v-if="overviewData"
+      v-model="calendarDialog" 
+      :date="calendarDateFormatted"
+      :raw-date="calendarDate"
     />
   </div>
   <div v-else class="text-center mt-10 text-grey">
