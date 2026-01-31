@@ -57,21 +57,27 @@ const checkWarnings = (meds) => {
   const yellowLimit = parseInt(localStorage.getItem('myMedsYellowLimit') || '21')
   const redLimit = parseInt(localStorage.getItem('myMedsRedLimit') || '7')
   
-  let mostCriticalMed = null
+  // Use the larger limit to catch all warnings
+  const warningLimit = Math.max(yellowLimit, redLimit)
+  
+  let criticalMeds = []
   let minDays = Infinity
   
   for (const med of meds) {
     const days = calculateDaysRemaining(med)
-    if (days !== null && days <= yellowLimit) {
+    if (days !== null && days <= warningLimit) {
       if (days < minDays) {
         minDays = days
-        mostCriticalMed = med
+        criticalMeds = [med.name]
+      } else if (days === minDays) {
+        criticalMeds.push(med.name)
       }
     }
   }
   
-  if (mostCriticalMed) {
-    snackbarText.value = t('app.notification', { name: mostCriticalMed.name, days: minDays })
+  if (criticalMeds.length > 0) {
+    const names = criticalMeds.join(', ')
+    snackbarText.value = t('app.notification', { name: names, days: minDays })
     snackbar.value = true
   }
 }
