@@ -15,6 +15,8 @@ const aboutDialog = ref(false)
 const displayMode = ref('pills') // 'pills', 'days', 'packages'
 const sortMode = ref('added') // 'added', 'name', 'days'
 const uiScale = ref('normal') // 'small', 'normal', 'large'
+const yellowLimit = ref(21)
+const redLimit = ref(7)
 
 onMounted(() => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -32,6 +34,12 @@ onMounted(() => {
     uiScale.value = savedScale
     applyScale(savedScale)
   }
+
+  const savedYellow = localStorage.getItem('myMedsYellowLimit')
+  if (savedYellow) yellowLimit.value = parseInt(savedYellow)
+
+  const savedRed = localStorage.getItem('myMedsRedLimit')
+  if (savedRed) redLimit.value = parseInt(savedRed)
 })
 
 const toggleTheme = () => {
@@ -45,7 +53,7 @@ const toggleLanguage = () => {
   localStorage.setItem('myMedsLocale', newLang)
 }
 
-const cycleDisplayMode = () => {
+const toggleDisplayMode = () => {
   if (displayMode.value === 'pills') displayMode.value = 'days'
   else if (displayMode.value === 'days') displayMode.value = 'packages'
   else displayMode.value = 'pills'
@@ -77,6 +85,12 @@ const applyScale = (scale) => {
   if (scale === 'small') root.style.fontSize = '14px'
   else if (scale === 'large') root.style.fontSize = '18px'
   else root.style.fontSize = '16px' // normal
+}
+
+const updateLimits = () => {
+  localStorage.setItem('myMedsYellowLimit', yellowLimit.value)
+  localStorage.setItem('myMedsRedLimit', redLimit.value)
+  window.dispatchEvent(new Event('storage-limits-changed'))
 }
 
 const getSortModeLabel = () => {
@@ -132,7 +146,7 @@ const getDisplayModeIcon = () => {
         </v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="cycleDisplayMode">
+      <v-list-item @click="toggleDisplayMode">
         <template v-slot:prepend>
           <v-icon>{{ getDisplayModeIcon() }}</v-icon>
         </template>
@@ -161,6 +175,35 @@ const getDisplayModeIcon = () => {
         </v-list-item-title>
         <v-list-item-subtitle>{{ t('app.uiScale') }}</v-list-item-subtitle>
       </v-list-item>
+
+      <v-divider></v-divider>
+      <v-list-subheader>{{ t('app.limits') }}</v-list-subheader>
+      
+      <v-list-item>
+        <v-text-field
+          v-model="yellowLimit"
+          :label="t('app.yellowLimit')"
+          type="number"
+          density="compact"
+          variant="underlined"
+          hide-details
+          @update:model-value="updateLimits"
+        ></v-text-field>
+      </v-list-item>
+      
+      <v-list-item>
+        <v-text-field
+          v-model="redLimit"
+          :label="t('app.redLimit')"
+          type="number"
+          density="compact"
+          variant="underlined"
+          hide-details
+          @update:model-value="updateLimits"
+        ></v-text-field>
+      </v-list-item>
+
+      <v-divider></v-divider>
 
       <v-list-item @click="aboutDialog = true">
         <template v-slot:prepend>

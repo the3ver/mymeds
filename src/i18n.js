@@ -21,7 +21,11 @@ const messages = {
       uiScale: 'UI Size',
       scaleSmall: 'Small',
       scaleNormal: 'Normal',
-      scaleLarge: 'Large'
+      scaleLarge: 'Large',
+      limits: 'Warning Limits',
+      yellowLimit: 'Yellow Limit (Days)',
+      redLimit: 'Red Limit (Days)',
+      notification: 'Attention: {name} lasts only {days} days!'
     },
     med: {
       name: 'Name',
@@ -85,7 +89,11 @@ const messages = {
       uiScale: 'Darstellungsgröße',
       scaleSmall: 'Klein',
       scaleNormal: 'Normal',
-      scaleLarge: 'Groß'
+      scaleLarge: 'Groß',
+      limits: 'Warngrenzen',
+      yellowLimit: 'Gelbe Grenze (Tage)',
+      redLimit: 'Rote Grenze (Tage)',
+      notification: 'Achtung: {name} hält noch {days} Tage!'
     },
     med: {
       name: 'Name',

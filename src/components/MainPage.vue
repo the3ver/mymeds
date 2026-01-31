@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
-import { checkAndUpdateDailyDose } from '../utils/medUtils'
+import { checkAndUpdateDailyDose, calculateDaysRemaining } from '../utils/medUtils'
 import MedDialog from './MedDialog.vue'
 import NavDrawer from './NavDrawer.vue'
 import MedList from './MedList.vue'
@@ -17,6 +17,8 @@ const welcomeDialog = ref(false)
 const items = ref([])
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
+const snackbar = ref(false)
+const snackbarText = ref('')
 
 // Load items from localStorage on mount
 onMounted(() => {
@@ -33,6 +35,9 @@ onMounted(() => {
     }
     
     items.value = result.updatedItems
+    
+    // Check for warnings
+    checkWarnings(items.value)
   } else {
     // Initialize last update date if no items exist yet
     localStorage.setItem('lastDoseUpdate', new Date().toDateString())
@@ -47,6 +52,35 @@ onMounted(() => {
   // Check for first run after installation
   checkFirstRun()
 })
+
+const checkWarnings = (meds) => {
+  const yellowLimit = parseInt(localStorage.getItem('myMedsYellowLimit') || '21')
+  const redLimit = parseInt(localStorage.getItem('myMedsRedLimit') || '7')
+  
+  // Use the larger limit to catch all warnings
+  const warningLimit = Math.max(yellowLimit, redLimit)
+  
+  let criticalMeds = []
+  let minDays = Infinity
+  
+  for (const med of meds) {
+    const days = calculateDaysRemaining(med)
+    if (days !== null && days <= warningLimit) {
+      if (days < minDays) {
+        minDays = days
+        criticalMeds = [med.name]
+      } else if (days === minDays) {
+        criticalMeds.push(med.name)
+      }
+    }
+  }
+  
+  if (criticalMeds.length > 0) {
+    const names = criticalMeds.join(', ')
+    snackbarText.value = t('app.notification', { name: names, days: minDays })
+    snackbar.value = true
+  }
+}
 
 const checkFirstRun = () => {
   // Check if running in standalone mode (installed PWA)
@@ -143,6 +177,24 @@ const saveEdit = (med) => {
 
   <!-- Welcome Dialog -->
   <WelcomeDialog v-model="welcomeDialog" />
+
+  <!-- Notification Snackbar -->
+  <v-snackbar
+    v-model="snackbar"
+    color="warning"
+    timeout="5000"
+  >
+    {{ snackbarText }}
+    <template v-slot:actions>
+      <v-btn
+        color="white"
+        variant="text"
+        @click="snackbar = false"
+      >
+        {{ t('about.close') }}
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>
