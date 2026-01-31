@@ -25,7 +25,10 @@ const messages = {
       limits: 'Warning Limits',
       yellowLimit: 'Yellow Limit (Days)',
       redLimit: 'Red Limit (Days)',
-      notification: 'Attention: {name} lasts only {days} days!'
+      notification: 'Attention: {name} lasts only {days} days!',
+      showOverview: 'Show Overview Card',
+      overviewText: 'Meds last until {date}',
+      overviewTextCritical: 'Meds last only {days} days until {date}'
     },
     med: {
       name: 'Name',
@@ -55,6 +58,7 @@ const messages = {
     welcome: {
       title: 'Welcome to MyMeds!',
       thankYou: 'Thank you for installing the app.',
+      explanation: 'MyMeds automatically deducts the daily dose from your inventory every day to warn you when supplies are running low.',
       chooseLanguage: 'Please choose your language:',
       chooseTheme: 'Please choose your preferred theme:',
       light: 'Light',
@@ -64,6 +68,7 @@ const messages = {
     about: {
       title: 'About MyMeds',
       description: 'MyMeds is a simple application to help you track your medication inventory.',
+      explanation: 'The app automatically deducts the daily dose from your inventory every day to warn you when supplies are running low.',
       github: 'GitHub Repository',
       license: 'License',
       close: 'Close'
@@ -93,7 +98,10 @@ const messages = {
       limits: 'Warngrenzen',
       yellowLimit: 'Gelbe Grenze (Tage)',
       redLimit: 'Rote Grenze (Tage)',
-      notification: 'Achtung: {name} hält noch {days} Tage!'
+      notification: 'Achtung: {name} hält noch {days} Tage!',
+      showOverview: 'Übersichtskarte anzeigen',
+      overviewText: 'Meds reichen bis {date}',
+      overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}'
     },
     med: {
       name: 'Name',
@@ -123,6 +131,7 @@ const messages = {
     welcome: {
       title: 'Willkommen bei MyMeds!',
       thankYou: 'Danke, dass du die App installiert hast.',
+      explanation: 'MyMeds zieht jeden Tag automatisch die Tagesdosis von deinem Bestand ab, um dich rechtzeitig zu warnen, wenn der Vorrat knapp wird.',
       chooseLanguage: 'Bitte wähle deine Sprache:',
       chooseTheme: 'Bitte wähle dein bevorzugtes Design:',
       light: 'Hell',
@@ -132,6 +141,7 @@ const messages = {
     about: {
       title: 'Über MyMeds',
       description: 'MyMeds ist eine einfache App, um deinen Medikamentenvorrat zu verwalten.',
+      explanation: 'Die App zieht jeden Tag automatisch die Tagesdosis von deinem Bestand ab, um dich rechtzeitig zu warnen, wenn der Vorrat knapp wird.',
       github: 'GitHub Repository',
       license: 'Lizenz',
       close: 'Schließen'

@@ -17,6 +17,7 @@ const sortMode = ref('added') // 'added', 'name', 'days'
 const uiScale = ref('normal') // 'small', 'normal', 'large'
 const yellowLimit = ref(21)
 const redLimit = ref(7)
+const showOverview = ref(true)
 
 onMounted(() => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -40,6 +41,11 @@ onMounted(() => {
 
   const savedRed = localStorage.getItem('myMedsRedLimit')
   if (savedRed) redLimit.value = parseInt(savedRed)
+
+  const savedOverview = localStorage.getItem('myMedsShowOverview')
+  if (savedOverview !== null) {
+    showOverview.value = savedOverview === 'true'
+  }
 })
 
 const toggleTheme = () => {
@@ -91,6 +97,11 @@ const updateLimits = () => {
   localStorage.setItem('myMedsYellowLimit', yellowLimit.value)
   localStorage.setItem('myMedsRedLimit', redLimit.value)
   window.dispatchEvent(new Event('storage-limits-changed'))
+}
+
+const toggleOverview = () => {
+  localStorage.setItem('myMedsShowOverview', showOverview.value)
+  window.dispatchEvent(new Event('storage-overview-changed'))
 }
 
 const getSortModeLabel = () => {
@@ -176,6 +187,22 @@ const getDisplayModeIcon = () => {
         <v-list-item-subtitle>{{ t('app.uiScale') }}</v-list-item-subtitle>
       </v-list-item>
 
+      <v-list-item>
+        <template v-slot:prepend>
+          <v-icon>mdi-calendar-check</v-icon>
+        </template>
+        <v-list-item-title>{{ t('app.showOverview') }}</v-list-item-title>
+        <template v-slot:append>
+          <v-switch
+            v-model="showOverview"
+            color="primary"
+            hide-details
+            density="compact"
+            @update:model-value="toggleOverview"
+          ></v-switch>
+        </template>
+      </v-list-item>
+
       <v-divider></v-divider>
       <v-list-subheader>{{ t('app.limits') }}</v-list-subheader>
       
@@ -220,6 +247,7 @@ const getDisplayModeIcon = () => {
       <v-card-title>{{ t('about.title') }}</v-card-title>
       <v-card-text>
         <p class="mb-4">{{ t('about.description') }}</p>
+        <p class="mb-4 text-body-2 text-grey-darken-1">{{ t('about.explanation') }}</p>
         
         <v-list density="compact">
           <v-list-item
