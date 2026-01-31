@@ -29,7 +29,7 @@ watch(() => props.modelValue, (val) => {
 })
 
 const loadSettings = () => {
-  language.value = localStorage.getItem('myMedsLocale') || 'en'
+  language.value = localStorage.getItem('myMedsLocale') || 'de'
   displayMode.value = localStorage.getItem('myMedsDisplayMode') || 'pills'
   sortMode.value = localStorage.getItem('myMedsSortMode') || 'added'
   uiScale.value = localStorage.getItem('myMedsUiScale') || 'normal'
@@ -73,7 +73,7 @@ watch([yellowLimit, redLimit], () => {
 
 const resetSettings = () => {
   // Reset values to defaults
-  language.value = 'en'
+  language.value = 'de'
   displayMode.value = 'pills'
   sortMode.value = 'added'
   uiScale.value = 'normal'
