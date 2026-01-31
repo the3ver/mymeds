@@ -7,7 +7,7 @@ const props = defineProps({
   modelValue: Boolean,
   med: {
     type: Object,
-    default: () => ({ name: '', ingredient: '', count: '', dose: '', color: '' })
+    default: () => ({ name: '', ingredient: '', count: '', packageSize: '', dose: '', color: '' })
   },
   title: {
     type: String,
@@ -51,6 +51,15 @@ const save = () => {
     close()
   }
 }
+
+const setPackageSize = (size) => {
+  localMed.value.packageSize = size
+}
+
+const addPackageSize = (size) => {
+  const currentCount = parseFloat(localMed.value.count) || 0
+  localMed.value.count = currentCount + size
+}
 </script>
 
 <template>
@@ -69,12 +78,34 @@ const save = () => {
           :label="t('med.ingredient')"
           variant="underlined"
         ></v-text-field>
+        
+        <v-text-field
+          v-model="localMed.packageSize"
+          :label="t('med.packageSize')"
+          variant="underlined"
+          type="number"
+        ></v-text-field>
+
+        <div class="d-flex gap-2 mb-4">
+          <v-btn size="small" variant="tonal" @click="setPackageSize(20)">20</v-btn>
+          <v-btn size="small" variant="tonal" @click="setPackageSize(50)">50</v-btn>
+          <v-btn size="small" variant="tonal" @click="setPackageSize(100)">100</v-btn>
+          <v-btn size="small" variant="tonal" @click="setPackageSize(200)">200</v-btn>
+        </div>
+
         <v-text-field
           v-model="localMed.count"
           :label="t('med.count')"
           variant="underlined"
           type="number"
         ></v-text-field>
+        
+        <div class="d-flex gap-2 mb-4">
+          <v-btn size="small" variant="tonal" @click="addPackageSize(20)">+20</v-btn>
+          <v-btn size="small" variant="tonal" @click="addPackageSize(50)">+50</v-btn>
+          <v-btn size="small" variant="tonal" @click="addPackageSize(100)">+100</v-btn>
+          <v-btn size="small" variant="tonal" @click="addPackageSize(200)">+200</v-btn>
+        </div>
         
         <DoseInput v-model="localMed.dose" :label="t('med.dose')" />
         
@@ -105,4 +136,7 @@ const save = () => {
 </template>
 
 <style scoped>
+.gap-2 {
+  gap: 8px;
+}
 </style>

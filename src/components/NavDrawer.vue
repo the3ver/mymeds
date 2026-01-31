@@ -12,7 +12,7 @@ const emit = defineEmits(['update:modelValue'])
 const theme = useTheme()
 const { t, locale } = useI18n()
 const aboutDialog = ref(false)
-const displayMode = ref('pills') // 'pills' or 'days'
+const displayMode = ref('pills') // 'pills', 'days', 'packages'
 const sortMode = ref('added') // 'added', 'name', 'days'
 const uiScale = ref('normal') // 'small', 'normal', 'large'
 
@@ -45,8 +45,11 @@ const toggleLanguage = () => {
   localStorage.setItem('myMedsLocale', newLang)
 }
 
-const toggleDisplayMode = () => {
-  displayMode.value = displayMode.value === 'pills' ? 'days' : 'pills'
+const cycleDisplayMode = () => {
+  if (displayMode.value === 'pills') displayMode.value = 'days'
+  else if (displayMode.value === 'days') displayMode.value = 'packages'
+  else displayMode.value = 'pills'
+  
   localStorage.setItem('myMedsDisplayMode', displayMode.value)
   window.dispatchEvent(new Event('storage-display-mode-changed'))
 }
@@ -87,6 +90,18 @@ const getUiScaleLabel = () => {
   if (uiScale.value === 'large') return t('app.scaleLarge')
   return t('app.scaleNormal')
 }
+
+const getDisplayModeLabel = () => {
+  if (displayMode.value === 'pills') return t('app.showPills')
+  if (displayMode.value === 'days') return t('app.showDays')
+  return t('app.showPackages')
+}
+
+const getDisplayModeIcon = () => {
+  if (displayMode.value === 'pills') return 'mdi-pill'
+  if (displayMode.value === 'days') return 'mdi-calendar-clock'
+  return 'mdi-package-variant-closed'
+}
 </script>
 
 <template>
@@ -117,13 +132,14 @@ const getUiScaleLabel = () => {
         </v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="toggleDisplayMode">
+      <v-list-item @click="cycleDisplayMode">
         <template v-slot:prepend>
-          <v-icon>{{ displayMode === 'pills' ? 'mdi-pill' : 'mdi-calendar-clock' }}</v-icon>
+          <v-icon>{{ getDisplayModeIcon() }}</v-icon>
         </template>
         <v-list-item-title>
-          {{ displayMode === 'pills' ? t('app.showDays') : t('app.showPills') }}
+          {{ getDisplayModeLabel() }}
         </v-list-item-title>
+        <v-list-item-subtitle>{{ t('app.displayMode') }}</v-list-item-subtitle>
       </v-list-item>
 
       <v-list-item @click="cycleSortMode">

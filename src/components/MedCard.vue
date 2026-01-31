@@ -14,7 +14,7 @@ const emit = defineEmits(['edit', 'delete'])
 const { t } = useI18n()
 
 const isExpanded = ref(false)
-const displayMode = ref('pills') // 'pills' or 'days'
+const displayMode = ref('pills') // 'pills', 'days', 'packages'
 
 const updateDisplayMode = () => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -78,6 +78,20 @@ const emptyDate = computed(() => {
   date.setDate(date.getDate() + days)
   return date.toLocaleDateString()
 })
+
+const packagesRemaining = computed(() => {
+  const size = parseFloat(props.item.packageSize)
+  if (!size || size <= 0) return 0
+  return props.item.count / size
+})
+
+const fullPackages = computed(() => {
+  return Math.floor(packagesRemaining.value)
+})
+
+const hasPartialPackage = computed(() => {
+  return packagesRemaining.value > fullPackages.value
+})
 </script>
 
 <template>
@@ -104,11 +118,32 @@ const emptyDate = computed(() => {
       
       <template v-slot:append>
         <div class="d-flex align-center pl-2">
-          <v-chip color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
+          <div v-if="displayMode === 'packages'" class="d-flex align-center gap-1">
+            <template v-if="item.packageSize && item.packageSize > 0">
+              <v-icon 
+                v-for="n in Math.min(fullPackages, 5)" 
+                :key="n" 
+                icon="mdi-package-variant-closed" 
+                color="primary"
+                size="small"
+              ></v-icon>
+              <v-icon 
+                v-if="hasPartialPackage && fullPackages < 5" 
+                icon="mdi-package-variant" 
+                color="primary"
+                size="small"
+                style="opacity: 0.7;"
+              ></v-icon>
+              <span v-if="fullPackages >= 5" class="text-caption font-weight-bold ml-1">+{{ Math.floor(packagesRemaining) - 4 }}</span>
+            </template>
+            <span v-else class="text-caption text-grey">-</span>
+          </div>
+          
+          <v-chip v-else color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
             <template v-if="displayMode === 'pills'">
               {{ item.count }} {{ t('med.unitPills') }}
             </template>
-            <template v-else>
+            <template v-else-if="displayMode === 'days'">
               {{ daysRemaining !== null ? daysRemaining : '-' }} {{ t('med.unitDays') }}
             </template>
           </v-chip>
@@ -120,6 +155,10 @@ const emptyDate = computed(() => {
       <div v-if="isExpanded">
         <v-divider></v-divider>
         <v-card-text class="text-body-1">
+          <div class="d-flex justify-space-between mb-2">
+            <span class="text-grey">{{ t('med.packageSize') }}:</span>
+            <span class="font-weight-medium">{{ item.packageSize || t('med.na') }}</span>
+          </div>
           <div class="d-flex justify-space-between mb-2">
             <span class="text-grey">{{ t('med.dose') }}:</span>
             <span class="font-weight-medium">{{ dailyDoseTotal }}</span>
@@ -163,5 +202,8 @@ const emptyDate = computed(() => {
 }
 .gap-2 {
   gap: 8px;
+}
+.gap-1 {
+  gap: 4px;
 }
 </style>
