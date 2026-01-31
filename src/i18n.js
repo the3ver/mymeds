@@ -31,7 +31,8 @@ const messages = {
       overviewText: 'Meds last until {date}',
       overviewTextCritical: 'Meds last only {days} days until {date}',
       reset: 'Reset Settings',
-      resetConfirm: 'Are you sure you want to reset all settings to default?'
+      resetConfirm: 'Are you sure you want to reset all settings to default?',
+      addMed: 'Add Medication'
     },
     med: {
       name: 'Name',
@@ -89,7 +90,7 @@ const messages = {
         },
         adding: {
           title: 'Adding Medications',
-          content: 'Click the "+" button at the bottom right to add a new medication. Enter the name, current stock, and your daily dose.'
+          content: 'Click the "Add Medication" card at the bottom of the list to add a new medication. Enter the name, current stock, and your daily dose.'
         },
         dose: {
           title: 'Daily Dose',
@@ -144,7 +145,8 @@ const messages = {
       overviewText: 'Meds reichen bis {date}',
       overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}',
       reset: 'Einstellungen zurücksetzen',
-      resetConfirm: 'Möchtest du wirklich alle Einstellungen auf Standard zurücksetzen?'
+      resetConfirm: 'Möchtest du wirklich alle Einstellungen auf Standard zurücksetzen?',
+      addMed: 'Medikament hinzufügen'
     },
     med: {
       name: 'Name',
@@ -202,7 +204,7 @@ const messages = {
         },
         adding: {
           title: 'Medikamente hinzufügen',
-          content: 'Klicke auf den "+" Button unten rechts, um ein neues Medikament hinzuzufügen. Gib den Namen, den aktuellen Bestand und deine Tagesdosis ein.'
+          content: 'Klicke auf die "Medikament hinzufügen" Karte am Ende der Liste, um ein neues Medikament hinzuzufügen. Gib den Namen, den aktuellen Bestand und deine Tagesdosis ein.'
         },
         dose: {
           title: 'Tagesdosis',

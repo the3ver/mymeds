@@ -148,7 +148,7 @@ const saveEdit = (med) => {
 <template>
   <NavDrawer v-model="drawer" />
 
-  <v-app-bar color="primary" density="compact">
+  <v-app-bar :color="theme.global.current.value.dark ? 'surface' : 'primary'" density="compact">
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
@@ -162,18 +162,22 @@ const saveEdit = (med) => {
         @edit="openEditDialog"
         @delete="deleteItem"
       />
+      
+      <!-- Add Button Card -->
+      <v-card
+        class="mb-4 border-dashed"
+        variant="outlined"
+        color="grey"
+        @click="openDialog"
+        style="border-style: dashed !important; border-width: 2px;"
+      >
+        <v-card-text class="d-flex align-center justify-center py-4">
+          <v-icon start size="large">mdi-plus</v-icon>
+          <span class="text-h6">{{ t('app.addMed') }}</span>
+        </v-card-text>
+      </v-card>
     </v-container>
   </v-main>
-
-  <v-btn
-    icon="mdi-plus"
-    color="secondary"
-    position="fixed"
-    location="bottom right"
-    class="mb-4 mr-4"
-    style="bottom: 16px; right: 16px; z-index: 1000;"
-    @click="openDialog"
-  ></v-btn>
 
   <!-- Add Dialog -->
   <MedDialog
@@ -218,4 +222,7 @@ const saveEdit = (med) => {
 </template>
 
 <style scoped>
+.border-dashed {
+  border-style: dashed !important;
+}
 </style>
