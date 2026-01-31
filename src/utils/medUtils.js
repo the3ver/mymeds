@@ -32,15 +32,15 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
   const todayStr = currentDate.toDateString()
 
   if (lastUpdateDate !== todayStr) {
-    // Calculate days passed
+    // Normalize dates to midnight to ignore time differences
     const lastDate = new Date(lastUpdateDate)
-    const diffTime = Math.abs(currentDate - lastDate)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
+    lastDate.setHours(0, 0, 0, 0)
     
-    // If diffDays is 0 (same day) or somehow negative/invalid, don't update
-    // But since we checked string equality first, diffDays should be at least 1 if dates differ
-    // However, to be safe and handle potential timezone edge cases or manual date manipulation:
-    // We only update if diffDays >= 1
+    const todayDate = new Date(currentDate)
+    todayDate.setHours(0, 0, 0, 0)
+    
+    const diffTime = Math.abs(todayDate - lastDate)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
     
     if (diffDays >= 1) {
       const updatedItems = savedItems.map(item => {
