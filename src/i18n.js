@@ -69,6 +69,8 @@ const messages = {
       title: 'About MyMeds',
       description: 'MyMeds is a simple application to help you track your medication inventory.',
       explanation: 'The app automatically deducts the daily dose from your inventory every day to warn you when supplies are running low.',
+      version: 'Version',
+      changelog: 'Changelog',
       github: 'GitHub Repository',
       license: 'License',
       close: 'Close'
@@ -142,6 +144,8 @@ const messages = {
       title: 'Über MyMeds',
       description: 'MyMeds ist eine einfache App, um deinen Medikamentenvorrat zu verwalten.',
       explanation: 'Die App zieht jeden Tag automatisch die Tagesdosis von deinem Bestand ab, um dich rechtzeitig zu warnen, wenn der Vorrat knapp wird.',
+      version: 'Version',
+      changelog: 'Änderungsprotokoll',
       github: 'GitHub Repository',
       license: 'Lizenz',
       close: 'Schließen'

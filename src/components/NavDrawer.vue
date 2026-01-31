@@ -251,6 +251,22 @@ const getDisplayModeIcon = () => {
         
         <v-list density="compact">
           <v-list-item
+            prepend-icon="mdi-tag-text-outline"
+            :title="t('about.version')"
+            :subtitle="'__APP_VERSION__'"
+          >
+            <template v-slot:append>
+              <v-btn
+                variant="text"
+                density="compact"
+                icon="mdi-open-in-new"
+                href="https://github.com/the3ver/mymeds/releases"
+                target="_blank"
+                :title="t('about.changelog')"
+              ></v-btn>
+            </template>
+          </v-list-item>
+          <v-list-item
             prepend-icon="mdi-github"
             :title="t('about.github')"
             href="https://github.com/the3ver/mymeds"
