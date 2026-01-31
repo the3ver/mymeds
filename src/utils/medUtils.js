@@ -50,3 +50,18 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
   
   return { updatedItems: savedItems, newDate: lastUpdateDate, updated: false }
 }
+
+// Calculate days remaining for an item
+export const calculateDaysRemaining = (item) => {
+  const dose = parseDose(item.dose)
+  if (!dose || dose <= 0) return null
+  return Math.floor(item.count / dose)
+}
+
+// Determine status color based on remaining days
+export const getStatusColor = (daysRemaining, yellowLimit, redLimit) => {
+  if (daysRemaining === null) return null
+  if (daysRemaining <= redLimit) return 'error'
+  if (daysRemaining <= yellowLimit) return 'warning'
+  return null
+}

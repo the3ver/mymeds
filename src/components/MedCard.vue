@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { parseDose } from '../utils/medUtils'
+import { parseDose, getStatusColor } from '../utils/medUtils'
 
 const props = defineProps({
   item: {
@@ -15,21 +15,29 @@ const { t } = useI18n()
 
 const isExpanded = ref(false)
 const displayMode = ref('pills') // 'pills', 'days', 'packages'
+const yellowLimit = ref(21)
+const redLimit = ref(7)
 
-const updateDisplayMode = () => {
+const updateSettings = () => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
-  if (savedMode) {
-    displayMode.value = savedMode
-  }
+  if (savedMode) displayMode.value = savedMode
+
+  const savedYellow = localStorage.getItem('myMedsYellowLimit')
+  if (savedYellow) yellowLimit.value = parseInt(savedYellow)
+
+  const savedRed = localStorage.getItem('myMedsRedLimit')
+  if (savedRed) redLimit.value = parseInt(savedRed)
 }
 
 onMounted(() => {
-  updateDisplayMode()
-  window.addEventListener('storage-display-mode-changed', updateDisplayMode)
+  updateSettings()
+  window.addEventListener('storage-display-mode-changed', updateSettings)
+  window.addEventListener('storage-limits-changed', updateSettings)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('storage-display-mode-changed', updateDisplayMode)
+  window.removeEventListener('storage-display-mode-changed', updateSettings)
+  window.removeEventListener('storage-limits-changed', updateSettings)
 })
 
 const dailyDoseTotal = computed(() => {
@@ -38,30 +46,21 @@ const dailyDoseTotal = computed(() => {
 
 const displayPlan = computed(() => {
   const dose = props.item.dose || ''
-  // Handle legacy or empty data
   if (!dose) return '0-0-0'
   
-  // If it's a pattern
   if (dose.includes('-')) {
     const parts = dose.split('-')
-    // Ensure at least 3 parts (M-N-E)
     while (parts.length < 3) {
       parts.push('0')
     }
-    
-    // Check if 4th part (Night) exists and is not 0
     if (parts.length >= 4) {
       const nightDose = parts[3]
       if (nightDose && nightDose !== '0' && nightDose !== '') {
         return parts.slice(0, 4).join('-')
       }
     }
-    
-    // Return only first 3 parts
     return parts.slice(0, 3).join('-')
   }
-  
-  // If it's a single number, assume it's the morning dose
   return `${dose}-0-0`
 })
 
@@ -91,6 +90,10 @@ const fullPackages = computed(() => {
 
 const hasPartialPackage = computed(() => {
   return packagesRemaining.value > fullPackages.value
+})
+
+const statusColor = computed(() => {
+  return getStatusColor(daysRemaining.value, yellowLimit.value, redLimit.value)
 })
 </script>
 
@@ -147,6 +150,13 @@ const hasPartialPackage = computed(() => {
               {{ daysRemaining !== null ? daysRemaining : '-' }} {{ t('med.unitDays') }}
             </template>
           </v-chip>
+
+          <v-icon 
+            v-if="statusColor" 
+            icon="mdi-alert" 
+            :color="statusColor"
+            class="ml-1"
+          ></v-icon>
         </div>
       </template>
     </v-card-item>
@@ -165,7 +175,9 @@ const hasPartialPackage = computed(() => {
           </div>
           <div class="d-flex justify-space-between mb-2">
             <span class="text-grey">{{ t('med.daysRemaining') }}:</span>
-            <span class="font-weight-medium">{{ daysRemaining !== null ? daysRemaining : t('med.na') }}</span>
+            <span class="font-weight-medium" :class="statusColor ? `text-${statusColor}` : ''">
+              {{ daysRemaining !== null ? daysRemaining : t('med.na') }}
+            </span>
           </div>
           <div class="d-flex justify-space-between mb-4">
             <span class="text-grey">{{ t('med.emptyDate') }}:</span>
