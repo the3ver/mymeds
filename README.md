@@ -27,6 +27,13 @@ npm run build
 ```bash
 npm run preview
 ```
+## build a release
+
+* update version in package.json
+* run npm i (creates package-lock.json)
+* git commit
+* git tag vX.X.X
+* git push --tags
 
 ## PWA Features
 
