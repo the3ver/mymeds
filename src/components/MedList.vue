@@ -151,7 +151,7 @@ const calendarDateFormatted = computed(() => {
       density="compact"
     >
       <v-card-text class="d-flex align-center justify-space-between py-1 pr-1">
-        <div class="text-center font-weight-bold flex-grow-1">
+        <div class="text-center font-weight-bold flex-grow-1 text-body-1">
           {{ overviewData.isCritical ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }) : t('app.overviewText', { date: overviewData.date }) }}
         </div>
         <v-btn
