@@ -30,6 +30,7 @@ const parseSingleDose = (val) => {
 // Check if a day has passed and update counts
 export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate = new Date()) => {
   const todayStr = currentDate.toDateString()
+  const deductions = {} // Map of item name -> amount deducted
 
   if (lastUpdateDate !== todayStr) {
     // Normalize dates to midnight to ignore time differences
@@ -47,6 +48,10 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
         const dose = parseDose(item.dose)
         const totalDeduction = dose * diffDays
         
+        if (totalDeduction > 0) {
+          deductions[item.name] = totalDeduction
+        }
+        
         let newCount = parseFloat(item.count) - totalDeduction
         // Ensure count doesn't go below 0
         if (newCount < 0) newCount = 0
@@ -58,11 +63,11 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
         }
       })
       
-      return { updatedItems, newDate: todayStr, updated: true }
+      return { updatedItems, newDate: todayStr, updated: true, deductions }
     }
   }
   
-  return { updatedItems: savedItems, newDate: lastUpdateDate, updated: false }
+  return { updatedItems: savedItems, newDate: lastUpdateDate, updated: false, deductions }
 }
 
 // Calculate days remaining for an item

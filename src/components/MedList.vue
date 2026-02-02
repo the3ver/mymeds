@@ -9,6 +9,10 @@ const props = defineProps({
   items: {
     type: Array,
     required: true
+  },
+  deductions: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -167,6 +171,7 @@ const calendarDateFormatted = computed(() => {
       v-for="item in sortedItems"
       :key="item.originalIndex"
       :item="item"
+      :deduction="deductions[item.name]"
       @edit="emit('edit', item.originalIndex)"
       @delete="emit('delete', item.originalIndex)"
     />

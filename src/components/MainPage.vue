@@ -24,6 +24,7 @@ const currentEditMed = ref({})
 const snackbar = ref(false)
 const snackbarText = ref('')
 const activeTab = ref('meds') // 'meds' or 'appointments'
+const deductions = ref({}) // Stores deductions for display
 
 // Load items from localStorage on mount
 onMounted(() => {
@@ -37,6 +38,10 @@ onMounted(() => {
     
     if (result.updated) {
       localStorage.setItem('lastDoseUpdate', result.newDate)
+      // Store deductions to show in UI
+      if (result.deductions) {
+        deductions.value = result.deductions
+      }
     }
     
     items.value = result.updatedItems
@@ -170,6 +175,7 @@ const saveEdit = (med) => {
     <v-container v-if="activeTab === 'meds'">
       <MedList
         :items="items"
+        :deductions="deductions"
         @edit="openEditDialog"
         @delete="deleteItem"
       />

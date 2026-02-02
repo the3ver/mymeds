@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parseDose, getStatusColor } from '../utils/medUtils'
 
@@ -7,6 +7,10 @@ const props = defineProps({
   item: {
     type: Object,
     required: true
+  },
+  deduction: {
+    type: Number,
+    default: 0
   }
 })
 
@@ -17,6 +21,7 @@ const isExpanded = ref(false)
 const displayMode = ref('pills') // 'pills', 'days', 'packages'
 const yellowLimit = ref(21)
 const redLimit = ref(7)
+const showDeduction = ref(false)
 
 const updateSettings = () => {
   const savedMode = localStorage.getItem('myMedsDisplayMode')
@@ -33,6 +38,13 @@ onMounted(() => {
   updateSettings()
   window.addEventListener('storage-display-mode-changed', updateSettings)
   window.addEventListener('storage-limits-changed', updateSettings)
+  
+  if (props.deduction > 0) {
+    showDeduction.value = true
+    setTimeout(() => {
+      showDeduction.value = false
+    }, 4000) // Show for 4 seconds
+  }
 })
 
 onUnmounted(() => {
@@ -120,7 +132,17 @@ const statusColor = computed(() => {
       </v-card-title>
       
       <template v-slot:append>
-        <div class="d-flex align-center pl-2">
+        <div class="d-flex align-center pl-2 position-relative">
+          <!-- Deduction Animation -->
+          <transition name="float-up">
+            <div 
+              v-if="showDeduction" 
+              class="deduction-badge text-error font-weight-bold"
+            >
+              -{{ deduction }}
+            </div>
+          </transition>
+
           <div v-if="displayMode === 'packages'" class="d-flex align-center gap-1">
             <template v-if="item.packageSize && item.packageSize > 0">
               <div 
@@ -234,5 +256,44 @@ const statusColor = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.position-relative {
+  position: relative;
+}
+.deduction-badge {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.float-up-enter-active,
+.float-up-leave-active {
+  transition: all 4s ease-out;
+}
+
+.float-up-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.float-up-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.float-up-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.float-up-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>
