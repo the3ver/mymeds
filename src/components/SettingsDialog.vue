@@ -103,40 +103,52 @@ const close = () => {
           <!-- Sort Mode -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.sortMode') }}</div>
-            <v-btn-toggle v-model="sortMode" mandatory color="primary" class="d-flex w-100" divided>
-              <v-btn value="added" class="flex-grow-1">{{ t('app.sortAdded') }}</v-btn>
-              <v-btn value="name" class="flex-grow-1">{{ t('app.sortName') }}</v-btn>
-              <v-btn value="days" class="flex-grow-1">{{ t('app.sortDays') }}</v-btn>
-            </v-btn-toggle>
+            <v-radio-group v-model="sortMode" color="primary">
+              <v-radio :label="t('app.sortAdded')" value="added"></v-radio>
+              <v-radio :label="t('app.sortName')" value="name"></v-radio>
+              <v-radio :label="t('app.sortDays')" value="days"></v-radio>
+            </v-radio-group>
           </div>
 
           <!-- Display Mode -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.displayMode') }}</div>
-            <v-btn-toggle v-model="displayMode" mandatory color="primary" class="d-flex w-100" divided>
-              <v-btn value="pills" class="flex-grow-1">
-                <v-icon start class="d-none d-sm-inline-flex">mdi-pill</v-icon>
-                {{ t('app.showPills') }}
-              </v-btn>
-              <v-btn value="days" class="flex-grow-1">
-                <v-icon start class="d-none d-sm-inline-flex">mdi-calendar-clock</v-icon>
-                {{ t('app.showDays') }}
-              </v-btn>
-              <v-btn value="packages" class="flex-grow-1">
-                <v-icon start class="d-none d-sm-inline-flex">mdi-package-variant-closed</v-icon>
-                {{ t('app.showPackages') }}
-              </v-btn>
-            </v-btn-toggle>
+            <v-radio-group v-model="displayMode" color="primary">
+              <v-radio value="pills">
+                <template v-slot:label>
+                  <div class="d-flex align-center">
+                    <v-icon start size="small" class="mr-2">mdi-pill</v-icon>
+                    {{ t('app.showPills') }}
+                  </div>
+                </template>
+              </v-radio>
+              <v-radio value="days">
+                <template v-slot:label>
+                  <div class="d-flex align-center">
+                    <v-icon start size="small" class="mr-2">mdi-calendar-clock</v-icon>
+                    {{ t('app.showDays') }}
+                  </div>
+                </template>
+              </v-radio>
+              <v-radio value="packages">
+                <template v-slot:label>
+                  <div class="d-flex align-center">
+                    <v-icon start size="small" class="mr-2">mdi-package-variant-closed</v-icon>
+                    {{ t('app.showPackages') }}
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
           </div>
 
           <!-- UI Scale -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.uiScale') }}</div>
-            <v-btn-toggle v-model="uiScale" mandatory color="primary" class="d-flex w-100" divided>
-              <v-btn value="small" class="flex-grow-1">{{ t('app.scaleSmall') }}</v-btn>
-              <v-btn value="normal" class="flex-grow-1">{{ t('app.scaleNormal') }}</v-btn>
-              <v-btn value="large" class="flex-grow-1">{{ t('app.scaleLarge') }}</v-btn>
-            </v-btn-toggle>
+            <v-radio-group v-model="uiScale" color="primary">
+              <v-radio :label="t('app.scaleSmall')" value="small"></v-radio>
+              <v-radio :label="t('app.scaleNormal')" value="normal"></v-radio>
+              <v-radio :label="t('app.scaleLarge')" value="large"></v-radio>
+            </v-radio-group>
           </div>
 
           <!-- Limits -->
@@ -168,10 +180,10 @@ const close = () => {
           <!-- Language -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">Language / Sprache</div>
-            <v-btn-toggle v-model="language" mandatory color="primary" class="d-flex w-100" divided>
-              <v-btn value="en" class="flex-grow-1">English</v-btn>
-              <v-btn value="de" class="flex-grow-1">Deutsch</v-btn>
-            </v-btn-toggle>
+            <v-radio-group v-model="language" color="primary">
+              <v-radio label="English" value="en"></v-radio>
+              <v-radio label="Deutsch" value="de"></v-radio>
+            </v-radio-group>
           </div>
 
           <v-divider class="mb-6"></v-divider>

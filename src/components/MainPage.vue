@@ -150,7 +150,12 @@ const saveEdit = (med) => {
 <template>
   <NavDrawer v-model="drawer" />
 
-  <v-app-bar :color="theme.global.current.value.dark ? 'surface' : 'primary'" density="compact">
+  <v-app-bar 
+    :color="theme.global.current.value.dark ? 'surface' : 'primary'" 
+    density="compact"
+    scroll-behavior="hide"
+    scroll-threshold="20"
+  >
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
