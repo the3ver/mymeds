@@ -8,6 +8,7 @@ import NavDrawer from './NavDrawer.vue'
 import MedList from './MedList.vue'
 import WelcomeDialog from './WelcomeDialog.vue'
 import UpdateDialog from './UpdateDialog.vue'
+import AppointmentsPage from './AppointmentsPage.vue'
 import packageJson from '../../package.json'
 
 const theme = useTheme()
@@ -22,6 +23,7 @@ const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const snackbar = ref(false)
 const snackbarText = ref('')
+const activeTab = ref('meds') // 'meds' or 'appointments'
 
 // Load items from localStorage on mount
 onMounted(() => {
@@ -152,11 +154,15 @@ const saveEdit = (med) => {
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
-    <v-app-bar-title>{{ t('app.title') }}</v-app-bar-title>
+    <v-app-bar-title>
+      {{ t('app.title') }}
+      <span v-if="activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
+      <span v-else-if="activeTab === 'appointments'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.appointments') }}</span>
+    </v-app-bar-title>
   </v-app-bar>
 
   <v-main>
-    <v-container>
+    <v-container v-if="activeTab === 'meds'">
       <MedList
         :items="items"
         @edit="openEditDialog"
@@ -177,7 +183,21 @@ const saveEdit = (med) => {
         </v-card-text>
       </v-card>
     </v-container>
+
+    <AppointmentsPage v-if="activeTab === 'appointments'" />
   </v-main>
+
+  <v-bottom-navigation v-model="activeTab" color="primary" grow>
+    <v-btn value="meds">
+      <v-icon>mdi-format-list-bulleted</v-icon>
+      <span>{{ t('app.nav.meds') }}</span>
+    </v-btn>
+
+    <v-btn value="appointments">
+      <v-icon>mdi-calendar-clock</v-icon>
+      <span>{{ t('app.nav.appointments') }}</span>
+    </v-btn>
+  </v-bottom-navigation>
 
   <!-- Add Dialog -->
   <MedDialog
@@ -224,5 +244,8 @@ const saveEdit = (med) => {
 <style scoped>
 .border-dashed {
   border-style: dashed !important;
+}
+.opacity-70 {
+  opacity: 0.7;
 }
 </style>

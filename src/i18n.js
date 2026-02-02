@@ -35,7 +35,11 @@ const messages = {
       addMed: 'Add Medication',
       calendar: 'Calendar Reminder',
       calendarTitle: 'Meds are running low!',
-      calendarDesc: 'Your meds are running low, click here to check.'
+      calendarDesc: 'Your meds are running low, click here to check.',
+      nav: {
+        meds: 'Medications',
+        appointments: 'Appointments'
+      }
     },
     med: {
       name: 'Name',
@@ -122,6 +126,34 @@ const messages = {
       title: 'Create Calendar Reminder',
       message: 'This will create a calendar event for {date} to remind you to restock your meds.',
       close: 'Cancel'
+    },
+    appointments: {
+      title: 'Appointments',
+      noAppointments: 'No appointments added yet',
+      add: 'Add Appointment',
+      edit: 'Edit Appointment',
+      date: 'Date',
+      titleLabel: 'Title',
+      doctor: 'Doctor (optional)',
+      type: 'Type (optional)',
+      location: 'Location (optional)',
+      notes: 'Notes (optional)',
+      today: 'Today',
+      types: {
+        general: 'General Practitioner',
+        specialist: 'Specialist',
+        dentist: 'Dentist',
+        eye: 'Ophthalmologist',
+        skin: 'Dermatologist',
+        women: 'Gynecologist',
+        men: 'Urologist',
+        heart: 'Cardiologist',
+        ortho: 'Orthopedist',
+        neuro: 'Neurologist',
+        psych: 'Psychiatrist',
+        nephro: 'Nephrologist',
+        other: 'Other'
+      }
     }
   },
   de: {
@@ -158,7 +190,11 @@ const messages = {
       addMed: 'Medikament hinzufügen',
       calendar: 'Kalender-Erinnerung',
       calendarTitle: 'Meds sind bald alle!',
-      calendarDesc: 'Deine Meds gehen zur Neige, klicke hier um nachzusehen.'
+      calendarDesc: 'Deine Meds gehen zur Neige, klicke hier um nachzusehen.',
+      nav: {
+        meds: 'Medikamente',
+        appointments: 'Termine'
+      }
     },
     med: {
       name: 'Name',
@@ -245,6 +281,34 @@ const messages = {
       title: 'Kalender-Erinnerung erstellen',
       message: 'Dies erstellt einen Kalendereintrag für den {date}, um dich an das Nachbestellen zu erinnern.',
       close: 'Abbrechen'
+    },
+    appointments: {
+      title: 'Termine',
+      noAppointments: 'Noch keine Termine hinzugefügt',
+      add: 'Termin hinzufügen',
+      edit: 'Termin bearbeiten',
+      date: 'Datum',
+      titleLabel: 'Bezeichnung',
+      doctor: 'Arzt (optional)',
+      type: 'Art (optional)',
+      location: 'Ort (optional)',
+      notes: 'Notizen (optional)',
+      today: 'Heute',
+      types: {
+        general: 'Hausarzt',
+        specialist: 'Facharzt',
+        dentist: 'Zahnarzt',
+        eye: 'Augenarzt',
+        skin: 'Hautarzt',
+        women: 'Frauenarzt',
+        men: 'Urologe',
+        heart: 'Kardiologe',
+        ortho: 'Orthopäde',
+        neuro: 'Neurologe',
+        psych: 'Psychiater',
+        nephro: 'Nephrologe',
+        other: 'Sonstiges'
+      }
     }
   }
 }
