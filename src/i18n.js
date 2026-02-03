@@ -38,7 +38,7 @@ const messages = {
       calendarDesc: 'Your meds are running low, click here to check.',
       nav: {
         meds: 'Medications',
-        appointments: 'Appointments'
+        calendar: 'Calendar'
       }
     },
     med: {
@@ -66,7 +66,8 @@ const messages = {
       edit: 'Edit',
       delete: 'Delete',
       confirm: 'Confirm',
-      create: 'Create'
+      create: 'Create',
+      next: 'Next'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -125,21 +126,42 @@ const messages = {
     calendar: {
       title: 'Create Calendar Reminder',
       message: 'This will create a calendar event for {date} to remind you to restock your meds.',
-      close: 'Cancel'
-    },
-    appointments: {
-      title: 'Appointments',
-      noAppointments: 'No appointments added yet',
-      add: 'Add Appointment',
-      edit: 'Edit Appointment',
-      date: 'Date',
-      titleLabel: 'Title',
-      doctor: 'Doctor (optional)',
-      type: 'Type (optional)',
-      location: 'Location (optional)',
-      notes: 'Notes (optional)',
+      close: 'Cancel',
+      titlePage: 'Calendar',
+      noEntries: 'No entries yet',
+      add: 'Add Entry',
+      edit: 'Edit Entry',
+      selectType: 'Select Entry Type',
       today: 'Today',
+      quarter: 'Q{q}/{year}',
+      fields: {
+        date: 'Date',
+        title: 'Title',
+        doctor: 'Doctor (optional)',
+        type: 'Type (optional)',
+        location: 'Location (optional)',
+        notes: 'Notes (optional)',
+        agent: 'Agent (optional)',
+        method: 'Method (optional)',
+        bodyPart: 'Body Part (optional)',
+        pathogen: 'Pathogen (optional)',
+        symptoms: 'Symptoms (optional)',
+        endDate: 'End Date (optional)'
+      },
       types: {
+        doctor: 'Doctor Appointment',
+        vaccination: 'Vaccination',
+        illness: 'Illness',
+        note: 'Note'
+      },
+      methods: {
+        subcutaneous: 'Subcutaneous',
+        intramuscular: 'Intramuscular',
+        oral: 'Oral',
+        rectal: 'Rectal',
+        other: 'Other'
+      },
+      doctorTypes: {
         general: 'General Practitioner',
         specialist: 'Specialist',
         dentist: 'Dentist',
@@ -193,7 +215,7 @@ const messages = {
       calendarDesc: 'Deine Meds gehen zur Neige, klicke hier um nachzusehen.',
       nav: {
         meds: 'Medikamente',
-        appointments: 'Termine'
+        calendar: 'Kalender'
       }
     },
     med: {
@@ -221,7 +243,8 @@ const messages = {
       edit: 'Bearbeiten',
       delete: 'Löschen',
       confirm: 'Bestätigen',
-      create: 'Erstellen'
+      create: 'Erstellen',
+      next: 'Weiter'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',
@@ -280,21 +303,42 @@ const messages = {
     calendar: {
       title: 'Kalender-Erinnerung erstellen',
       message: 'Dies erstellt einen Kalendereintrag für den {date}, um dich an das Nachbestellen zu erinnern.',
-      close: 'Abbrechen'
-    },
-    appointments: {
-      title: 'Termine',
-      noAppointments: 'Noch keine Termine hinzugefügt',
-      add: 'Termin hinzufügen',
-      edit: 'Termin bearbeiten',
-      date: 'Datum',
-      titleLabel: 'Bezeichnung',
-      doctor: 'Arzt (optional)',
-      type: 'Art (optional)',
-      location: 'Ort (optional)',
-      notes: 'Notizen (optional)',
+      close: 'Abbrechen',
+      titlePage: 'Kalender',
+      noEntries: 'Noch keine Einträge',
+      add: 'Eintrag hinzufügen',
+      edit: 'Eintrag bearbeiten',
+      selectType: 'Art des Eintrags wählen',
       today: 'Heute',
+      quarter: 'Q{q}/{year}',
+      fields: {
+        date: 'Datum',
+        title: 'Bezeichnung',
+        doctor: 'Arzt (optional)',
+        type: 'Art (optional)',
+        location: 'Ort (optional)',
+        notes: 'Notizen (optional)',
+        agent: 'Wirkstoff (optional)',
+        method: 'Methode (optional)',
+        bodyPart: 'Körperstelle (optional)',
+        pathogen: 'Erreger (optional)',
+        symptoms: 'Symptome (optional)',
+        endDate: 'Enddatum (optional)'
+      },
       types: {
+        doctor: 'Arzttermin',
+        vaccination: 'Impfung',
+        illness: 'Erkrankung',
+        note: 'Notiz'
+      },
+      methods: {
+        subcutaneous: 'Subkutan',
+        intramuscular: 'Intramuskulär',
+        oral: 'Oral',
+        rectal: 'Rektal',
+        other: 'Sonstiges'
+      },
+      doctorTypes: {
         general: 'Hausarzt',
         specialist: 'Facharzt',
         dentist: 'Zahnarzt',

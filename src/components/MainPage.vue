@@ -8,7 +8,7 @@ import NavDrawer from './NavDrawer.vue'
 import MedList from './MedList.vue'
 import WelcomeDialog from './WelcomeDialog.vue'
 import UpdateDialog from './UpdateDialog.vue'
-import AppointmentsPage from './AppointmentsPage.vue'
+import CalendarPage from './CalendarPage.vue'
 import packageJson from '../../package.json'
 
 const theme = useTheme()
@@ -23,7 +23,7 @@ const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const snackbar = ref(false)
 const snackbarText = ref('')
-const activeTab = ref('meds') // 'meds' or 'appointments'
+const activeTab = ref('meds') // 'meds' or 'calendar'
 const deductions = ref({}) // Stores deductions for display
 
 // Load items from localStorage on mount
@@ -167,7 +167,7 @@ const saveEdit = (med) => {
     <v-app-bar-title>
       {{ t('app.title') }}
       <span v-if="activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
-      <span v-else-if="activeTab === 'appointments'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.appointments') }}</span>
+      <span v-else-if="activeTab === 'calendar'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.calendar') }}</span>
     </v-app-bar-title>
   </v-app-bar>
 
@@ -195,7 +195,7 @@ const saveEdit = (med) => {
       </v-card>
     </v-container>
 
-    <AppointmentsPage v-if="activeTab === 'appointments'" />
+    <CalendarPage v-if="activeTab === 'calendar'" />
   </v-main>
 
   <v-bottom-navigation v-model="activeTab" color="primary" grow>
@@ -204,9 +204,9 @@ const saveEdit = (med) => {
       <span>{{ t('app.nav.meds') }}</span>
     </v-btn>
 
-    <v-btn value="appointments">
+    <v-btn value="calendar">
       <v-icon>mdi-calendar-clock</v-icon>
-      <span>{{ t('app.nav.appointments') }}</span>
+      <span>{{ t('app.nav.calendar') }}</span>
     </v-btn>
   </v-bottom-navigation>
 
