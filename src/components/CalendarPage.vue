@@ -196,8 +196,13 @@ const onTypeSelected = (type) => {
 
 const addEntry = (entry) => {
   entries.value.push(entry)
-  lastAddedEntry.value = entry
-  exportDialog.value = true
+
+  // Check if entry is in the future
+  const today = new Date().toISOString().substr(0, 10)
+  if (entry.date >= today) {
+    lastAddedEntry.value = entry
+    exportDialog.value = true
+  }
 }
 
 const openEditDialog = (entry) => {
