@@ -39,7 +39,14 @@ const messages = {
       nav: {
         meds: 'Medications',
         calendar: 'Calendar'
-      }
+      },
+      dataManagement: 'Data Management',
+      deleteMeds: 'Delete Medications',
+      deleteMedsConfirm: 'Are you sure you want to delete all medications? This cannot be undone.',
+      deleteCalendar: 'Delete Calendar Entries',
+      deleteCalendarConfirm: 'Are you sure you want to delete all calendar entries? This cannot be undone.',
+      deleteAll: 'Delete All Data',
+      deleteAllConfirm: 'Are you sure you want to delete ALL data (medications, calendar, settings)? This cannot be undone.'
     },
     med: {
       name: 'Name',
@@ -218,7 +225,14 @@ const messages = {
       nav: {
         meds: 'Medikamente',
         calendar: 'Kalender'
-      }
+      },
+      dataManagement: 'Datenverwaltung',
+      deleteMeds: 'Medikamente löschen',
+      deleteMedsConfirm: 'Möchtest du wirklich alle Medikamente löschen? Dies kann nicht rückgängig gemacht werden.',
+      deleteCalendar: 'Kalendereinträge löschen',
+      deleteCalendarConfirm: 'Möchtest du wirklich alle Kalendereinträge löschen? Dies kann nicht rückgängig gemacht werden.',
+      deleteAll: 'Alle Daten löschen',
+      deleteAllConfirm: 'Möchtest du wirklich ALLE Daten (Medikamente, Kalender, Einstellungen) löschen? Dies kann nicht rückgängig gemacht werden.'
     },
     med: {
       name: 'Name',

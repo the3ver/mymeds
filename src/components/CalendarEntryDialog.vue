@@ -9,21 +9,17 @@ const props = defineProps({
     default: () => ({
       date: '',
       title: '',
-      type: 'doctor', // doctor, vaccination, illness, note
-      // Doctor fields
+      type: 'doctor',
       doctor: '',
       doctorType: '',
       location: '',
-      treatments: [],
-      // Vaccination fields
+      treatments: '', // Changed to String for mixed content
       agent: '',
       method: '',
       bodyPart: '',
-      // Illness fields
       pathogen: '',
       symptoms: '',
       endDate: '',
-      // Note fields
       notes: ''
     })
   },
@@ -45,18 +41,20 @@ const emit = defineEmits(['update:modelValue', 'confirm'])
 const { t } = useI18n()
 
 const localEntry = ref({ ...props.entry })
+const treatmentsInput = ref(null) // Reference to textarea
 
 // Watch for dialog opening to reset/set values
 watch(() => props.modelValue, (val) => {
   if (val) {
     localEntry.value = { ...props.entry }
-    // If date is empty, set to today
     if (!localEntry.value.date) {
       localEntry.value.date = new Date().toISOString().substr(0, 10)
     }
-    // Ensure treatments is an array
-    if (!localEntry.value.treatments) {
-      localEntry.value.treatments = []
+    // Ensure treatments is a string (migration from array if needed)
+    if (Array.isArray(localEntry.value.treatments)) {
+      localEntry.value.treatments = localEntry.value.treatments.join(', ')
+    } else if (!localEntry.value.treatments) {
+      localEntry.value.treatments = ''
     }
   }
 })
@@ -75,7 +73,7 @@ const doctorTypes = computed(() => [
   { title: t('calendar.doctorTypes.psych'), value: 'psych' },
   { title: t('calendar.doctorTypes.nephro'), value: 'nephro' },
   { title: t('calendar.doctorTypes.other'), value: 'other' }
-])
+].sort((a, b) => a.title.localeCompare(b.title)))
 
 const vaccinationMethods = computed(() => [
   { title: t('calendar.methods.subcutaneous'), value: 'subcutaneous' },
@@ -84,6 +82,22 @@ const vaccinationMethods = computed(() => [
   { title: t('calendar.methods.rectal'), value: 'rectal' },
   { title: t('calendar.methods.other'), value: 'other' }
 ])
+
+const addSuggestion = (suggestion) => {
+  const tag = `#${suggestion}#`
+  const currentText = localEntry.value.treatments || ''
+
+  // Append tag. If text is not empty and doesn't end with space, add space.
+  if (currentText && !currentText.endsWith(' ')) {
+    localEntry.value.treatments = currentText + ' ' + tag + ' '
+  } else {
+    localEntry.value.treatments = currentText + tag + ' '
+  }
+
+  // Focus back to textarea
+  // Note: Vuetify refs might need .value.$el.querySelector('textarea') or similar
+  // but simple focus might work if user clicks chip
+}
 
 const close = () => {
   emit('update:modelValue', false)
@@ -105,7 +119,7 @@ const save = () => {
         <!-- Common Fields -->
         <v-text-field
           v-model="localEntry.date"
-          :label="t('calendar.fields.date')"
+          :label="t('calendar.fields.date') + ' *'"
           type="date"
           variant="underlined"
           required
@@ -113,7 +127,7 @@ const save = () => {
         
         <v-text-field
           v-model="localEntry.title"
-          :label="t('calendar.fields.title')"
+          :label="t('calendar.fields.title') + ' *'"
           variant="underlined"
           required
           autofocus
@@ -142,18 +156,33 @@ const save = () => {
             variant="underlined"
           ></v-text-field>
 
-          <v-combobox
+          <!-- Treatments Textarea -->
+          <v-textarea
+            ref="treatmentsInput"
             v-model="localEntry.treatments"
-            :items="suggestions"
             :label="t('calendar.fields.treatments')"
-            multiple
-            chips
-            closable-chips
             variant="underlined"
-            hide-selected
+            rows="2"
+            auto-grow
             :hint="t('calendar.fields.treatmentsHint')"
             persistent-hint
-          ></v-combobox>
+          ></v-textarea>
+
+          <!-- Suggestions -->
+          <div v-if="suggestions.length > 0" class="mb-4">
+            <div class="text-caption text-grey mb-1">Suggestions:</div>
+            <div class="d-flex flex-wrap gap-1">
+              <v-chip
+                v-for="suggestion in suggestions"
+                :key="suggestion"
+                size="small"
+                variant="outlined"
+                @click="addSuggestion(suggestion)"
+              >
+                {{ suggestion }}
+              </v-chip>
+            </div>
+          </div>
         </template>
 
         <!-- Vaccination Fields -->
@@ -234,4 +263,7 @@ const save = () => {
 </template>
 
 <style scoped>
+.gap-1 {
+  gap: 4px;
+}
 </style>

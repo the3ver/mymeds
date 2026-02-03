@@ -18,6 +18,14 @@ onMounted(() => {
   if (savedEntries) {
     entries.value = JSON.parse(savedEntries)
   }
+
+  // Scroll to today separator after render
+  nextTick(() => {
+    const todayEl = document.getElementById('separator-today')
+    if (todayEl) {
+      todayEl.scrollIntoView({ behavior: 'auto', block: 'center' })
+    }
+  })
 })
 
 // Save entries to localStorage
@@ -34,9 +42,9 @@ const sortedEntries = computed(() => {
 const groupedEntries = computed(() => {
   const today = new Date().toISOString().substr(0, 10)
   const result = []
-  
+
   let todayInserted = false
-  
+
   // Helper to get quarter string (e.g. "Q1/2024")
   const getQuarter = (dateStr) => {
     const date = new Date(dateStr)
@@ -92,12 +100,12 @@ const groupedEntries = computed(() => {
   
   // Now build the final list with Today separator
   const finalResult = []
-  todayInserted = false
+  let todayInsertedLoop = false
   
   for (const entry of combined) {
-    if (!todayInserted && entry.date < today) {
+    if (!todayInsertedLoop && entry.date < today) {
       finalResult.push({ type: 'separator-today', date: today })
-      todayInserted = true
+      todayInsertedLoop = true
     }
     
     if (entry.isVirtual) {
@@ -107,7 +115,7 @@ const groupedEntries = computed(() => {
     }
   }
   
-  if (!todayInserted) {
+  if (!todayInsertedLoop) {
     finalResult.push({ type: 'separator-today', date: today })
   }
   
@@ -176,7 +184,7 @@ const onTypeSelected = (type) => {
     agent: '', method: '', bodyPart: '',
     pathogen: '', symptoms: '', endDate: '',
     notes: '',
-    treatments: [] // Initialize treatments array
+    treatments: '' // Initialize treatments as string
   }
   editingIndex.value = -1
   entryDialog.value = true
@@ -188,9 +196,11 @@ const addEntry = (entry) => {
 
 const openEditDialog = (entry) => {
   currentEntry.value = { ...entry }
-  // Ensure treatments array exists for older entries
-  if (!currentEntry.value.treatments) {
-    currentEntry.value.treatments = []
+  // Ensure treatments is string for older entries
+  if (Array.isArray(currentEntry.value.treatments)) {
+    currentEntry.value.treatments = currentEntry.value.treatments.join(', ')
+  } else if (!currentEntry.value.treatments) {
+    currentEntry.value.treatments = ''
   }
   editingIndex.value = entry.originalIndex
   entryDialog.value = true
@@ -227,13 +237,49 @@ const toggleExpand = (index) => {
 // Collect all unique treatments from existing entries for suggestions
 const existingTreatments = computed(() => {
   const treatments = new Set()
+  const regex = /#([^#]+)#/g
+
   entries.value.forEach(entry => {
-    if (entry.treatments && Array.isArray(entry.treatments)) {
+    // Check if treatments is a string (new format)
+    if (typeof entry.treatments === 'string') {
+      let match
+      while ((match = regex.exec(entry.treatments)) !== null) {
+        treatments.add(match[1]) // Add the captured group (without #)
+      }
+    }
+    // Fallback for old array format (if any exist)
+    else if (Array.isArray(entry.treatments)) {
       entry.treatments.forEach(t => treatments.add(t))
     }
   })
   return Array.from(treatments).sort()
 })
+
+// Helper to parse treatment text into segments (text and tags)
+const parseTreatmentText = (text) => {
+  if (!text) return []
+  const segments = []
+  const regex = /#([^#]+)#/g
+  let lastIndex = 0
+  let match
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before tag
+    if (match.index > lastIndex) {
+      segments.push({ type: 'text', content: text.substring(lastIndex, match.index) })
+    }
+    // Add tag
+    segments.push({ type: 'tag', content: match[1] })
+    lastIndex = regex.lastIndex
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    segments.push({ type: 'text', content: text.substring(lastIndex) })
+  }
+
+  return segments
+}
 </script>
 
 <template>
@@ -241,16 +287,31 @@ const existingTreatments = computed(() => {
     <div v-if="entries.length > 0">
       <template v-for="(item, i) in groupedEntries" :key="i">
         <!-- Today Separator -->
-        <v-card 
-          v-if="item.type === 'separator-today'" 
-          class="mb-4 bg-primary-lighten-5 text-center py-1" 
-          variant="tonal" 
-          density="compact"
-        >
-          <span class="text-caption font-weight-bold">
-            {{ t('calendar.today') }}, {{ formatDate(item.date) }}
-          </span>
-        </v-card>
+        <div v-if="item.type === 'separator-today'" id="separator-today">
+          <v-card
+            class="mb-4 bg-primary-lighten-5 text-center py-1"
+            variant="tonal"
+            density="compact"
+          >
+            <span class="text-caption font-weight-bold">
+              {{ t('calendar.today') }}, {{ formatDate(item.date) }}
+            </span>
+          </v-card>
+
+          <!-- Add Button Card (moved here) -->
+          <v-card
+            class="mb-4 border-dashed"
+            variant="outlined"
+            color="grey"
+            @click="openTypeDialog"
+            style="border-style: dashed !important; border-width: 2px;"
+          >
+            <v-card-text class="d-flex align-center justify-center py-4">
+              <v-icon start size="large">mdi-plus</v-icon>
+              <span class="text-h6">{{ t('calendar.add') }}</span>
+            </v-card-text>
+          </v-card>
+        </div>
 
         <!-- Quarter Marker -->
         <div 
@@ -304,19 +365,22 @@ const existingTreatments = computed(() => {
                     <div class="font-weight-medium">{{ item.data.location }}</div>
                   </div>
                   
-                  <!-- Treatments -->
-                  <div v-if="item.data.treatments && item.data.treatments.length > 0" class="mb-2">
+                  <!-- Treatments (Mixed Content) -->
+                  <div v-if="item.data.treatments" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.treatments') }}:</span>
-                    <div class="d-flex flex-wrap gap-1 mt-1">
-                      <v-chip
-                        v-for="(treatment, idx) in item.data.treatments"
-                        :key="idx"
-                        size="small"
-                        color="primary"
-                        variant="tonal"
-                      >
-                        {{ treatment }}
-                      </v-chip>
+                    <div class="mt-1">
+                      <template v-for="(segment, idx) in parseTreatmentText(item.data.treatments)" :key="idx">
+                        <span v-if="segment.type === 'text'">{{ segment.content }}</span>
+                        <v-chip
+                          v-else
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                          class="mx-1"
+                        >
+                          {{ segment.content }}
+                        </v-chip>
+                      </template>
                     </div>
                   </div>
                 </template>
@@ -393,21 +457,21 @@ const existingTreatments = computed(() => {
     </div>
     <div v-else class="text-center mt-10 text-grey">
       {{ t('calendar.noEntries') }}
-    </div>
 
-    <!-- Add Button Card -->
-    <v-card
-      class="mb-4 border-dashed"
-      variant="outlined"
-      color="grey"
-      @click="openTypeDialog"
-      style="border-style: dashed !important; border-width: 2px;"
-    >
-      <v-card-text class="d-flex align-center justify-center py-4">
-        <v-icon start size="large">mdi-plus</v-icon>
-        <span class="text-h6">{{ t('calendar.add') }}</span>
-      </v-card-text>
-    </v-card>
+      <!-- Add Button Card (when no entries) -->
+      <v-card
+        class="mt-4 border-dashed"
+        variant="outlined"
+        color="grey"
+        @click="openTypeDialog"
+        style="border-style: dashed !important; border-width: 2px;"
+      >
+        <v-card-text class="d-flex align-center justify-center py-4">
+          <v-icon start size="large">mdi-plus</v-icon>
+          <span class="text-h6">{{ t('calendar.add') }}</span>
+        </v-card-text>
+      </v-card>
+    </div>
 
     <!-- Type Selection Dialog -->
     <EntryTypeDialog
