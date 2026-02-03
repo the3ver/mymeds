@@ -74,7 +74,10 @@ const messages = {
       delete: 'Delete',
       confirm: 'Confirm',
       create: 'Create',
-      next: 'Next'
+      next: 'Next',
+      download: 'Download',
+      yes: 'Yes',
+      no: 'No'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -119,6 +122,10 @@ const messages = {
         warnings: {
           title: 'Warnings',
           content: 'The app warns you when your stock is running low. You can customize the warning limits (yellow and red) in the settings.'
+        },
+        calendar: {
+          title: 'Calendar',
+          content: 'The calendar allows you to track doctor appointments, vaccinations, illnesses, and notes. You can add entries by clicking the "Add" button below the "Today" separator. Entries are sorted chronologically.'
         }
       },
       close: 'Close'
@@ -184,7 +191,9 @@ const messages = {
         psych: 'Psychiatrist',
         nephro: 'Nephrologist',
         other: 'Other'
-      }
+      },
+      export: 'Export to Calendar',
+      exportConfirm: 'Do you want to add this entry to your device calendar?'
     }
   },
   de: {
@@ -260,7 +269,10 @@ const messages = {
       delete: 'Löschen',
       confirm: 'Bestätigen',
       create: 'Erstellen',
-      next: 'Weiter'
+      next: 'Weiter',
+      download: 'Download',
+      yes: 'Ja',
+      no: 'Nein'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',
@@ -305,6 +317,10 @@ const messages = {
         warnings: {
           title: 'Warnungen',
           content: 'Die App warnt dich, wenn dein Vorrat zur Neige geht. Die Warngrenzen (gelb und rot) kannst du in den Einstellungen anpassen.'
+        },
+        calendar: {
+          title: 'Kalender',
+          content: 'Der Kalender ermöglicht es dir, Arzttermine, Impfungen, Erkrankungen und Notizen zu erfassen. Du kannst Einträge hinzufügen, indem du auf den "Hinzufügen"-Button unter dem "Heute"-Trenner klickst. Die Einträge werden chronologisch sortiert.'
         }
       },
       close: 'Schließen'
@@ -370,7 +386,9 @@ const messages = {
         psych: 'Psychiater',
         nephro: 'Nephrologe',
         other: 'Sonstiges'
-      }
+      },
+      export: 'In Kalender exportieren',
+      exportConfirm: 'Möchtest du diesen Eintrag in deinen Gerätekalender übernehmen?'
     }
   }
 }

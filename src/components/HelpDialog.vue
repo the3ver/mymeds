@@ -50,6 +50,11 @@ const close = () => {
               <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.warnings.title') }}</v-expansion-panel-title>
               <v-expansion-panel-text>{{ t('help.sections.warnings.content') }}</v-expansion-panel-text>
             </v-expansion-panel>
+
+            <v-expansion-panel>
+              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.calendar.title') }}</v-expansion-panel-title>
+              <v-expansion-panel-text>{{ t('help.sections.calendar.content') }}</v-expansion-panel-text>
+            </v-expansion-panel>
           </v-expansion-panels>
         </v-container>
       </v-card-text>

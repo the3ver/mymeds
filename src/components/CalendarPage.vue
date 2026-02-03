@@ -3,14 +3,18 @@ import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
+import { createDetailedCalendarEvent } from '../utils/calendarUtils'
 
 const { t, locale } = useI18n()
 const entries = ref([])
 const typeDialog = ref(false)
 const entryDialog = ref(false)
+const exportDialog = ref(false)
 const currentEntry = ref({})
 const editingIndex = ref(-1)
 const expandedIndex = ref(-1)
+const lastAddedEntry = ref(null)
 
 // Load entries from localStorage
 onMounted(() => {
@@ -192,6 +196,8 @@ const onTypeSelected = (type) => {
 
 const addEntry = (entry) => {
   entries.value.push(entry)
+  lastAddedEntry.value = entry
+  exportDialog.value = true
 }
 
 const openEditDialog = (entry) => {
@@ -231,6 +237,17 @@ const toggleExpand = (index) => {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
     })
+  }
+}
+
+const exportToCalendar = (entry) => {
+  createDetailedCalendarEvent(entry)
+}
+
+const confirmExport = () => {
+  if (lastAddedEntry.value) {
+    exportToCalendar(lastAddedEntry.value)
+    lastAddedEntry.value = null
   }
 }
 
@@ -435,6 +452,14 @@ const parseTreatmentText = (text) => {
                   <v-btn
                     variant="text"
                     color="primary"
+                    prepend-icon="mdi-calendar-export"
+                    @click.stop="exportToCalendar(item.data)"
+                  >
+                    {{ t('calendar.export') }}
+                  </v-btn>
+                  <v-btn
+                    variant="text"
+                    color="primary"
                     prepend-icon="mdi-pencil"
                     @click.stop="openEditDialog(item.data)"
                   >
@@ -487,6 +512,16 @@ const parseTreatmentText = (text) => {
       :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')"
       :confirm-text="t('dialog.save')"
       @confirm="saveEntry"
+    />
+
+    <!-- Export Confirmation Dialog -->
+    <ConfirmDialog
+      v-model="exportDialog"
+      :title="t('calendar.export')"
+      :message="t('calendar.exportConfirm')"
+      :confirm-text="t('dialog.yes')"
+      :cancel-text="t('dialog.no')"
+      @confirm="confirmExport"
     />
   </v-container>
 </template>
