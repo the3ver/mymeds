@@ -450,29 +450,26 @@ const parseTreatmentText = (text) => {
 
                 <div class="d-flex justify-end gap-2 mt-4">
                   <v-btn
+                    icon="mdi-calendar-export"
                     variant="text"
                     color="primary"
-                    prepend-icon="mdi-calendar-export"
+                    :aria-label="t('calendar.export')"
                     @click.stop="exportToCalendar(item.data)"
-                  >
-                    {{ t('calendar.export') }}
-                  </v-btn>
+                  ></v-btn>
                   <v-btn
+                    icon="mdi-pencil"
                     variant="text"
                     color="primary"
-                    prepend-icon="mdi-pencil"
+                    :aria-label="t('dialog.edit')"
                     @click.stop="openEditDialog(item.data)"
-                  >
-                    {{ t('dialog.edit') }}
-                  </v-btn>
+                  ></v-btn>
                   <v-btn
+                    icon="mdi-delete"
                     variant="text"
                     color="error"
-                    prepend-icon="mdi-delete"
+                    :aria-label="t('dialog.delete')"
                     @click.stop="deleteEntry(item.data.originalIndex)"
-                  >
-                    {{ t('dialog.delete') }}
-                  </v-btn>
+                  ></v-btn>
                 </div>
               </v-card-text>
             </div>
