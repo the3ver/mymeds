@@ -14,6 +14,7 @@ const props = defineProps({
       doctor: '',
       doctorType: '',
       location: '',
+      treatments: [],
       // Vaccination fields
       agent: '',
       method: '',
@@ -25,6 +26,10 @@ const props = defineProps({
       // Note fields
       notes: ''
     })
+  },
+  suggestions: {
+    type: Array,
+    default: () => []
   },
   title: {
     type: String,
@@ -48,6 +53,10 @@ watch(() => props.modelValue, (val) => {
     // If date is empty, set to today
     if (!localEntry.value.date) {
       localEntry.value.date = new Date().toISOString().substr(0, 10)
+    }
+    // Ensure treatments is an array
+    if (!localEntry.value.treatments) {
+      localEntry.value.treatments = []
     }
   }
 })
@@ -132,6 +141,19 @@ const save = () => {
             :label="t('calendar.fields.location')"
             variant="underlined"
           ></v-text-field>
+
+          <v-combobox
+            v-model="localEntry.treatments"
+            :items="suggestions"
+            :label="t('calendar.fields.treatments')"
+            multiple
+            chips
+            closable-chips
+            variant="underlined"
+            hide-selected
+            :hint="t('calendar.fields.treatmentsHint')"
+            persistent-hint
+          ></v-combobox>
         </template>
 
         <!-- Vaccination Fields -->

@@ -175,7 +175,8 @@ const onTypeSelected = (type) => {
     doctor: '', doctorType: '', location: '',
     agent: '', method: '', bodyPart: '',
     pathogen: '', symptoms: '', endDate: '',
-    notes: ''
+    notes: '',
+    treatments: [] // Initialize treatments array
   }
   editingIndex.value = -1
   entryDialog.value = true
@@ -187,6 +188,10 @@ const addEntry = (entry) => {
 
 const openEditDialog = (entry) => {
   currentEntry.value = { ...entry }
+  // Ensure treatments array exists for older entries
+  if (!currentEntry.value.treatments) {
+    currentEntry.value.treatments = []
+  }
   editingIndex.value = entry.originalIndex
   entryDialog.value = true
 }
@@ -218,6 +223,17 @@ const toggleExpand = (index) => {
     })
   }
 }
+
+// Collect all unique treatments from existing entries for suggestions
+const existingTreatments = computed(() => {
+  const treatments = new Set()
+  entries.value.forEach(entry => {
+    if (entry.treatments && Array.isArray(entry.treatments)) {
+      entry.treatments.forEach(t => treatments.add(t))
+    }
+  })
+  return Array.from(treatments).sort()
+})
 </script>
 
 <template>
@@ -286,6 +302,22 @@ const toggleExpand = (index) => {
                   <div v-if="item.data.location" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.location') }}:</span>
                     <div class="font-weight-medium">{{ item.data.location }}</div>
+                  </div>
+                  
+                  <!-- Treatments -->
+                  <div v-if="item.data.treatments && item.data.treatments.length > 0" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.treatments') }}:</span>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                      <v-chip
+                        v-for="(treatment, idx) in item.data.treatments"
+                        :key="idx"
+                        size="small"
+                        color="primary"
+                        variant="tonal"
+                      >
+                        {{ treatment }}
+                      </v-chip>
+                    </div>
                   </div>
                 </template>
 
@@ -387,6 +419,7 @@ const toggleExpand = (index) => {
     <CalendarEntryDialog
       v-model="entryDialog"
       :entry="currentEntry"
+      :suggestions="existingTreatments"
       :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')"
       :confirm-text="t('dialog.save')"
       @confirm="saveEntry"
@@ -400,6 +433,9 @@ const toggleExpand = (index) => {
 }
 .gap-2 {
   gap: 8px;
+}
+.gap-1 {
+  gap: 4px;
 }
 .text-wrap {
   white-space: normal !important;

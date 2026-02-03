@@ -146,7 +146,9 @@ const messages = {
         bodyPart: 'Body Part (optional)',
         pathogen: 'Pathogen (optional)',
         symptoms: 'Symptoms (optional)',
-        endDate: 'End Date (optional)'
+        endDate: 'End Date (optional)',
+        treatments: 'Treatments / Examinations',
+        treatmentsHint: 'Type and press Enter to add'
       },
       types: {
         doctor: 'Doctor Appointment',
@@ -323,7 +325,9 @@ const messages = {
         bodyPart: 'Körperstelle (optional)',
         pathogen: 'Erreger (optional)',
         symptoms: 'Symptome (optional)',
-        endDate: 'Enddatum (optional)'
+        endDate: 'Enddatum (optional)',
+        treatments: 'Untersuchungen / Behandlungen',
+        treatmentsHint: 'Tippen und Enter drücken zum Hinzufügen'
       },
       types: {
         doctor: 'Arzttermin',
