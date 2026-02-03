@@ -43,31 +43,8 @@ const groupedAppointments = computed(() => {
     }
   })
   
-  // Future appointments should be ascending (nearest first)
-  // But requirement says "chronological order (Newest First)" for the whole list?
-  // Usually future appointments are sorted ascending (nearest first) and past descending (newest first).
-  // But let's stick to "Newest First" for all as requested, which means descending.
-  // So future: 2024, 2023... Past: 2022, 2021...
-  // Wait, "chronological" usually means oldest first. "Newest first" means reverse chronological.
-  // Let's stick to the computed `sortedAppointments` which is descending.
-  
-  // We need to insert the "Today" separator.
-  // Since the list is descending (Newest first), future dates come first, then today, then past.
-  // So we can just iterate and insert the separator when we cross the boundary.
-  
   const result = []
   let separatorInserted = false
-  
-  // If we have future appointments, add them
-  // If we have past appointments, add them
-  // The separator should be between future and past? Or just "Today"?
-  // Requirement: "Termine in der Zukunft von denen in der Vergangenheit durch eine kleine Card ... getrennt"
-  
-  // Since list is descending:
-  // Future Date (e.g. 2025)
-  // Future Date (e.g. 2024)
-  // --- TODAY ---
-  // Past Date (e.g. 2022)
   
   for (const app of sortedAppointments.value) {
     if (!separatorInserted && app.date < today) {
@@ -77,9 +54,6 @@ const groupedAppointments = computed(() => {
     result.push({ type: 'appointment', data: app })
   }
   
-  // If we reached the end and haven't inserted separator (all future), insert at end?
-  // Or if all past, insert at beginning?
-  // Let's just insert it where it belongs chronologically.
   if (!separatorInserted) {
     result.push({ type: 'separator', date: today })
   }
@@ -168,17 +142,22 @@ const toggleExpand = (index) => {
           <v-card-item>
             <template v-slot:prepend>
               <v-avatar color="secondary" class="mr-2">
-                <v-icon color="white">mdi-calendar-check</v-icon>
+                <span class="text-h6 text-white">
+                  <v-icon color="white">mdi-calendar-check</v-icon>
+                </span>
               </v-avatar>
             </template>
-            <v-card-title>{{ item.data.title }}</v-card-title>
-            <v-card-subtitle>{{ formatDate(item.data.date) }}</v-card-subtitle>
+            
+            <v-card-title class="text-wrap" style="line-height: 1.2;">
+              <div class="text-h6 font-weight-bold mb-1">{{ item.data.title }}</div>
+              <div class="text-body-2 text-grey">{{ formatDate(item.data.date) }}</div>
+            </v-card-title>
           </v-card-item>
 
           <v-expand-transition>
             <div v-if="expandedIndex === item.data.originalIndex">
               <v-divider></v-divider>
-              <v-card-text>
+              <v-card-text class="text-body-1">
                 <div v-if="item.data.doctor" class="mb-2">
                   <span class="text-grey">{{ t('appointments.doctor') }}:</span>
                   <div class="font-weight-medium">{{ item.data.doctor }}</div>
@@ -266,5 +245,8 @@ const toggleExpand = (index) => {
 }
 .gap-2 {
   gap: 8px;
+}
+.text-wrap {
+  white-space: normal !important;
 }
 </style>
