@@ -18,6 +18,9 @@ const uiScale = ref('normal')
 const yellowLimit = ref(21)
 const redLimit = ref(7)
 const confirmResetDialog = ref(false)
+const confirmDeleteMedsDialog = ref(false)
+const confirmDeleteCalendarDialog = ref(false)
+const confirmDeleteAllDialog = ref(false)
 
 // Load settings when dialog opens or component mounts
 onMounted(() => {
@@ -85,6 +88,22 @@ const resetSettings = () => {
   window.dispatchEvent(new Event('storage-overview-changed'))
 }
 
+const deleteMeds = () => {
+  localStorage.removeItem('myMedsItems')
+  localStorage.removeItem('lastDoseUpdate')
+  window.location.reload() // Reload to refresh data
+}
+
+const deleteCalendar = () => {
+  localStorage.removeItem('myMedsCalendarEntries')
+  window.location.reload() // Reload to refresh data
+}
+
+const deleteAll = () => {
+  localStorage.clear()
+  window.location.reload() // Reload to refresh data
+}
+
 const close = () => {
   emit('update:modelValue', false)
 }
@@ -103,52 +122,40 @@ const close = () => {
           <!-- Sort Mode -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.sortMode') }}</div>
-            <v-radio-group v-model="sortMode" color="primary">
-              <v-radio :label="t('app.sortAdded')" value="added"></v-radio>
-              <v-radio :label="t('app.sortName')" value="name"></v-radio>
-              <v-radio :label="t('app.sortDays')" value="days"></v-radio>
-            </v-radio-group>
+            <v-btn-toggle v-model="sortMode" mandatory color="primary" class="d-flex w-100" divided>
+              <v-btn value="added" class="flex-grow-1">{{ t('app.sortAdded') }}</v-btn>
+              <v-btn value="name" class="flex-grow-1">{{ t('app.sortName') }}</v-btn>
+              <v-btn value="days" class="flex-grow-1">{{ t('app.sortDays') }}</v-btn>
+            </v-btn-toggle>
           </div>
 
           <!-- Display Mode -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.displayMode') }}</div>
-            <v-radio-group v-model="displayMode" color="primary">
-              <v-radio value="pills">
-                <template v-slot:label>
-                  <div class="d-flex align-center">
-                    <v-icon start size="small" class="mr-2">mdi-pill</v-icon>
-                    {{ t('app.showPills') }}
-                  </div>
-                </template>
-              </v-radio>
-              <v-radio value="days">
-                <template v-slot:label>
-                  <div class="d-flex align-center">
-                    <v-icon start size="small" class="mr-2">mdi-calendar-clock</v-icon>
-                    {{ t('app.showDays') }}
-                  </div>
-                </template>
-              </v-radio>
-              <v-radio value="packages">
-                <template v-slot:label>
-                  <div class="d-flex align-center">
-                    <v-icon start size="small" class="mr-2">mdi-package-variant-closed</v-icon>
-                    {{ t('app.showPackages') }}
-                  </div>
-                </template>
-              </v-radio>
-            </v-radio-group>
+            <v-btn-toggle v-model="displayMode" mandatory color="primary" class="d-flex w-100" divided>
+              <v-btn value="pills" class="flex-grow-1">
+                <v-icon start class="d-none d-sm-inline-flex">mdi-pill</v-icon>
+                {{ t('app.showPills') }}
+              </v-btn>
+              <v-btn value="days" class="flex-grow-1">
+                <v-icon start class="d-none d-sm-inline-flex">mdi-calendar-clock</v-icon>
+                {{ t('app.showDays') }}
+              </v-btn>
+              <v-btn value="packages" class="flex-grow-1">
+                <v-icon start class="d-none d-sm-inline-flex">mdi-package-variant-closed</v-icon>
+                {{ t('app.showPackages') }}
+              </v-btn>
+            </v-btn-toggle>
           </div>
 
           <!-- UI Scale -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.uiScale') }}</div>
-            <v-radio-group v-model="uiScale" color="primary">
-              <v-radio :label="t('app.scaleSmall')" value="small"></v-radio>
-              <v-radio :label="t('app.scaleNormal')" value="normal"></v-radio>
-              <v-radio :label="t('app.scaleLarge')" value="large"></v-radio>
-            </v-radio-group>
+            <v-btn-toggle v-model="uiScale" mandatory color="primary" class="d-flex w-100" divided>
+              <v-btn value="small" class="flex-grow-1">{{ t('app.scaleSmall') }}</v-btn>
+              <v-btn value="normal" class="flex-grow-1">{{ t('app.scaleNormal') }}</v-btn>
+              <v-btn value="large" class="flex-grow-1">{{ t('app.scaleLarge') }}</v-btn>
+            </v-btn-toggle>
           </div>
 
           <!-- Limits -->
@@ -180,10 +187,41 @@ const close = () => {
           <!-- Language -->
           <div class="mb-6">
             <div class="text-subtitle-1 font-weight-bold mb-2">Language / Sprache</div>
-            <v-radio-group v-model="language" color="primary">
-              <v-radio label="English" value="en"></v-radio>
-              <v-radio label="Deutsch" value="de"></v-radio>
-            </v-radio-group>
+            <v-btn-toggle v-model="language" mandatory color="primary" class="d-flex w-100" divided>
+              <v-btn value="en" class="flex-grow-1">English</v-btn>
+              <v-btn value="de" class="flex-grow-1">Deutsch</v-btn>
+            </v-btn-toggle>
+          </div>
+
+          <v-divider class="mb-6"></v-divider>
+
+          <!-- Data Management -->
+          <div class="text-h6 mb-4">{{ t('app.dataManagement') }}</div>
+          <div class="d-flex flex-column gap-2 mb-6">
+            <v-btn
+              color="error"
+              variant="outlined"
+              prepend-icon="mdi-pill"
+              @click="confirmDeleteMedsDialog = true"
+            >
+              {{ t('app.deleteMeds') }}
+            </v-btn>
+            <v-btn
+              color="error"
+              variant="outlined"
+              prepend-icon="mdi-calendar"
+              @click="confirmDeleteCalendarDialog = true"
+            >
+              {{ t('app.deleteCalendar') }}
+            </v-btn>
+            <v-btn
+              color="error"
+              variant="elevated"
+              prepend-icon="mdi-delete-forever"
+              @click="confirmDeleteAllDialog = true"
+            >
+              {{ t('app.deleteAll') }}
+            </v-btn>
           </div>
 
           <v-divider class="mb-6"></v-divider>
@@ -191,8 +229,8 @@ const close = () => {
           <!-- Reset Button -->
           <div class="d-flex justify-center">
             <v-btn
-              color="error"
-              variant="outlined"
+              color="warning"
+              variant="text"
               prepend-icon="mdi-restore"
               @click="confirmResetDialog = true"
             >
@@ -213,8 +251,41 @@ const close = () => {
       :cancel-text="t('dialog.cancel')"
       @confirm="resetSettings"
     />
+
+    <!-- Confirm Delete Meds Dialog -->
+    <ConfirmDialog
+      v-model="confirmDeleteMedsDialog"
+      :title="t('app.deleteMeds')"
+      :message="t('app.deleteMedsConfirm')"
+      :confirm-text="t('dialog.delete')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="deleteMeds"
+    />
+
+    <!-- Confirm Delete Calendar Dialog -->
+    <ConfirmDialog
+      v-model="confirmDeleteCalendarDialog"
+      :title="t('app.deleteCalendar')"
+      :message="t('app.deleteCalendarConfirm')"
+      :confirm-text="t('dialog.delete')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="deleteCalendar"
+    />
+
+    <!-- Confirm Delete All Dialog -->
+    <ConfirmDialog
+      v-model="confirmDeleteAllDialog"
+      :title="t('app.deleteAll')"
+      :message="t('app.deleteAllConfirm')"
+      :confirm-text="t('dialog.delete')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="deleteAll"
+    />
   </v-dialog>
 </template>
 
 <style scoped>
+.gap-2 {
+  gap: 8px;
+}
 </style>
