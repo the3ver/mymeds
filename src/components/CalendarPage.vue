@@ -45,17 +45,6 @@ const sortedEntries = computed(() => {
 
 const groupedEntries = computed(() => {
   const today = new Date().toISOString().substr(0, 10)
-  const result = []
-
-  let todayInserted = false
-
-  // Helper to get quarter string (e.g. "Q1/2024")
-  const getQuarter = (dateStr) => {
-    const date = new Date(dateStr)
-    const q = Math.floor((date.getMonth() + 3) / 3)
-    const y = date.getFullYear()
-    return { q, y, str: `${y}-Q${q}` }
-  }
 
   // Better approach:
   // 1. Take real entries.
@@ -131,10 +120,6 @@ const formatDate = (dateStr) => {
   const date = new Date(dateStr)
   const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
   return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
-}
-
-const getEntryTypeLabel = (type) => {
-  return t(`calendar.types.${type}`)
 }
 
 const getEntryIcon = (type) => {
@@ -534,9 +519,6 @@ const parseTreatmentText = (text) => {
 }
 .gap-2 {
   gap: 8px;
-}
-.gap-1 {
-  gap: 4px;
 }
 .text-wrap {
   white-space: normal !important;

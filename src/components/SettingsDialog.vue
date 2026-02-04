@@ -18,9 +18,6 @@ const uiScale = ref('normal')
 const yellowLimit = ref(21)
 const redLimit = ref(7)
 const confirmResetDialog = ref(false)
-const confirmDeleteMedsDialog = ref(false)
-const confirmDeleteCalendarDialog = ref(false)
-const confirmDeleteAllDialog = ref(false)
 
 // Load settings when dialog opens or component mounts
 onMounted(() => {
@@ -86,22 +83,6 @@ const resetSettings = () => {
   // Reset overview (not in this dialog but part of settings)
   localStorage.setItem('myMedsShowOverview', 'true')
   window.dispatchEvent(new Event('storage-overview-changed'))
-}
-
-const deleteMeds = () => {
-  localStorage.removeItem('myMedsItems')
-  localStorage.removeItem('lastDoseUpdate')
-  window.location.reload() // Reload to refresh data
-}
-
-const deleteCalendar = () => {
-  localStorage.removeItem('myMedsCalendarEntries')
-  window.location.reload() // Reload to refresh data
-}
-
-const deleteAll = () => {
-  localStorage.clear()
-  window.location.reload() // Reload to refresh data
 }
 
 const close = () => {
@@ -207,37 +188,6 @@ const close = () => {
 
           <v-divider class="mb-6"></v-divider>
 
-          <!-- Data Management -->
-          <div class="text-h6 mb-4">{{ t('app.dataManagement') }}</div>
-          <div class="d-flex flex-column gap-2 mb-6">
-            <v-btn
-              color="error"
-              variant="outlined"
-              prepend-icon="mdi-pill"
-              @click="confirmDeleteMedsDialog = true"
-            >
-              {{ t('app.deleteMeds') }}
-            </v-btn>
-            <v-btn
-              color="error"
-              variant="outlined"
-              prepend-icon="mdi-calendar"
-              @click="confirmDeleteCalendarDialog = true"
-            >
-              {{ t('app.deleteCalendar') }}
-            </v-btn>
-            <v-btn
-              color="error"
-              variant="elevated"
-              prepend-icon="mdi-delete-forever"
-              @click="confirmDeleteAllDialog = true"
-            >
-              {{ t('app.deleteAll') }}
-            </v-btn>
-          </div>
-
-          <v-divider class="mb-6"></v-divider>
-
           <!-- Reset Button -->
           <div class="d-flex justify-center">
             <v-btn
@@ -262,36 +212,6 @@ const close = () => {
       :confirm-text="t('dialog.confirm')"
       :cancel-text="t('dialog.cancel')"
       @confirm="resetSettings"
-    />
-
-    <!-- Confirm Delete Meds Dialog -->
-    <ConfirmDialog
-      v-model="confirmDeleteMedsDialog"
-      :title="t('app.deleteMeds')"
-      :message="t('app.deleteMedsConfirm')"
-      :confirm-text="t('dialog.delete')"
-      :cancel-text="t('dialog.cancel')"
-      @confirm="deleteMeds"
-    />
-
-    <!-- Confirm Delete Calendar Dialog -->
-    <ConfirmDialog
-      v-model="confirmDeleteCalendarDialog"
-      :title="t('app.deleteCalendar')"
-      :message="t('app.deleteCalendarConfirm')"
-      :confirm-text="t('dialog.delete')"
-      :cancel-text="t('dialog.cancel')"
-      @confirm="deleteCalendar"
-    />
-
-    <!-- Confirm Delete All Dialog -->
-    <ConfirmDialog
-      v-model="confirmDeleteAllDialog"
-      :title="t('app.deleteAll')"
-      :message="t('app.deleteAllConfirm')"
-      :confirm-text="t('dialog.delete')"
-      :cancel-text="t('dialog.cancel')"
-      @confirm="deleteAll"
     />
   </v-dialog>
 </template>
