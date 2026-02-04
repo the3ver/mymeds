@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
+import FilterDialog from './FilterDialog.vue'
 import { createDetailedCalendarEvent } from '../utils/calendarUtils'
 
 const { t, locale } = useI18n()
@@ -11,10 +12,12 @@ const entries = ref([])
 const typeDialog = ref(false)
 const entryDialog = ref(false)
 const exportDialog = ref(false)
+const filterDialog = ref(false)
 const currentEntry = ref({})
 const editingIndex = ref(-1)
 const expandedIndex = ref(-1)
 const lastAddedEntry = ref(null)
+const filterTypes = ref([])
 
 // Load entries from localStorage
 onMounted(() => {
@@ -39,7 +42,13 @@ watch(entries, (newVal) => {
 
 const sortedEntries = computed(() => {
   // Sort by date descending (newest first)
-  return [...entries.value].map((item, index) => ({ ...item, originalIndex: index }))
+  let filtered = [...entries.value]
+
+  if (filterTypes.value.length > 0) {
+    filtered = filtered.filter(entry => filterTypes.value.includes(entry.type))
+  }
+
+  return filtered.map((item, index) => ({ ...item, originalIndex: index }))
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 })
 
@@ -241,6 +250,16 @@ const confirmExport = () => {
   }
 }
 
+const clearFilter = () => {
+  filterTypes.value = []
+}
+
+const filterText = computed(() => {
+  if (filterTypes.value.length === 0) return ''
+  const typeNames = filterTypes.value.map(type => t(`calendar.types.${type}`)).join(', ')
+  return t('calendar.filterBy', { types: typeNames })
+})
+
 // Collect all unique treatments from existing entries for suggestions
 const existingTreatments = computed(() => {
   const treatments = new Set()
@@ -291,6 +310,38 @@ const parseTreatmentText = (text) => {
 
 <template>
   <v-container>
+    <!-- Header with Filter Icon -->
+    <div class="d-flex justify-end mb-2">
+      <v-btn
+        icon="mdi-filter-variant"
+        variant="text"
+        :color="filterTypes.length > 0 ? 'primary' : undefined"
+        @click="filterDialog = true"
+      ></v-btn>
+    </div>
+
+    <!-- Active Filter Display -->
+    <v-card
+      v-if="filterTypes.length > 0"
+      class="mb-4 bg-primary-lighten-5"
+      variant="tonal"
+      density="compact"
+    >
+      <v-card-text class="d-flex align-center justify-space-between py-2">
+        <span class="text-caption font-weight-bold text-truncate mr-2">
+          {{ filterText }}
+        </span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          density="compact"
+          size="small"
+          :title="t('calendar.clearFilter')"
+          @click="clearFilter"
+        ></v-btn>
+      </v-card-text>
+    </v-card>
+
     <div v-if="entries.length > 0">
       <template v-for="(item, i) in groupedEntries" :key="i">
         <!-- Today Separator -->
@@ -509,6 +560,12 @@ const parseTreatmentText = (text) => {
       :confirm-text="t('dialog.yes')"
       :cancel-text="t('dialog.no')"
       @confirm="confirmExport"
+    />
+
+    <!-- Filter Dialog -->
+    <FilterDialog
+      v-model="filterDialog"
+      v-model:selected-filters="filterTypes"
     />
   </v-container>
 </template>

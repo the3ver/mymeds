@@ -193,7 +193,10 @@ const messages = {
         other: 'Other'
       },
       export: 'Export to Calendar',
-      exportConfirm: 'Do you want to add this entry to your device calendar?'
+      exportConfirm: 'Do you want to add this entry to your device calendar?',
+      filter: 'Filter',
+      filterBy: 'Filtered by type: {types}',
+      clearFilter: 'Clear Filter'
     }
   },
   de: {
@@ -388,7 +391,10 @@ const messages = {
         other: 'Sonstiges'
       },
       export: 'In Kalender exportieren',
-      exportConfirm: 'Möchtest du diesen Eintrag in deinen Gerätekalender übernehmen?'
+      exportConfirm: 'Möchtest du diesen Eintrag in deinen Gerätekalender übernehmen?',
+      filter: 'Filtern',
+      filterBy: 'Gefiltert nach Typ: {types}',
+      clearFilter: 'Filter löschen'
     }
   }
 }
