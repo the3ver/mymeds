@@ -326,7 +326,7 @@ defineExpose({
       density="compact"
     >
       <v-card-text class="d-flex align-center justify-space-between py-2">
-        <span class="text-caption font-weight-bold text-truncate mr-2">
+        <span class="text-body-2 font-weight-bold text-truncate mr-2">
           {{ filterText }}
         </span>
         <v-btn
