@@ -215,9 +215,3 @@ const close = () => {
     />
   </v-dialog>
 </template>
-
-<style scoped>
-.gap-2 {
-  gap: 8px;
-}
-</style>
