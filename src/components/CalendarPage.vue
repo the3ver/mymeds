@@ -315,7 +315,7 @@ const parseTreatmentText = (text) => {
             variant="tonal"
             density="compact"
           >
-            <span class="text-caption font-weight-bold">
+            <span class="text-body-1 font-weight-bold">
               {{ t('calendar.today') }}, {{ formatDate(item.date) }}
             </span>
           </v-card>
@@ -341,7 +341,7 @@ const parseTreatmentText = (text) => {
           class="d-flex align-center justify-center mb-4 text-grey"
         >
           <v-divider class="flex-grow-1"></v-divider>
-          <span class="mx-4 text-caption font-weight-bold">{{ item.data.title }}</span>
+          <span class="mx-4 text-body-1 font-weight-bold">{{ item.data.title }}</span>
           <v-divider class="flex-grow-1"></v-divider>
         </div>
 
