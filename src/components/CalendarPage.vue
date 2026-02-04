@@ -44,7 +44,7 @@ const sortedEntries = computed(() => {
 })
 
 const groupedEntries = computed(() => {
-  const today = new Date().toISOString().substr(0, 10)
+  const today = new Date().toISOString().split('T')[0]
 
   // Better approach:
   // 1. Take real entries.
@@ -65,7 +65,7 @@ const groupedEntries = computed(() => {
     
     while (current <= maxDate) {
       const qDate = new Date(current)
-      const qStr = qDate.toISOString().substr(0, 10)
+      const qStr = qDate.toISOString().split('T')[0]
       
       // Check if we already have a quarter entry for this date (unlikely for user entries, but possible)
       // We add a virtual entry
@@ -122,6 +122,10 @@ const formatDate = (dateStr) => {
   return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 }
 
+const getEntryTypeLabel = (type) => {
+  return t(`calendar.types.${type}`)
+}
+
 const getEntryIcon = (type) => {
   switch (type) {
     case 'doctor': return 'mdi-doctor'
@@ -167,7 +171,7 @@ const openTypeDialog = () => {
 const onTypeSelected = (type) => {
   currentEntry.value = { 
     type, 
-    date: new Date().toISOString().substr(0, 10),
+    date: new Date().toISOString().split('T')[0],
     title: '',
     doctor: '', doctorType: '', location: '',
     agent: '', method: '', bodyPart: '',
@@ -183,7 +187,7 @@ const addEntry = (entry) => {
   entries.value.push(entry)
 
   // Check if entry is in the future
-  const today = new Date().toISOString().substr(0, 10)
+  const today = new Date().toISOString().split('T')[0]
   if (entry.date >= today) {
     lastAddedEntry.value = entry
     exportDialog.value = true
