@@ -122,10 +122,6 @@ const formatDate = (dateStr) => {
   return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 }
 
-const getEntryTypeLabel = (type) => {
-  return t(`calendar.types.${type}`)
-}
-
 const getEntryIcon = (type) => {
   switch (type) {
     case 'doctor': return 'mdi-doctor'
