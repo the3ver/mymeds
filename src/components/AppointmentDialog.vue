@@ -36,7 +36,7 @@ watch(() => props.modelValue, (val) => {
     localAppointment.value = { ...props.appointment }
     // If date is empty, set to today
     if (!localAppointment.value.date) {
-      localAppointment.value.date = new Date().toISOString().substr(0, 10)
+      localAppointment.value.date = new Date().toISOString().split('T')[0]
     }
   }
 })

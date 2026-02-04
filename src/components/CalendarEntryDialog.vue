@@ -48,7 +48,7 @@ watch(() => props.modelValue, (val) => {
   if (val) {
     localEntry.value = { ...props.entry }
     if (!localEntry.value.date) {
-      localEntry.value.date = new Date().toISOString().substr(0, 10)
+      localEntry.value.date = new Date().toISOString().split('T')[0]
     }
     // Ensure treatments is a string (migration from array if needed)
     if (Array.isArray(localEntry.value.treatments)) {

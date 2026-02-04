@@ -31,7 +31,7 @@ const sortedAppointments = computed(() => {
 })
 
 const groupedAppointments = computed(() => {
-  const today = new Date().toISOString().substr(0, 10)
+  const today = new Date().toISOString().split('T')[0]
   const future = []
   const past = []
   
