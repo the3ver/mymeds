@@ -25,6 +25,7 @@ const snackbar = ref(false)
 const snackbarText = ref('')
 const activeTab = ref('meds') // 'meds' or 'calendar'
 const deductions = ref({}) // Stores deductions for display
+const calendarPageRef = ref(null)
 
 // Load items from localStorage on mount
 onMounted(() => {
@@ -150,6 +151,16 @@ const saveEdit = (med) => {
     editingIndex.value = -1
   }
 }
+
+const refreshPage = () => {
+  window.location.reload()
+}
+
+const openCalendarFilter = () => {
+  if (calendarPageRef.value) {
+    calendarPageRef.value.openFilterDialog()
+  }
+}
 </script>
 
 <template>
@@ -169,6 +180,14 @@ const saveEdit = (med) => {
       <span v-if="activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
       <span v-else-if="activeTab === 'calendar'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.calendar') }}</span>
     </v-app-bar-title>
+    <template v-slot:append>
+      <v-btn
+        v-if="activeTab === 'calendar'"
+        icon="mdi-filter-variant"
+        @click="openCalendarFilter"
+      ></v-btn>
+      <v-btn icon="mdi-refresh" @click="refreshPage"></v-btn>
+    </template>
   </v-app-bar>
 
   <v-main>
@@ -195,7 +214,10 @@ const saveEdit = (med) => {
       </v-card>
     </v-container>
 
-    <CalendarPage v-if="activeTab === 'calendar'" />
+    <CalendarPage
+      v-if="activeTab === 'calendar'"
+      ref="calendarPageRef"
+    />
   </v-main>
 
   <v-bottom-navigation v-model="activeTab" color="primary" grow>
@@ -251,6 +273,13 @@ const saveEdit = (med) => {
     </template>
   </v-snackbar>
 </template>
+
+<style>
+/* Global style to prevent pull-to-refresh */
+html, body {
+  overscroll-behavior-y: contain;
+}
+</style>
 
 <style scoped>
 .border-dashed {

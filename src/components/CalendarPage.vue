@@ -306,20 +306,18 @@ const parseTreatmentText = (text) => {
 
   return segments
 }
+
+const openFilterDialog = () => {
+  filterDialog.value = true
+}
+
+defineExpose({
+  openFilterDialog
+})
 </script>
 
 <template>
   <v-container>
-    <!-- Header with Filter Icon -->
-    <div class="d-flex justify-end mb-2">
-      <v-btn
-        icon="mdi-filter-variant"
-        variant="text"
-        :color="filterTypes.length > 0 ? 'primary' : undefined"
-        @click="filterDialog = true"
-      ></v-btn>
-    </div>
-
     <!-- Active Filter Display -->
     <v-card
       v-if="filterTypes.length > 0"
@@ -332,7 +330,7 @@ const parseTreatmentText = (text) => {
           {{ filterText }}
         </span>
         <v-btn
-          icon="mdi-close"
+          icon="mdi-delete"
           variant="text"
           density="compact"
           size="small"
