@@ -397,8 +397,8 @@ defineExpose({
             </template>
             
             <v-card-title class="text-wrap" style="line-height: 1.2;">
-              <div class="text-h6 font-weight-bold mb-1">{{ item.data.title }}</div>
-              <div class="text-body-2 text-grey">{{ getEntrySubtitle(item.data) }}</div>
+              <div class="text-h6 mb-1">{{ item.data.title }}</div>
+              <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
             </v-card-title>
           </v-card-item>
 

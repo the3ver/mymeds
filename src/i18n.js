@@ -47,6 +47,8 @@ const messages = {
       deleteCalendarConfirm: 'Are you sure you want to delete all calendar entries? This cannot be undone.',
       deleteAll: 'Delete All Data',
       deleteAllConfirm: 'Are you sure you want to delete ALL data (medications, calendar, settings)? This cannot be undone.',
+      deleteConfirmLabel: 'Type "Delete" to confirm',
+      deleteConfirmValue: 'Delete',
       exportData: 'Export Data',
       importData: 'Import Data',
       exportTitle: 'Export Data',
@@ -185,10 +187,10 @@ const messages = {
       },
       methods: {
         subcutaneous: 'Subcutaneous',
-        intramuscular: 'Intramuscular',
+        intramuscular: 'Intramuskulär',
         oral: 'Oral',
         rectal: 'Rectal',
-        other: 'Other'
+        other: 'Sonstiges'
       },
       doctorTypes: {
         general: 'General Practitioner',
@@ -258,6 +260,8 @@ const messages = {
       deleteCalendarConfirm: 'Möchtest du wirklich alle Kalendereinträge löschen? Dies kann nicht rückgängig gemacht werden.',
       deleteAll: 'Alle Daten löschen',
       deleteAllConfirm: 'Möchtest du wirklich ALLE Daten (Medikamente, Kalender, Einstellungen) löschen? Dies kann nicht rückgängig gemacht werden.',
+      deleteConfirmLabel: 'Tippe "Löschen" zum Bestätigen',
+      deleteConfirmValue: 'Löschen',
       exportData: 'Daten exportieren',
       importData: 'Daten importieren',
       exportTitle: 'Daten exportieren',

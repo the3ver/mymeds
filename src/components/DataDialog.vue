@@ -213,6 +213,8 @@ const close = () => {
       :message="t('app.deleteMedsConfirm')"
       :confirm-text="t('dialog.delete')"
       :cancel-text="t('dialog.cancel')"
+      :confirm-input-label="t('app.deleteConfirmLabel')"
+      :confirm-input-value="t('app.deleteConfirmValue')"
       @confirm="deleteMeds"
     />
 
@@ -223,6 +225,8 @@ const close = () => {
       :message="t('app.deleteCalendarConfirm')"
       :confirm-text="t('dialog.delete')"
       :cancel-text="t('dialog.cancel')"
+      :confirm-input-label="t('app.deleteConfirmLabel')"
+      :confirm-input-value="t('app.deleteConfirmValue')"
       @confirm="deleteCalendar"
     />
 
@@ -233,6 +237,8 @@ const close = () => {
       :message="t('app.deleteAllConfirm')"
       :confirm-text="t('dialog.delete')"
       :cancel-text="t('dialog.cancel')"
+      :confirm-input-label="t('app.deleteConfirmLabel')"
+      :confirm-input-value="t('app.deleteConfirmValue')"
       @confirm="deleteAll"
     />
   </v-dialog>
