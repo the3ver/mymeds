@@ -107,6 +107,10 @@ const confirmImport = () => {
   localStorage.setItem('myMedsItems', JSON.stringify(data.meds))
   localStorage.setItem('myMedsCalendarEntries', JSON.stringify(data.calendar))
 
+  // We do NOT update lastDoseUpdate here.
+  // The user is responsible for the data consistency regarding daily doses.
+  // The app will keep its current lastDoseUpdate state.
+
   alert(t('app.importSuccess'))
   window.location.reload()
 }
