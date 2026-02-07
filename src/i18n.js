@@ -46,7 +46,20 @@ const messages = {
       deleteCalendar: 'Delete Calendar Entries',
       deleteCalendarConfirm: 'Are you sure you want to delete all calendar entries? This cannot be undone.',
       deleteAll: 'Delete All Data',
-      deleteAllConfirm: 'Are you sure you want to delete ALL data (medications, calendar, settings)? This cannot be undone.'
+      deleteAllConfirm: 'Are you sure you want to delete ALL data (medications, calendar, settings)? This cannot be undone.',
+      exportData: 'Export Data',
+      importData: 'Import Data',
+      exportTitle: 'Export Data',
+      exportMessage: 'Do you want to save the data as a file or share it?',
+      saveFile: 'Save File',
+      shareFile: 'Share / Email',
+      importTitle: 'Import Data',
+      importMessage: 'This will overwrite your current data. Please confirm the import.',
+      importStats: 'Export Date: {date}\nMedications: {medsCount} (Current: {currentMedsCount})\nCalendar Entries: {calendarCount} (Current: {currentCalendarCount})',
+      importConfirmLabel: 'Type "Import" to confirm',
+      importConfirmValue: 'Import',
+      importSuccess: 'Data imported successfully.',
+      importError: 'Error importing data. Invalid file format.'
     },
     med: {
       name: 'Name',
@@ -244,7 +257,20 @@ const messages = {
       deleteCalendar: 'Kalendereinträge löschen',
       deleteCalendarConfirm: 'Möchtest du wirklich alle Kalendereinträge löschen? Dies kann nicht rückgängig gemacht werden.',
       deleteAll: 'Alle Daten löschen',
-      deleteAllConfirm: 'Möchtest du wirklich ALLE Daten (Medikamente, Kalender, Einstellungen) löschen? Dies kann nicht rückgängig gemacht werden.'
+      deleteAllConfirm: 'Möchtest du wirklich ALLE Daten (Medikamente, Kalender, Einstellungen) löschen? Dies kann nicht rückgängig gemacht werden.',
+      exportData: 'Daten exportieren',
+      importData: 'Daten importieren',
+      exportTitle: 'Daten exportieren',
+      exportMessage: 'Möchtest du die Daten als Datei speichern oder teilen?',
+      saveFile: 'Datei speichern',
+      shareFile: 'Teilen / E-Mail',
+      importTitle: 'Daten importieren',
+      importMessage: 'Dies überschreibt deine aktuellen Daten. Bitte bestätige den Import.',
+      importStats: 'Exportdatum: {date}\nMedikamente: {medsCount} (Aktuell: {currentMedsCount})\nKalendereinträge: {calendarCount} (Aktuell: {currentCalendarCount})',
+      importConfirmLabel: 'Tippe "Import" zum Bestätigen',
+      importConfirmValue: 'Import',
+      importSuccess: 'Daten erfolgreich importiert.',
+      importError: 'Fehler beim Importieren der Daten. Ungültiges Dateiformat.'
     },
     med: {
       name: 'Name',
