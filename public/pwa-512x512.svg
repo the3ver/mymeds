@@ -1,10 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background List Lines -->
+  <g stroke="#E0E0E0" stroke-width="30" stroke-linecap="round">
+    <line x1="80" y1="120" x2="432" y2="120" />
+    <line x1="80" y1="200" x2="432" y2="200" />
+    <line x1="80" y1="280" x2="432" y2="280" />
+    <line x1="80" y1="360" x2="432" y2="360" />
+  </g>
+
+  <!-- Pill -->
   <g transform="rotate(45 256 256)">
     <!-- Top Half: Red -->
-    <path d="M156,256 L156,156 A100,100 0 0,1 356,156 L356,256 Z" fill="#F44336"/>
+    <path d="M136,256 L136,136 A120,120 0 0,1 376,136 L376,256 Z" fill="#F44336"/>
     <!-- Bottom Half: White -->
-    <path d="M156,256 L356,256 L356,356 A100,100 0 0,1 156,356 Z" fill="#FFFFFF"/>
+    <path d="M136,256 L376,256 L376,376 A120,120 0 0,1 136,376 Z" fill="#FFFFFF"/>
     <!-- Border -->
-    <rect x="156" y="56" width="200" height="400" rx="100" ry="100" fill="none" stroke="#2c3e50" stroke-width="10"/>
+    <rect x="136" y="16" width="240" height="480" rx="120" ry="120" fill="none" stroke="#2c3e50" stroke-width="12"/>
   </g>
 </svg>
