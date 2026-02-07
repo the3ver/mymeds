@@ -387,6 +387,7 @@ defineExpose({
           variant="elevated"
           @click="toggleExpand(item.data.originalIndex)"
         >
+
           <v-card-item>
             <template v-slot:prepend>
               <v-avatar :color="getEntryColor(item.data.type)" class="mr-2">
