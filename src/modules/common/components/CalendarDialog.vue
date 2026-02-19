@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { createCalendarEvent } from '../utils/calendarUtils'
+import { createCalendarEvent } from '../../calendar/utils/calendarUtils'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -19,7 +19,7 @@ const createEvent = () => {
   const title = t('app.calendarTitle')
   const appUrl = 'https://the3ver.github.io/mymeds/'
   const description = `${t('app.calendarDesc')}\n${appUrl}`
-  
+
   createCalendarEvent(title, description, props.rawDate, appUrl)
   close()
 }

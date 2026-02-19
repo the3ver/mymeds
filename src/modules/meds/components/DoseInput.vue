@@ -40,7 +40,7 @@ watch(() => props.modelValue, (val) => {
   } else {
     // If it's just a single number, put it in morning or treat as custom?
     // For backward compatibility, if it's a single number, we might just leave it
-    // But this component enforces the pattern. 
+    // But this component enforces the pattern.
     // Let's assume if it's not a pattern, we try to parse it as morning dose or reset.
     // Actually, let's try to be smart: if it's a single number, maybe user just entered "1".
     // We can set morning=1 and others 0.
@@ -62,7 +62,7 @@ const updateModel = () => {
   if (ni && ni !== '0' && ni !== '') {
     result += `-${ni}`
   }
-  
+
   emit('update:modelValue', result)
 }
 
@@ -74,12 +74,12 @@ const validateInput = (val) => {
 
 const onInput = (field, val) => {
   if (!validateInput(val)) return
-  
+
   if (field === 'morning') morning.value = val
   if (field === 'noon') noon.value = val
   if (field === 'evening') evening.value = val
   if (field === 'night') night.value = val
-  
+
   updateModel()
 }
 </script>

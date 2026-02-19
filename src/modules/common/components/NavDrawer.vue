@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
-import packageJson from '../../package.json'
+import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
 import DataDialog from './DataDialog.vue'
@@ -36,7 +36,7 @@ const toggleTheme = () => {
     <v-list>
       <v-list-item :title="t('app.settings')" :subtitle="t('app.preferences')"></v-list-item>
       <v-divider></v-divider>
-      
+
       <v-list-item @click="toggleTheme">
         <template v-slot:prepend>
           <v-icon>{{ theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
@@ -94,7 +94,7 @@ const toggleTheme = () => {
       <v-card-text>
         <p class="mb-4">{{ t('about.description') }}</p>
         <p class="mb-4 text-body-2 text-grey-darken-1">{{ t('about.explanation') }}</p>
-        
+
         <v-list density="compact">
           <v-list-item
             prepend-icon="mdi-tag-text-outline"

@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LinkDialog from './LinkDialog.vue'
 import { useDoctorTypes, useVaccinationMethods } from '../utils/calendarOptions.js'
-import { appendLink } from '../utils/stringUtils.js'
+import { appendLink } from '../../common/utils/stringUtils.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -111,7 +111,7 @@ const save = () => {
           variant="underlined"
           required
         ></v-text-field>
-        
+
         <v-text-field
           v-model="localEntry.title"
           :label="t('calendar.fields.title') + ' *'"
@@ -127,7 +127,7 @@ const save = () => {
             :label="t('calendar.fields.doctor')"
             variant="underlined"
           ></v-text-field>
-          
+
           <v-select
             v-model="localEntry.doctorType"
             :items="doctorTypes"
@@ -136,7 +136,7 @@ const save = () => {
             item-title="title"
             item-value="value"
           ></v-select>
-          
+
           <v-text-field
             v-model="localEntry.location"
             :label="t('calendar.fields.location')"
@@ -179,7 +179,7 @@ const save = () => {
             :label="t('calendar.fields.agent')"
             variant="underlined"
           ></v-text-field>
-          
+
           <v-select
             v-model="localEntry.method"
             :items="vaccinationMethods"
@@ -188,7 +188,7 @@ const save = () => {
             item-title="title"
             item-value="value"
           ></v-select>
-          
+
           <v-text-field
             v-model="localEntry.bodyPart"
             :label="t('calendar.fields.bodyPart')"
@@ -203,7 +203,7 @@ const save = () => {
             :label="t('calendar.fields.pathogen')"
             variant="underlined"
           ></v-text-field>
-          
+
           <v-textarea
             v-model="localEntry.symptoms"
             :label="t('calendar.fields.symptoms')"
@@ -211,7 +211,7 @@ const save = () => {
             rows="2"
             auto-grow
           ></v-textarea>
-          
+
           <v-text-field
             v-model="localEntry.endDate"
             :label="t('calendar.fields.endDate')"
@@ -248,7 +248,7 @@ const save = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="close">{{ t('dialog.cancel') }}</v-btn>
+        <v-btn color="primary" text @click="close">{{ t('dialog.cancel') }}</v-b-btn>
         <v-btn color="primary" text @click="save">{{ confirmText }}</v-btn>
       </v-card-actions>
     </v-card>

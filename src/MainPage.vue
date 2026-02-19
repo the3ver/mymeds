@@ -2,14 +2,14 @@
 import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
-import { checkAndUpdateDailyDose, calculateDaysRemaining } from '../utils/medUtils'
-import MedDialog from './MedDialog.vue'
-import NavDrawer from './NavDrawer.vue'
-import MedList from './MedList.vue'
-import WelcomeDialog from './WelcomeDialog.vue'
-import UpdateDialog from './UpdateDialog.vue'
-import CalendarPage from './CalendarPage.vue'
-import packageJson from '../../package.json'
+import { checkAndUpdateDailyDose, calculateDaysRemaining } from './modules/meds/utils/medUtils'
+import MedDialog from './modules/meds/components/MedDialog.vue'
+import NavDrawer from './modules/common/components/NavDrawer.vue'
+import MedList from './modules/meds/components/MedList.vue'
+import WelcomeDialog from './modules/common/components/WelcomeDialog.vue'
+import UpdateDialog from './modules/common/components/UpdateDialog.vue'
+import CalendarPage from './modules/calendar/components/CalendarPage.vue'
+import packageJson from '../package.json'
 
 const theme = useTheme()
 const { t } = useI18n()
@@ -33,10 +33,10 @@ onMounted(() => {
   if (savedItemsJson) {
     let savedItems = JSON.parse(savedItemsJson)
     const lastUpdate = localStorage.getItem('lastDoseUpdate')
-    
+
     // Check for daily updates
     const result = checkAndUpdateDailyDose(savedItems, lastUpdate)
-    
+
     if (result.updated) {
       localStorage.setItem('lastDoseUpdate', result.newDate)
       // Store deductions to show in UI
@@ -44,9 +44,9 @@ onMounted(() => {
         deductions.value = result.deductions
       }
     }
-    
+
     items.value = result.updatedItems
-    
+
     // Check for warnings
     checkWarnings(items.value)
   } else {
@@ -62,7 +62,7 @@ onMounted(() => {
 
   // Check for first run after installation
   checkFirstRun()
-  
+
   // Check for updates
   checkUpdate()
 })
@@ -70,13 +70,13 @@ onMounted(() => {
 const checkWarnings = (meds) => {
   const yellowLimit = parseInt(localStorage.getItem('myMedsYellowLimit') || '21')
   const redLimit = parseInt(localStorage.getItem('myMedsRedLimit') || '7')
-  
+
   // Use the larger limit to catch all warnings
   const warningLimit = Math.max(yellowLimit, redLimit)
-  
+
   let criticalMeds = []
   let minDays = Infinity
-  
+
   for (const med of meds) {
     const days = calculateDaysRemaining(med)
     if (days !== null && days <= warningLimit) {
@@ -88,7 +88,7 @@ const checkWarnings = (meds) => {
       }
     }
   }
-  
+
   if (criticalMeds.length > 0) {
     const names = criticalMeds.join(', ')
     snackbarText.value = t('app.notification', { name: names, days: minDays })
@@ -98,8 +98,8 @@ const checkWarnings = (meds) => {
 
 const checkFirstRun = () => {
   // Check if running in standalone mode (installed PWA)
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone || 
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                       window.navigator.standalone ||
                        document.referrer.includes('android-app://');
 
   if (isStandalone) {
@@ -114,11 +114,11 @@ const checkFirstRun = () => {
 const checkUpdate = () => {
   const lastVersion = localStorage.getItem('myMedsVersion')
   const currentVersion = packageJson.version
-  
+
   if (lastVersion && lastVersion !== currentVersion) {
     updateDialog.value = true
   }
-  
+
   localStorage.setItem('myMedsVersion', currentVersion)
 }
 
@@ -166,8 +166,8 @@ const openCalendarFilter = () => {
 <template>
   <NavDrawer v-model="drawer" />
 
-  <v-app-bar 
-    :color="theme.global.current.value.dark ? 'surface' : 'primary'" 
+  <v-app-bar
+    :color="theme.global.current.value.dark ? 'surface' : 'primary'"
     density="compact"
     scroll-behavior="hide"
     scroll-threshold="20"
@@ -198,7 +198,7 @@ const openCalendarFilter = () => {
         @edit="openEditDialog"
         @delete="deleteItem"
       />
-      
+
       <!-- Add Button Card -->
       <v-card
         class="mb-4 border-dashed"

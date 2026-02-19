@@ -3,7 +3,7 @@ import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
-import ConfirmDialog from './ConfirmDialog.vue'
+import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
 import { createDetailedCalendarEvent } from '../utils/calendarUtils'
 
@@ -59,68 +59,68 @@ const groupedEntries = computed(() => {
   // 1. Take real entries.
   // 2. Generate quarter entries for the range covered by real entries (plus maybe current quarter).
   // 3. Merge and sort.
-  
+
   const combined = [...sortedEntries.value]
-  
+
   if (combined.length > 0) {
     const minDate = new Date(combined[combined.length - 1].date)
     const maxDate = new Date(combined[0].date)
-    
+
     // Extend maxDate to today to ensure current quarter is included
     const now = new Date()
     if (now > maxDate) maxDate.setTime(now.getTime())
-      
+
     let current = new Date(minDate.getFullYear(), Math.floor(minDate.getMonth() / 3) * 3, 1)
-    
+
     while (current <= maxDate) {
       const qDate = new Date(current)
       const qStr = qDate.toISOString().split('T')[0]
-      
+
       // Check if we already have a quarter entry for this date (unlikely for user entries, but possible)
       // We add a virtual entry
       const q = Math.floor((qDate.getMonth() + 3) / 3)
       const y = qDate.getFullYear()
-      
+
       combined.push({
         date: qStr,
         title: t('calendar.quarter', { q, year: y }),
         type: 'quarter',
         isVirtual: true
       })
-      
+
       // Next quarter
       current.setMonth(current.getMonth() + 3)
     }
   }
-  
+
   // Re-sort combined list
   combined.sort((a, b) => {
     const dateDiff = new Date(b.date) - new Date(a.date)
     if (dateDiff !== 0) return dateDiff
     return 0
   })
-  
+
   // Now build the final list with Today separator
   const finalResult = []
   let todayInsertedLoop = false
-  
+
   for (const entry of combined) {
     if (!todayInsertedLoop && entry.date < today) {
       finalResult.push({ type: 'separator-today', date: today })
       todayInsertedLoop = true
     }
-    
+
     if (entry.isVirtual) {
       finalResult.push({ type: 'quarter', data: entry })
     } else {
       finalResult.push({ type: 'entry', data: entry })
     }
   }
-  
+
   if (!todayInsertedLoop) {
     finalResult.push({ type: 'separator-today', date: today })
   }
-  
+
   return finalResult
 })
 
@@ -155,17 +155,17 @@ const getEntryColor = (type) => {
 
 const getEntrySubtitle = (entry) => {
   const dateStr = formatDate(entry.date)
-  
+
   if (entry.type === 'illness' && entry.endDate) {
     const start = new Date(entry.date)
     const end = new Date(entry.endDate)
     // Calculate difference in days (inclusive)
     const diffTime = Math.abs(end - start)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
-    
+
     return `${dateStr} - ${formatDate(entry.endDate)} (${diffDays} ${t('app.showDays')})`
   }
-  
+
   return dateStr
 }
 
@@ -174,8 +174,8 @@ const openTypeDialog = () => {
 }
 
 const onTypeSelected = (type) => {
-  currentEntry.value = { 
-    type, 
+  currentEntry.value = {
+    type,
     date: new Date().toISOString().split('T')[0],
     title: '',
     doctor: '', doctorType: '', location: '',
@@ -405,8 +405,8 @@ defineExpose({
         </div>
 
         <!-- Quarter Marker -->
-        <div 
-          v-else-if="item.type === 'quarter'" 
+        <div
+          v-else-if="item.type === 'quarter'"
           class="d-flex align-center justify-center mb-4 text-grey"
         >
           <v-divider class="flex-grow-1"></v-divider>
@@ -431,7 +431,7 @@ defineExpose({
                 </span>
               </v-avatar>
             </template>
-            
+
             <v-card-title class="text-wrap" style="line-height: 1.2;">
               <div class="text-h6 mb-1">{{ item.data.title }}</div>
               <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
@@ -456,7 +456,7 @@ defineExpose({
                     <span class="text-grey">{{ t('calendar.fields.location') }}:</span>
                     <div class="font-weight-medium">{{ item.data.location }}</div>
                   </div>
-                  
+
                   <!-- Treatments (Mixed Content) -->
                   <div v-if="item.data.treatments" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.treatments') }}:</span>

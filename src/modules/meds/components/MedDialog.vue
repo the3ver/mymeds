@@ -78,7 +78,7 @@ const addPackageSize = (size) => {
           :label="t('med.ingredient')"
           variant="underlined"
         ></v-text-field>
-        
+
         <v-text-field
           v-model="localMed.packageSize"
           :label="t('med.packageSize')"
@@ -99,16 +99,16 @@ const addPackageSize = (size) => {
           variant="underlined"
           type="number"
         ></v-text-field>
-        
+
         <div class="d-flex gap-2 mb-4">
           <v-btn size="small" variant="tonal" @click="addPackageSize(20)">+20</v-btn>
           <v-btn size="small" variant="tonal" @click="addPackageSize(50)">+50</v-btn>
           <v-btn size="small" variant="tonal" @click="addPackageSize(100)">+100</v-btn>
           <v-btn size="small" variant="tonal" @click="addPackageSize(200)">+200</v-btn>
         </div>
-        
+
         <DoseInput v-model="localMed.dose" :label="t('med.dose')" />
-        
+
         <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.color') }}</div>
         <div class="d-flex flex-wrap gap-2">
           <v-btn

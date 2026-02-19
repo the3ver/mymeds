@@ -33,7 +33,7 @@ const loadSettings = () => {
   displayMode.value = localStorage.getItem('myMedsDisplayMode') || 'pills'
   sortMode.value = localStorage.getItem('myMedsSortMode') || 'added'
   uiScale.value = localStorage.getItem('myMedsUiScale') || 'normal'
-  
+
   const savedYellow = localStorage.getItem('myMedsYellowLimit')
   if (savedYellow) yellowLimit.value = parseInt(savedYellow)
 
@@ -79,7 +79,7 @@ const resetSettings = () => {
   uiScale.value = 'normal'
   yellowLimit.value = 21
   redLimit.value = 7
-  
+
   // Reset overview (not in this dialog but part of settings)
   localStorage.setItem('myMedsShowOverview', 'true')
   window.dispatchEvent(new Event('storage-overview-changed'))
@@ -97,7 +97,7 @@ const close = () => {
         <v-btn icon="mdi-close" @click="close"></v-btn>
         <v-toolbar-title>{{ t('app.settings') }}</v-toolbar-title>
       </v-toolbar>
-      
+
       <v-card-text>
         <v-container>
           <!-- Sort Mode -->

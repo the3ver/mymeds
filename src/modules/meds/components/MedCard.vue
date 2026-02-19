@@ -38,7 +38,7 @@ onMounted(() => {
   updateSettings()
   window.addEventListener('storage-display-mode-changed', updateSettings)
   window.addEventListener('storage-limits-changed', updateSettings)
-  
+
   if (props.deduction > 0) {
     showDeduction.value = true
     setTimeout(() => {
@@ -59,7 +59,7 @@ const dailyDoseTotal = computed(() => {
 const displayPlan = computed(() => {
   const dose = props.item.dose || ''
   if (!dose) return '0-0-0'
-  
+
   if (dose.includes('-')) {
     const parts = dose.split('-')
     while (parts.length < 3) {
@@ -122,7 +122,7 @@ const statusColor = computed(() => {
           <span class="text-h6 text-white">{{ item.name.charAt(0).toUpperCase() }}</span>
         </v-avatar>
       </template>
-      
+
       <v-card-title class="text-wrap" style="line-height: 1.2;">
         <div class="text-h6 mb-1">{{ item.name }}</div>
         <div class="d-flex flex-wrap align-center gap-2 text-body-1 text-grey">
@@ -130,13 +130,13 @@ const statusColor = computed(() => {
           <span class="text-high-emphasis text-body-2 font-weight-bold ml-1">{{ displayPlan }}</span>
         </div>
       </v-card-title>
-      
+
       <template v-slot:append>
         <div class="d-flex align-center pl-2 position-relative">
           <!-- Deduction Animation -->
           <transition name="float-up">
-            <div 
-              v-if="showDeduction" 
+            <div
+              v-if="showDeduction"
               class="deduction-badge text-error font-weight-bold"
             >
               -{{ deduction }}
@@ -145,24 +145,24 @@ const statusColor = computed(() => {
 
           <div v-if="displayMode === 'packages'" class="d-flex align-center gap-1">
             <template v-if="item.packageSize && item.packageSize > 0">
-              <div 
-                v-for="n in Math.min(fullPackages, 5)" 
+              <div
+                v-for="n in Math.min(fullPackages, 5)"
                 :key="n"
                 class="package-icon-wrapper"
               >
-                <v-icon 
-                  icon="mdi-package-variant-closed" 
+                <v-icon
+                  icon="mdi-package-variant-closed"
                   color="primary"
                   size="small"
                 ></v-icon>
               </div>
-              <div 
-                v-if="hasPartialPackage && fullPackages < 5" 
+              <div
+                v-if="hasPartialPackage && fullPackages < 5"
                 class="package-icon-wrapper"
                 style="opacity: 0.7;"
               >
-                <v-icon 
-                  icon="mdi-package-variant" 
+                <v-icon
+                  icon="mdi-package-variant"
                   color="primary"
                   size="small"
                 ></v-icon>
@@ -171,7 +171,7 @@ const statusColor = computed(() => {
             </template>
             <span v-else class="text-caption text-grey">-</span>
           </div>
-          
+
           <v-chip v-else color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
             <template v-if="displayMode === 'pills'">
               {{ item.count }} {{ t('med.unitPills') }}
@@ -181,9 +181,9 @@ const statusColor = computed(() => {
             </template>
           </v-chip>
 
-          <v-icon 
-            v-if="statusColor" 
-            icon="mdi-alert" 
+          <v-icon
+            v-if="statusColor"
+            icon="mdi-alert"
             :color="statusColor"
             class="ml-1"
           ></v-icon>
@@ -213,7 +213,7 @@ const statusColor = computed(() => {
             <span class="text-grey">{{ t('med.emptyDate') }}:</span>
             <span class="font-weight-medium">{{ emptyDate !== null ? emptyDate : t('med.na') }}</span>
           </div>
-          
+
           <div class="d-flex justify-end gap-2">
             <v-btn
               variant="text"

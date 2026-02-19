@@ -33,7 +33,7 @@ const close = () => {
       <v-card-text class="text-center">
         <p class="mb-4">{{ t('welcome.thankYou') }}</p>
         <p class="mb-6 text-body-2 text-grey-darken-1">{{ t('welcome.explanation') }}</p>
-        
+
         <p class="mb-2 font-weight-bold">{{ t('welcome.chooseLanguage') }}</p>
         <div class="d-flex justify-center gap-4 mb-6">
           <v-btn
@@ -64,7 +64,7 @@ const close = () => {
             <v-icon size="large" class="mb-2">mdi-weather-sunny</v-icon>
             <span>{{ t('welcome.light') }}</span>
           </v-card>
-          
+
           <v-card
             variant="outlined"
             class="pa-4 cursor-pointer d-flex flex-column align-center"
@@ -78,9 +78,9 @@ const close = () => {
         </div>
       </v-card-text>
       <v-card-actions class="justify-center pb-4">
-        <v-btn 
-          color="primary" 
-          variant="elevated" 
+        <v-btn
+          color="primary"
+          variant="elevated"
           size="large"
           @click="close"
           class="px-8"

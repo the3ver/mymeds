@@ -211,7 +211,14 @@ const messages = {
       exportConfirm: 'Do you want to add this entry to your device calendar?',
       filter: 'Filter',
       filterBy: 'Filtered by type: {types}',
-      clearFilter: 'Clear Filter'
+      clearFilter: 'Clear Filter',
+      addLink: {
+        title: 'Add Link',
+        url: 'URL',
+        label: 'Label (optional)',
+        labelPlaceholder: 'Text to display',
+        add: 'Add'
+      }
     }
   },
   de: {
@@ -424,7 +431,14 @@ const messages = {
       exportConfirm: 'Möchtest du diesen Eintrag in deinen Gerätekalender übernehmen?',
       filter: 'Filtern',
       filterBy: 'Gefiltert nach Typ: {types}',
-      clearFilter: 'Filter löschen'
+      clearFilter: 'Filter löschen',
+      addLink: {
+        title: 'Link hinzufügen',
+        url: 'URL',
+        label: 'Bezeichnung (optional)',
+        labelPlaceholder: 'Anzuzeigender Text',
+        add: 'Hinzufügen'
+      }
     }
   }
 }

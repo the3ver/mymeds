@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MedCard from './MedCard.vue'
-import CalendarDialog from './CalendarDialog.vue'
+import CalendarDialog from '../../../components/CalendarDialog.vue'
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils'
 
 const props = defineProps({
@@ -49,32 +49,32 @@ onUnmounted(() => {
 const sortedItems = computed(() => {
   // Create a copy to sort, but we need to keep track of original indices for editing/deleting
   const itemsWithIndex = props.items.map((item, index) => ({ ...item, originalIndex: index }))
-  
+
   if (sortMode.value === 'name') {
     return itemsWithIndex.sort((a, b) => a.name.localeCompare(b.name))
   } else if (sortMode.value === 'days') {
     return itemsWithIndex.sort((a, b) => {
       const doseA = parseDose(a.dose)
       const doseB = parseDose(b.dose)
-      
+
       // Handle cases with 0 dose (infinite days) -> put at end
       if (doseA <= 0 && doseB <= 0) return 0
       if (doseA <= 0) return 1
       if (doseB <= 0) return -1
-      
+
       const daysA = a.count / doseA
       const daysB = b.count / doseB
       return daysA - daysB
     })
   }
-  
+
   // Default: 'added' (no sort, just original order)
   return itemsWithIndex
 })
 
 const overviewData = computed(() => {
   if (props.items.length === 0) return null
-  
+
   let minDays = Infinity
   let hasValidMeds = false
 
@@ -92,13 +92,13 @@ const overviewData = computed(() => {
 
   const date = new Date()
   date.setDate(date.getDate() + minDays)
-  
+
   // Format date with weekday
   const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
   const formattedDate = date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 
   const status = getStatusColor(minDays, yellowLimit.value, redLimit.value)
-  
+
   return {
     date: formattedDate,
     days: minDays,
@@ -110,22 +110,22 @@ const overviewData = computed(() => {
 
 const calendarDate = computed(() => {
   if (!overviewData.value) return null
-  
+
   // Calculate date for yellow limit warning
   // If we are already below yellow limit, use tomorrow
   // Otherwise use the date when we hit the yellow limit
-  
+
   // Actually, the requirement says: "Termin sollte zum Datum eingestellt werden das der gelben Warnstufe entspeicht"
   // This means: Date when meds run out MINUS yellow limit days?
   // Or simply the date when meds run out?
   // Usually a reminder is set BEFORE it runs out.
   // Let's set it to (Empty Date - Yellow Limit Days)
   // But if that date is in the past, set it to tomorrow.
-  
+
   const emptyDate = new Date(overviewData.value.rawDate)
   const reminderDate = new Date(emptyDate)
   reminderDate.setDate(reminderDate.getDate() - yellowLimit.value)
-  
+
   const now = new Date()
   if (reminderDate < now) {
     // If reminder would be in the past, set it to tomorrow 9:00 AM
@@ -134,7 +134,7 @@ const calendarDate = computed(() => {
     tomorrow.setHours(9, 0, 0, 0)
     return tomorrow
   }
-  
+
   return reminderDate
 })
 
@@ -147,11 +147,11 @@ const calendarDateFormatted = computed(() => {
 
 <template>
   <div v-if="items.length > 0">
-    <v-card 
-      v-if="overviewData" 
-      class="mb-4" 
+    <v-card
+      v-if="overviewData"
+      class="mb-4"
       :color="overviewData.status || 'success'"
-      variant="tonal" 
+      variant="tonal"
       density="compact"
     >
       <v-card-text class="d-flex align-center justify-space-between py-1 pr-1">
@@ -175,10 +175,10 @@ const calendarDateFormatted = computed(() => {
       @edit="emit('edit', item.originalIndex)"
       @delete="emit('delete', item.originalIndex)"
     />
-    
-    <CalendarDialog 
+
+    <CalendarDialog
       v-if="overviewData"
-      v-model="calendarDialog" 
+      v-model="calendarDialog"
       :date="calendarDateFormatted"
       :raw-date="calendarDate"
     />

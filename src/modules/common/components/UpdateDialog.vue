@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import packageJson from '../../package.json'
+import packageJson from '../../../../package.json'
 
 const props = defineProps({
   modelValue: Boolean
@@ -21,7 +21,7 @@ const close = () => {
       <v-card-title class="text-h5 text-center pt-4">{{ t('update.title') }}</v-card-title>
       <v-card-text class="text-center">
         <p class="mb-4">{{ t('update.message') }}</p>
-        
+
         <div class="d-flex justify-center align-center mb-4">
           <span class="font-weight-bold mr-2">{{ t('update.version') }}</span>
           <span class="text-primary">{{ appVersion }}</span>
@@ -39,9 +39,9 @@ const close = () => {
         </v-btn>
       </v-card-text>
       <v-card-actions class="justify-center pb-4">
-        <v-btn 
-          color="primary" 
-          variant="elevated" 
+        <v-btn
+          color="primary"
+          variant="elevated"
           @click="close"
           class="px-8"
         >
