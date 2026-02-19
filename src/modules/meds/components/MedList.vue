@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MedCard from './MedCard.vue'
-import CalendarDialog from '../../../components/CalendarDialog.vue'
+import CalendarDialog from '../../common/components/CalendarDialog.vue'
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils'
 
 const props = defineProps({

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { appendLink } from '../../src/utils/stringUtils'
+import { appendLink } from '../../src/modules/common/utils/stringUtils'
 
 describe('appendLink', () => {
   const link = { url: 'https://example.com', label: 'Example' }

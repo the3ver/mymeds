@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseDose, checkAndUpdateDailyDose } from '../../src/utils/medUtils'
+import { parseDose, checkAndUpdateDailyDose } from '../../src/modules/meds/utils/medUtils'
 
 describe('medUtils', () => {
   describe('parseDose', () => {
