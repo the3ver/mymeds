@@ -6,6 +6,7 @@ import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
 import { createDetailedCalendarEvent } from '../utils/calendarUtils'
+import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const { t, locale } = useI18n()
 const entries = ref([])
@@ -305,41 +306,6 @@ const parseTreatmentText = (text) => {
   }
 
   return segments
-}
-
-const renderMarkdownLinks = (text) => {
-  if (!text) return ''
-
-  // Escape HTML to prevent XSS, except for our links
-  const escapeHtml = (str) => str.replace(/[&<>"']/g, (match) => {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[match]
-  })
-
-  const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g
-  const urlRegex = /(?<!]\()https?:\/\/[^\s)]+/g
-
-  let html = escapeHtml(text)
-
-  // Replace [label](url)
-  html = html.replace(markdownLinkRegex, (match, label, url) => {
-    const safeUrl = escapeHtml(url) // URL is already escaped, but good practice
-    const safeLabel = escapeHtml(label)
-    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`
-  })
-
-  // Replace standalone URLs (that are not already in a link)
-  html = html.replace(urlRegex, (url) => {
-    const safeUrl = escapeHtml(url)
-    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`
-  })
-
-  return html.replace(/\n/g, '<br>')
 }
 
 const openFilterDialog = () => {
