@@ -66,7 +66,7 @@ const addPackageSize = (size) => {
   <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px">
     <v-card>
       <v-card-title>{{ title }}</v-card-title>
-      <v-card-text>
+      <v-card-text class="text-body-1">
         <v-text-field
           v-model="localMed.name"
           :label="t('med.name') + ' *'"
