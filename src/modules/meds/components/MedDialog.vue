@@ -69,7 +69,7 @@ const addPackageSize = (size) => {
       <v-card-text>
         <v-text-field
           v-model="localMed.name"
-          :label="t('med.name')"
+          :label="t('med.name') + ' *'"
           variant="underlined"
           autofocus
         ></v-text-field>
@@ -95,7 +95,7 @@ const addPackageSize = (size) => {
 
         <v-text-field
           v-model="localMed.count"
-          :label="t('med.count')"
+          :label="t('med.count') + ' *'"
           variant="underlined"
           type="number"
         ></v-text-field>
@@ -107,7 +107,7 @@ const addPackageSize = (size) => {
           <v-btn size="small" variant="tonal" @click="addPackageSize(200)">+200</v-btn>
         </div>
 
-        <DoseInput v-model="localMed.dose" :label="t('med.dose')" />
+        <DoseInput v-model="localMed.dose" :label="t('med.dose') + ' *'" />
 
         <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.color') }}</div>
         <div class="d-flex flex-wrap gap-2">
