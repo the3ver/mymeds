@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
@@ -133,6 +133,13 @@ const openCalendarAddDialog = () => {
     <DataDialog :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
   </div>
 </template>
+
+<style>
+/* Global style to prevent pull-to-refresh on this page */
+html, body {
+  overscroll-behavior-y: contain;
+}
+</style>
 
 <style scoped>
 .border-dashed {
