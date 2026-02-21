@@ -5,17 +5,12 @@ const DB_VERSION = 2;
 const DB_STORE_NAME = 'databases';
 const SETTINGS_STORE_NAME = 'settings';
 
-console.log('[indexedDbAdapter] 🚀 Initializing DB promise...');
 const dbPromise = openDB(DB_NAME, DB_VERSION, {
   upgrade(db, oldVersion) {
-    console.log(`[indexedDbAdapter]  Upgrading DB from v${oldVersion} to v${DB_VERSION}`);
-    
     if (!db.objectStoreNames.contains(SETTINGS_STORE_NAME)) {
-      console.log(`[indexedDbAdapter]   Creating store: ${SETTINGS_STORE_NAME}`);
       db.createObjectStore(SETTINGS_STORE_NAME);
     }
     if (!db.objectStoreNames.contains(DB_STORE_NAME)) {
-      console.log(`[indexedDbAdapter]   Creating store: ${DB_STORE_NAME}`);
       db.createObjectStore(DB_STORE_NAME, { keyPath: 'id', autoIncrement: true });
     }
   },
@@ -24,7 +19,6 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, {
     alert("The database needs to update, but other tabs are blocking it. Please close all other tabs with this app open and reload.");
   }
 });
-console.log('[indexedDbAdapter] ✅ DB promise created.');
 
 // --- Database (Tresor) Management ---
 
@@ -74,19 +68,16 @@ export const setSetting = async (key, value) => {
 };
 
 export async function getSettings() {
-  console.log('[indexedDbAdapter] 🚀 Getting settings from DB...');
   const settings = {
     locale: await getSetting('locale', navigator.language.startsWith('de') ? 'de' : 'en'),
     theme: await getSetting('theme', 'light'),
     uiScale: await getSetting('uiScale', 'normal'),
-    // These were missing from the new structure
     sortMode: await getSetting('sortMode', 'added'),
     displayMode: await getSetting('displayMode', 'pills'),
     yellowLimit: await getSetting('yellowLimit', 21),
     redLimit: await getSetting('redLimit', 7),
     showOverview: await getSetting('showOverview', true),
   };
-  console.log('[indexedDbAdapter] ✅ Got settings from DB:', settings);
   return settings;
 }
 
@@ -99,14 +90,19 @@ export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
 
-
 // --- App Meta Data (also in settings) ---
 export const getLastVersion = () => getSetting('lastVersion', null);
 export const saveLastVersion = (version) => setSetting('lastVersion', version);
 export const getFirstRunCompleted = () => getSetting('firstRunCompleted', null);
 export const setFirstRunCompleted = () => setSetting('firstRunCompleted', 'true');
 
-// --- Legacy data operations (to be removed or repurposed) ---
+// --- Session Recovery ---
+export const saveRecoveryState = (state) => setSetting('sessionRecovery', state);
+export const getRecoveryState = () => getSetting('sessionRecovery', null);
+export const clearRecoveryState = () => dbAdapter.delete(SETTINGS_STORE_NAME, 'sessionRecovery');
+
+
+// --- Bulk Delete ---
 export const deleteAllData = async () => {
   const db = await dbPromise;
   await db.clear(DB_STORE_NAME);

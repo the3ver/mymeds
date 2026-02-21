@@ -1,8 +1,6 @@
 import * as dbAdapter from './indexedDbAdapter';
 import * as crypto from './cryptoService';
 
-const SESSION_RECOVERY_KEY = 'myMedsSessionRecovery';
-
 // --- Database (Tresor) Management ---
 
 export const getDatabaseList = dbAdapter.getDatabaseList;
@@ -65,17 +63,14 @@ export async function saveAndLockDatabase(id, password, data) {
 export const deleteDatabase = dbAdapter.deleteDatabase;
 
 // --- Session Recovery ---
-export function saveRecoveryState(id, password, intent = null) {
-  sessionStorage.setItem(SESSION_RECOVERY_KEY, JSON.stringify({ id, password, intent }));
+export async function saveRecoveryState(id, password, intent = null) {
+  await dbAdapter.saveRecoveryState({ id, password, intent });
 }
 
-export function getRecoveryState() {
-  const state = sessionStorage.getItem(SESSION_RECOVERY_KEY);
-  return state ? JSON.parse(state) : null;
-}
+export const getRecoveryState = dbAdapter.getRecoveryState;
 
-export function clearRecoveryState() {
-  sessionStorage.removeItem(SESSION_RECOVERY_KEY);
+export async function clearRecoveryState() {
+  await dbAdapter.clearRecoveryState();
 }
 
 

@@ -44,42 +44,42 @@ const handleExport = () => {
   exportDialog.value = true
 }
 
-const triggerImport = () => {
-  dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword, 'import');
+const triggerImport = async () => {
+  await dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword, 'import');
   showSaveStateMessage.value = true;
   setTimeout(() => showSaveStateMessage.value = false, 3000);
   fileInput.value.click()
 }
 
-const onFileSelected = (event) => {
+const onFileSelected = async (event) => {
   const file = event.target.files[0]
   if (!file) {
-    dataService.clearRecoveryState();
+    await dataService.clearRecoveryState();
     return;
   }
 
   const reader = new FileReader()
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const result = importExportService.processImport(e.target.result)
     if (result.success) {
       importStats.value = result.stats
       importDialog.value = true
     } else {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
-      dataService.clearRecoveryState();
+      await dataService.clearRecoveryState();
     }
     event.target.value = ''
   }
   reader.readAsText(file)
 }
 
-const handleConfirmImport = () => {
+const handleConfirmImport = async () => {
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
 
   alert(t('app.importSuccess'))
   importDialog.value = false
-  dataService.clearRecoveryState();
+  await dataService.clearRecoveryState();
 }
 
 const close = () => {
