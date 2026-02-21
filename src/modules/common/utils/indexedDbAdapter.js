@@ -1,12 +1,13 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'MyMedsDB';
-const DB_VERSION = 2;
+const DB_VERSION = 4; // Incremented to force a clean upgrade
 const DB_STORE_NAME = 'databases';
 const SETTINGS_STORE_NAME = 'settings';
 
 const dbPromise = openDB(DB_NAME, DB_VERSION, {
-  upgrade(db, oldVersion) {
+  upgrade(db, oldVersion, newVersion, tx) {
+    // This is the most robust upgrade path: ensure the required stores for the current version exist.
     if (!db.objectStoreNames.contains(SETTINGS_STORE_NAME)) {
       db.createObjectStore(SETTINGS_STORE_NAME);
     }
@@ -99,8 +100,10 @@ export const setFirstRunCompleted = () => setSetting('firstRunCompleted', 'true'
 // --- Session Recovery ---
 export const saveRecoveryState = (state) => setSetting('sessionRecovery', state);
 export const getRecoveryState = () => getSetting('sessionRecovery', null);
-export const clearRecoveryState = () => dbAdapter.delete(SETTINGS_STORE_NAME, 'sessionRecovery');
-
+export const clearRecoveryState = async () => {
+  const db = await dbPromise;
+  return db.delete(SETTINGS_STORE_NAME, 'sessionRecovery');
+};
 
 // --- Bulk Delete ---
 export const deleteAllData = async () => {
