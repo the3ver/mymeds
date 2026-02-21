@@ -5,13 +5,14 @@ import * as dataService from '../utils/dataService';
 import { unlock } from '../../../app-state';
 import CreateDatabaseDialog from './CreateDatabaseDialog.vue';
 import DatabaseUnlockDialog from './DatabaseUnlockDialog.vue';
+import ConfirmDialog from './ConfirmDialog.vue';
 
 const { t } = useI18n();
 const databases = ref([]);
 const createDialog = ref(false);
 const unlockDialog = ref(false);
+const confirmDeleteDialog = ref(false);
 const selectedDb = ref(null);
-const passwordForUnlock = ref('');
 
 onMounted(async () => {
   await loadDatabases();
@@ -24,6 +25,18 @@ async function loadDatabases() {
 function handleDbClick(db) {
   selectedDb.value = db;
   unlockDialog.value = true;
+}
+
+function handleDeleteClick(db) {
+  selectedDb.value = db;
+  confirmDeleteDialog.value = true;
+}
+
+async function confirmDelete() {
+  if (selectedDb.value) {
+    await dataService.deleteDatabase(selectedDb.value.id);
+    loadDatabases();
+  }
 }
 
 function handleCreateNew() {
@@ -42,35 +55,37 @@ function onDatabaseUnlocked(data, password) {
 </script>
 
 <template>
-  <v-app-bar color="primary" density="compact">
-    <v-app-bar-title>{{ t('app.title') }} - Databases</v-app-bar-title>
-  </v-app-bar>
+  <v-container>
+    <v-list lines="two">
+      <v-list-subheader>{{ t('app.databases') }}</v-list-subheader>
+      <v-list-item
+        v-for="db in databases"
+        :key="db.id"
+        :title="db.name"
+        :subtitle="`Last modified: ${new Date(db.modifiedAt).toLocaleString()}`"
+        @click="handleDbClick(db)"
+      >
+        <template v-slot:prepend>
+          <v-avatar :color="db.encryptionStrategy === 'password' ? 'primary' : 'secondary'">
+            <v-icon>{{ db.encryptionStrategy === 'password' ? 'mdi-lock' : 'mdi-fingerprint' }}</v-icon>
+          </v-avatar>
+        </template>
+        <template v-slot:append>
+          <v-btn
+            icon="mdi-delete-outline"
+            variant="text"
+            color="grey"
+            @click.stop="handleDeleteClick(db)"
+          ></v-btn>
+        </template>
+      </v-list-item>
+    </v-list>
 
-  <v-main>
-    <v-container>
-      <v-list lines="two">
-        <v-list-subheader>Your Databases</v-list-subheader>
-        <v-list-item
-          v-for="db in databases"
-          :key="db.id"
-          :title="db.name"
-          :subtitle="`Last modified: ${new Date(db.modifiedAt).toLocaleString()}`"
-          @click="handleDbClick(db)"
-        >
-          <template v-slot:prepend>
-            <v-avatar :color="db.encryptionStrategy === 'password' ? 'primary' : 'secondary'">
-              <v-icon>{{ db.encryptionStrategy === 'password' ? 'mdi-lock' : 'mdi-fingerprint' }}</v-icon>
-            </v-avatar>
-          </template>
-        </v-list-item>
-      </v-list>
-
-      <div v-if="databases.length === 0" class="text-center text-grey mt-8">
-        <p>No databases found.</p>
-        <p>Create your first encrypted database to get started.</p>
-      </div>
-    </v-container>
-  </v-main>
+    <div v-if="databases.length === 0" class="text-center text-grey mt-8">
+      <p>{{ t('app.noDatabases') }}</p>
+      <p>{{ t('app.createFirstDb') }}</p>
+    </div>
+  </v-container>
 
   <v-fab
     icon="mdi-plus"
@@ -91,6 +106,14 @@ function onDatabaseUnlocked(data, password) {
   <DatabaseUnlockDialog
     v-model="unlockDialog"
     :database="selectedDb"
-    @unlocked="(data, password) => onDatabaseUnlocked(data, password)"
+    @unlocked="onDatabaseUnlocked"
+  />
+
+  <ConfirmDialog
+    v-model="confirmDeleteDialog"
+    :title="t('app.deleteDatabaseTitle')"
+    :message="t('app.deleteDatabaseConfirm', { name: selectedDb?.name })"
+    :confirm-text="t('dialog.delete')"
+    @confirm="confirmDelete"
   />
 </template>

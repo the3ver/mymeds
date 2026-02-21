@@ -1,77 +1,24 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
-import { state as appState, lock } from './app-state'
-import * as dataService from './modules/common/utils/dataService'
+import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
-import NavDrawer from './modules/common/components/NavDrawer.vue'
 import MedList from './modules/meds/components/MedList.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
 import DataDialog from './modules/common/components/DataDialog.vue'
 
-const theme = useTheme()
+defineProps({
+  dataDialogOpen: Boolean,
+});
+const emit = defineEmits(['update:dataDialogOpen']);
+
 const { t } = useI18n()
-const drawer = ref(false)
 const medDialog = ref(false)
 const editDialog = ref(false)
-const dataDialog = ref(false)
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const activeTab = ref('meds')
 const calendarPageRef = ref(null)
-
-// --- Inactivity Timer ---
-let inactivityTimer = null;
-const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-
-function resetInactivityTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(async () => {
-    await handleLock();
-  }, INACTIVITY_TIMEOUT);
-}
-
-async function handleLock() {
-  // Do not lock if a sensitive action (like file picking) is in progress
-  if (appState.isActionPending) return;
-
-  if (!appState.isLocked) {
-    await dataService.saveAndLockDatabase(
-      appState.activeDatabaseId,
-      appState.activeDatabasePassword,
-      appState.decryptedData
-    );
-    lock();
-  }
-}
-
-onMounted(() => {
-  if (appState.pendingIntent === 'import') {
-    dataDialog.value = true;
-  }
-
-  window.addEventListener('beforeunload', handleLock);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      handleLock();
-    }
-  });
-  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
-    document.addEventListener(event, resetInactivityTimer);
-  });
-  resetInactivityTimer();
-});
-
-onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleLock);
-  document.removeEventListener('visibilitychange', handleLock);
-  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
-    document.removeEventListener(event, resetInactivityTimer);
-  });
-  clearTimeout(inactivityTimer);
-});
-
 
 // --- Component Logic ---
 const openMedDialog = () => {
@@ -113,31 +60,7 @@ const openCalendarAddDialog = () => {
 </script>
 
 <template>
-  <NavDrawer v-model="drawer" @open-data="dataDialog = true" />
-
-  <v-app-bar
-    :color="theme.global.current.value.dark ? 'surface' : 'primary'"
-    density="compact"
-  >
-    <template v-slot:prepend>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    </template>
-    <v-app-bar-title>
-      {{ t('app.title') }}
-      <span v-if="activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
-      <span v-else-if="activeTab === 'calendar'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.calendar') }}</span>
-    </v-app-bar-title>
-    <template v-slot:append>
-      <v-btn
-        v-if="activeTab === 'calendar'"
-        icon="mdi-filter-variant"
-        @click="openCalendarFilter"
-      ></v-btn>
-      <v-btn icon="mdi-lock" @click="handleLock"></v-btn>
-    </template>
-  </v-app-bar>
-
-  <v-main>
+  <div>
     <v-window v-model="activeTab">
       <v-window-item value="meds">
         <v-container>
@@ -168,54 +91,51 @@ const openCalendarAddDialog = () => {
         />
       </v-window-item>
     </v-window>
-  </v-main>
 
-  <v-fab
-    v-if="activeTab === 'calendar'"
-    icon="mdi-plus"
-    location="bottom end"
-    size="large"
-    color="primary"
-    app
-    appear
-    class="mb-14"
-    @click="openCalendarAddDialog"
-  ></v-fab>
+    <v-fab
+      v-if="activeTab === 'calendar'"
+      icon="mdi-plus"
+      location="bottom end"
+      size="large"
+      color="primary"
+      app
+      appear
+      class="mb-14"
+      @click="openCalendarAddDialog"
+    ></v-fab>
 
-  <v-bottom-navigation v-model="activeTab" color="primary" grow>
-    <v-btn value="meds">
-      <v-icon>mdi-format-list-bulleted</v-icon>
-      <span>{{ t('app.nav.meds') }}</span>
-    </v-btn>
-    <v-btn value="calendar">
-      <v-icon>mdi-calendar-clock</v-icon>
-      <span>{{ t('app.nav.calendar') }}</span>
-    </v-btn>
-  </v-bottom-navigation>
+    <v-bottom-navigation v-model="activeTab" color="primary" grow>
+      <v-btn value="meds">
+        <v-icon>mdi-format-list-bulleted</v-icon>
+        <span>{{ t('app.nav.meds') }}</span>
+      </v-btn>
+      <v-btn value="calendar">
+        <v-icon>mdi-calendar-clock</v-icon>
+        <span>{{ t('app.nav.calendar') }}</span>
+      </v-btn>
+    </v-bottom-navigation>
 
-  <MedDialog
-    v-model="medDialog"
-    :title="t('dialog.addTitle')"
-    :confirm-text="t('dialog.add')"
-    @confirm="addItem"
-  />
+    <MedDialog
+      v-model="medDialog"
+      :title="t('dialog.addTitle')"
+      :confirm-text="t('dialog.add')"
+      @confirm="addItem"
+    />
 
-  <MedDialog
-    v-model="editDialog"
-    :med="currentEditMed"
-    :title="t('dialog.editTitle')"
-    :confirm-text="t('dialog.save')"
-    @confirm="saveEdit"
-  />
+    <MedDialog
+      v-model="editDialog"
+      :med="currentEditMed"
+      :title="t('dialog.editTitle')"
+      :confirm-text="t('dialog.save')"
+      @confirm="saveEdit"
+    />
 
-  <DataDialog v-model="dataDialog" />
+    <DataDialog :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
+  </div>
 </template>
 
 <style scoped>
 .border-dashed {
   border-style: dashed !important;
-}
-.opacity-70 {
-  opacity: 0.7;
 }
 </style>

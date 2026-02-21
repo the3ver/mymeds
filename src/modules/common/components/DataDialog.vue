@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from '../../../app-state'
-import * as dataService from '../utils/dataService'
 import * as importExportService from '../utils/importExportService'
 import ConfirmDialog from './ConfirmDialog.vue'
 import ExportDialog from './ExportDialog.vue'
@@ -15,18 +14,13 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 
-const confirmDeleteAllDialog = ref(false)
+const confirmClearDialog = ref(false)
 const exportDialog = ref(false)
 const importDialog = ref(false)
 const importStats = ref(null)
 const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
-
-const deleteAll = async () => {
-  await dataService.deleteAllData()
-  window.location.reload()
-}
 
 const handleExport = () => {
   const { exportDataContent: content, exportFileName: name } = importExportService.prepareExport(appState.decryptedData)
@@ -36,16 +30,12 @@ const handleExport = () => {
 }
 
 const triggerImport = () => {
-  appState.isActionPending = true; // Signal that we are about to leave the app intentionally
   fileInput.value.click()
 }
 
 const onFileSelected = (event) => {
   const file = event.target.files[0]
-  if (!file) {
-    appState.isActionPending = false; // Reset if user cancels
-    return;
-  }
+  if (!file) return;
 
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -59,13 +49,7 @@ const onFileSelected = (event) => {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
     }
     event.target.value = ''
-    // The action is complete once the dialog is shown or an error is alerted
-    appState.isActionPending = false;
   }
-  reader.onerror = () => {
-    alert("Error reading file.");
-    appState.isActionPending = false;
-  };
   reader.readAsText(file)
 }
 
@@ -76,6 +60,13 @@ const handleConfirmImport = () => {
 
   alert(t('app.importSuccess'))
   importDialog.value = false
+}
+
+const handleClearEntries = () => {
+  appState.decryptedData.meds = [];
+  appState.decryptedData.calendar = [];
+  appState.decryptedData.version += 1;
+  confirmClearDialog.value = false;
 }
 
 const close = () => {
@@ -129,10 +120,10 @@ const close = () => {
             <v-btn
               color="error"
               variant="elevated"
-              prepend-icon="mdi-delete-forever"
-              @click="confirmDeleteAllDialog = true"
+              prepend-icon="mdi-delete-sweep"
+              @click="confirmClearDialog = true"
             >
-              {{ t('app.deleteAll') }}
+              {{ t('app.clearEntries') }}
             </v-btn>
           </div>
         </v-container>
@@ -152,14 +143,14 @@ const close = () => {
     />
 
     <ConfirmDialog
-      v-model="confirmDeleteAllDialog"
-      :title="t('app.deleteAll')"
-      :message="t('app.deleteAllConfirm')"
+      v-model="confirmClearDialog"
+      :title="t('app.clearEntriesTitle')"
+      :message="t('app.clearEntriesConfirm')"
       :confirm-text="t('dialog.delete')"
       :cancel-text="t('dialog.cancel')"
       :confirm-input-label="t('app.deleteConfirmLabel')"
       :confirm-input-value="t('app.deleteConfirmValue')"
-      @confirm="deleteAll"
+      @confirm="handleClearEntries"
     />
   </v-dialog>
 </template>

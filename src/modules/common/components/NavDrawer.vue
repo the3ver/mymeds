@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
+import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
 import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
@@ -53,7 +54,7 @@ const toggleTheme = () => {
         <v-list-item-title>{{ t('app.settings') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="emit('open-data')">
+      <v-list-item v-if="!appState.isLocked" @click="emit('open-data')">
         <template v-slot:prepend>
           <v-icon>mdi-database</v-icon>
         </template>

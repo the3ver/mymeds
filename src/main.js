@@ -19,7 +19,7 @@ async function initializeApp() {
   // Create i18n instance with the loaded locale
   const i18n = createI18n({
     legacy: false,
-    locale: settings.locale,
+    locale: settings.locale || 'de', // Set German as default
     fallbackLocale: 'en',
     messages,
   });
