@@ -23,11 +23,11 @@ const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
 const showResumeImportMessage = ref(false)
+const showSaveStateMessage = ref(false)
 
 onMounted(() => {
   if (appState.pendingIntent === 'import') {
     showResumeImportMessage.value = true;
-    // Clear the intent so it doesn't show again on subsequent opens
     appState.pendingIntent = null;
   }
 });
@@ -46,6 +46,8 @@ const handleExport = () => {
 
 const triggerImport = () => {
   dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword, 'import');
+  showSaveStateMessage.value = true;
+  setTimeout(() => showSaveStateMessage.value = false, 3000);
   fileInput.value.click()
 }
 
@@ -173,6 +175,15 @@ const close = () => {
       :confirm-input-value="t('app.deleteConfirmValue')"
       @confirm="deleteAll"
     />
+
+    <!-- Debug Snackbar -->
+    <v-snackbar
+      v-model="showSaveStateMessage"
+      :timeout="3000"
+      color="blue-grey"
+    >
+      DEBUG: Saving recovery state...
+    </v-snackbar>
   </v-dialog>
 </template>
 
