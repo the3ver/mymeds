@@ -1,12 +1,14 @@
 /**
  * Prepares the data for export by creating a JSON string and a filename.
- * @param {{meds: Array, calendar: Array}} dataToExport - The decrypted data from the app state.
+ * @param {{meds: Array, calendar: Array, lastDoseUpdate: string}} dataToExport - The decrypted data from the app state.
  * @returns {{exportDataContent: string, exportFileName: string}}
  */
 export function prepareExport(dataToExport) {
   const data = {
     exportDate: new Date().toISOString(),
-    ...dataToExport,
+    meds: dataToExport.meds,
+    calendar: dataToExport.calendar,
+    lastDoseUpdate: dataToExport.lastDoseUpdate,
   };
   const exportDataContent = JSON.stringify(data, null, 2);
 
@@ -37,7 +39,12 @@ export function processImport(fileContent) {
       date: data.exportDate ? new Date(data.exportDate).toLocaleString() : 'N/A',
       medsCount: data.meds.length,
       calendarCount: data.calendar.length,
-      data: { meds: data.meds, calendar: data.calendar } // Return clean data object
+      data: { 
+        meds: data.meds, 
+        calendar: data.calendar,
+        // Ensure lastDoseUpdate is present, default to today if not
+        lastDoseUpdate: data.lastDoseUpdate || new Date().toDateString()
+      }
     };
 
     return { success: true, stats, error: null };

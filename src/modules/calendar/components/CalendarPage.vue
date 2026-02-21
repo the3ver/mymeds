@@ -113,13 +113,24 @@ const formatDate = (dateStr, forceShort = false) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
   const today = new Date()
+  today.setHours(0, 0, 0, 0); // Normalize today to the start of the day
+
   const currentQuarter = Math.floor(today.getMonth() / 3)
   const dateQuarter = Math.floor(date.getMonth() / 3)
-  const isRecent = date.getFullYear() === today.getFullYear() && dateQuarter === currentQuarter
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
-  if (isRecent && !forceShort) {
+
+  const isFuture = date >= today;
+  const isRecentPast = date.getFullYear() === today.getFullYear() && dateQuarter === currentQuarter;
+
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }
+
+  if ((isFuture || isRecentPast) && !forceShort) {
     options.weekday = 'short'
   }
+
   return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 }
 

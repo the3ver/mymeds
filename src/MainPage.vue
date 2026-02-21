@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { state as appState } from './app-state'
+import { state as appState, lock } from './app-state'
+import * as dataService from './modules/common/utils/dataService'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import MedList from './modules/meds/components/MedList.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
@@ -10,7 +11,7 @@ import DataDialog from './modules/common/components/DataDialog.vue'
 defineProps({
   dataDialogOpen: Boolean,
 });
-const emit = defineEmits(['update:dataDialogOpen']);
+const emit = defineEmits(['update:dataDialogOpen', 'update:activeTab']);
 
 const { t } = useI18n()
 const medDialog = ref(false)
@@ -19,6 +20,50 @@ const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const activeTab = ref('meds')
 const calendarPageRef = ref(null)
+
+// --- Inactivity Timer & Auto-Lock ---
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(handleLock, INACTIVITY_TIMEOUT);
+}
+
+async function handleLock() {
+  if (appState.isLocked || appState.isActionPending) return;
+
+  await dataService.saveAndLockDatabase(
+    appState.activeDatabaseId,
+    appState.activeDatabasePassword,
+    appState.decryptedData
+  );
+  lock();
+}
+
+onMounted(() => {
+  if (appState.pendingIntent === 'import') {
+    emit('update:dataDialogOpen', true);
+  }
+
+  window.addEventListener('beforeunload', handleLock);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') handleLock();
+  });
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer);
+  });
+  resetInactivityTimer();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleLock);
+  document.removeEventListener('visibilitychange', handleLock);
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.removeEventListener(event, resetInactivityTimer);
+  });
+  clearTimeout(inactivityTimer);
+});
 
 // --- Component Logic ---
 const openMedDialog = () => {

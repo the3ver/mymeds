@@ -1,5 +1,6 @@
 import * as dbAdapter from './indexedDbAdapter';
 import * as crypto from './cryptoService';
+import { checkAndUpdateDailyDose } from '../../meds/utils/medUtils';
 
 // --- Database (Tresor) Management ---
 
@@ -9,7 +10,11 @@ export async function createDatabaseWithPassword(name, password) {
   const salt = crypto.generateSalt();
   const key = await crypto.deriveKeyFromPassword(password, salt);
   
-  const emptyData = { meds: [], calendar: [] };
+  const emptyData = { 
+    meds: [], 
+    calendar: [],
+    lastDoseUpdate: new Date().toDateString() // Initialize on creation
+  };
   const { iv, encryptedData } = await crypto.encryptData(emptyData, key);
 
   const now = new Date();
@@ -33,7 +38,17 @@ export async function unlockDatabase(id, password) {
     const { salt, iv } = dbEntry.passwordData;
     try {
       const key = await crypto.deriveKeyFromPassword(password, salt);
-      const data = await crypto.decryptData(dbEntry.encryptedData, iv, key);
+      let data = await crypto.decryptData(dbEntry.encryptedData, iv, key);
+
+      // --- This is the new, correct place for the dose update logic ---
+      const updateResult = checkAndUpdateDailyDose(data.meds, data.lastDoseUpdate);
+      if (updateResult.updated) {
+        console.log("Doses updated upon unlock.");
+        data.meds = updateResult.updatedItems;
+        data.lastDoseUpdate = updateResult.newDate;
+      }
+      // ----------------------------------------------------------------
+
       return { success: true, data };
     } catch (e) {
       console.error("Decryption failed:", e);

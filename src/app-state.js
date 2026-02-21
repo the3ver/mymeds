@@ -2,13 +2,14 @@ import { reactive } from 'vue';
 
 export const state = reactive({
   isLocked: true,
-  isActionPending: false, // Prevents auto-locking during sensitive operations like file picking
+  isActionPending: false,
   activeDatabaseId: null,
   activeDatabasePassword: null,
   decryptedData: {
     version: 1,
     meds: [],
     calendar: [],
+    lastDoseUpdate: null, // This is now part of the decrypted data
   },
 });
 
@@ -17,6 +18,7 @@ export function unlock(id, password, data) {
   state.activeDatabasePassword = password;
   state.decryptedData.meds = data.meds || [];
   state.decryptedData.calendar = data.calendar || [];
+  state.decryptedData.lastDoseUpdate = data.lastDoseUpdate;
   state.decryptedData.version += 1;
   state.isLocked = false;
 }
@@ -26,5 +28,6 @@ export function lock() {
   state.activeDatabasePassword = null;
   state.decryptedData.meds = [];
   state.decryptedData.calendar = [];
+  state.decryptedData.lastDoseUpdate = null;
   state.isLocked = true;
 }

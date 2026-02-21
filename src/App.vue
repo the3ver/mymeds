@@ -12,6 +12,8 @@ const theme = useTheme();
 const { t } = useI18n();
 const drawer = ref(false);
 const dataDialog = ref(false);
+const mainPageRef = ref(null);
+const activeTab = ref('meds');
 
 async function handleLock() {
   if (!appState.isLocked) {
@@ -21,6 +23,12 @@ async function handleLock() {
       appState.decryptedData
     );
     lock();
+  }
+}
+
+function openCalendarFilter() {
+  if (mainPageRef.value) {
+    mainPageRef.value.openCalendarFilter();
   }
 }
 </script>
@@ -33,15 +41,37 @@ async function handleLock() {
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
-      <v-app-bar-title>{{ t('app.title') }}</v-app-bar-title>
+      <v-app-bar-title>
+        {{ t('app.title') }}
+        <span v-if="!appState.isLocked && activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
+        <span v-if="!appState.isLocked && activeTab === 'calendar'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.calendar') }}</span>
+      </v-app-bar-title>
       <template v-slot:append>
+        <v-btn
+          v-if="!appState.isLocked && activeTab === 'calendar'"
+          icon="mdi-filter-variant"
+          @click="openCalendarFilter"
+        ></v-btn>
         <v-btn v-if="!appState.isLocked" icon="mdi-lock" @click="handleLock"></v-btn>
       </template>
     </v-app-bar>
 
     <v-main>
       <DatabaseListPage v-if="appState.isLocked" />
-      <MainPage v-else :key="appState.decryptedData.version" :data-dialog-open="dataDialog" @update:data-dialog-open="dataDialog = $event" />
+      <MainPage
+        v-else
+        ref="mainPageRef"
+        :key="appState.decryptedData.version"
+        :data-dialog-open="dataDialog"
+        @update:data-dialog-open="dataDialog = $event"
+        @update:active-tab="activeTab = $event"
+      />
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+.opacity-70 {
+  opacity: 0.7;
+}
+</style>
