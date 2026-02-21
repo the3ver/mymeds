@@ -123,10 +123,26 @@ const groupedEntries = computed(() => {
   return finalResult
 })
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr, forceShort = false) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
-  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
+
+  const today = new Date()
+  const currentQuarter = Math.floor(today.getMonth() / 3)
+  const dateQuarter = Math.floor(date.getMonth() / 3)
+
+  const isRecent = date.getFullYear() === today.getFullYear() && dateQuarter === currentQuarter
+
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }
+
+  if (isRecent && !forceShort) {
+    options.weekday = 'short'
+  }
+
   return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
 }
 
@@ -162,7 +178,7 @@ const getEntrySubtitle = (entry) => {
     const diffTime = Math.abs(end - start)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
 
-    return `${dateStr} - ${formatDate(entry.endDate)} (${diffDays} ${t('app.showDays')})`
+    return `${dateStr} - ${formatDate(entry.endDate, true)} (${diffDays} ${t('app.showDays')})`
   }
 
   return dateStr
@@ -311,7 +327,8 @@ const openFilterDialog = () => {
 }
 
 defineExpose({
-  openFilterDialog
+  openFilterDialog,
+  openTypeDialog
 })
 </script>
 
@@ -352,20 +369,6 @@ defineExpose({
               {{ t('calendar.today') }}, {{ formatDate(item.date) }}
             </span>
           </v-card>
-
-          <!-- Add Button Card (moved here) -->
-          <v-card
-            class="mb-4 border-dashed"
-            variant="outlined"
-            color="grey"
-            @click="openTypeDialog"
-            style="border-style: dashed !important; border-width: 2px;"
-          >
-            <v-card-text class="d-flex align-center justify-center py-4">
-              <v-icon start size="large">mdi-plus</v-icon>
-              <span class="text-h6">{{ t('calendar.add') }}</span>
-            </v-card-text>
-          </v-card>
         </div>
 
         <!-- Quarter Marker -->
@@ -387,17 +390,15 @@ defineExpose({
           @click="toggleExpand(item.data.originalIndex)"
         >
 
-          <v-card-item>
+          <v-card-item class="py-3">
             <template v-slot:prepend>
-              <v-avatar :color="getEntryColor(item.data.type)" class="mr-2">
-                <span class="text-h6 text-white">
-                  <v-icon color="white">{{ getEntryIcon(item.data.type) }}</v-icon>
-                </span>
+              <v-avatar :color="getEntryColor(item.data.type)" size="36" class="mr-3">
+                <v-icon color="white" size="20">{{ getEntryIcon(item.data.type) }}</v-icon>
               </v-avatar>
             </template>
 
-            <v-card-title class="text-wrap" style="line-height: 1.2;">
-              <div class="text-h6 mb-1">{{ item.data.title }}</div>
+            <v-card-title class="d-flex flex-wrap align-baseline" style="gap: 0.5rem; line-height: 1.2;">
+              <div class="text-h6">{{ item.data.title }}</div>
               <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
             </v-card-title>
           </v-card-item>
@@ -469,7 +470,7 @@ defineExpose({
                   </div>
                   <div v-if="item.data.endDate" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
-                    <div class="font-weight-medium">{{ formatDate(item.data.endDate) }}</div>
+                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
                   </div>
                 </template>
 
@@ -477,7 +478,7 @@ defineExpose({
                 <template v-if="item.data.type === 'note'">
                    <div v-if="item.data.endDate" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
-                    <div class="font-weight-medium">{{ formatDate(item.data.endDate) }}</div>
+                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
                   </div>
                 </template>
 
@@ -518,20 +519,6 @@ defineExpose({
     </div>
     <div v-else class="text-center mt-10 text-grey">
       {{ t('calendar.noEntries') }}
-
-      <!-- Add Button Card (when no entries) -->
-      <v-card
-        class="mt-4 border-dashed"
-        variant="outlined"
-        color="grey"
-        @click="openTypeDialog"
-        style="border-style: dashed !important; border-width: 2px;"
-      >
-        <v-card-text class="d-flex align-center justify-center py-4">
-          <v-icon start size="large">mdi-plus</v-icon>
-          <span class="text-h6">{{ t('calendar.add') }}</span>
-        </v-card-text>
-      </v-card>
     </div>
 
     <!-- Type Selection Dialog -->

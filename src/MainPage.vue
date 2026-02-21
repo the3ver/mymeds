@@ -154,6 +154,12 @@ const openCalendarFilter = () => {
     calendarPageRef.value.openFilterDialog()
   }
 }
+
+const openCalendarAddDialog = () => {
+  if (calendarPageRef.value) {
+    calendarPageRef.value.openTypeDialog()
+  }
+}
 </script>
 
 <template>
@@ -212,6 +218,18 @@ const openCalendarFilter = () => {
       ref="calendarPageRef"
     />
   </v-main>
+
+  <v-fab
+    v-if="activeTab === 'calendar'"
+    icon="mdi-plus"
+    location="bottom end"
+    size="large"
+    color="primary"
+    app
+    appear
+    class="mb-14"
+    @click="openCalendarAddDialog"
+  ></v-fab>
 
   <v-bottom-navigation v-model="activeTab" color="primary" grow>
     <v-btn value="meds">
