@@ -6,20 +6,18 @@ import * as dataService from '../utils/dataService'
 import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
-import DataDialog from './DataDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'open-data'])
 
 const theme = useTheme()
 const { t } = useI18n()
 const aboutDialog = ref(false)
 const helpDialog = ref(false)
 const settingsDialog = ref(false)
-const dataDialog = ref(false)
 const appVersion = packageJson.version
 
 const toggleTheme = () => {
@@ -55,7 +53,7 @@ const toggleTheme = () => {
         <v-list-item-title>{{ t('app.settings') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="dataDialog = true">
+      <v-list-item @click="emit('open-data')">
         <template v-slot:prepend>
           <v-icon>mdi-database</v-icon>
         </template>
@@ -82,9 +80,6 @@ const toggleTheme = () => {
 
   <!-- Settings Dialog -->
   <SettingsDialog v-model="settingsDialog" />
-
-  <!-- Data Dialog -->
-  <DataDialog v-model="dataDialog" />
 
   <!-- Help Dialog -->
   <HelpDialog v-model="helpDialog" />

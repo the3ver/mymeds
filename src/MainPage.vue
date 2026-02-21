@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { state as appState, lock } from './app-state'
@@ -8,12 +8,14 @@ import MedDialog from './modules/meds/components/MedDialog.vue'
 import NavDrawer from './modules/common/components/NavDrawer.vue'
 import MedList from './modules/meds/components/MedList.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
+import DataDialog from './modules/common/components/DataDialog.vue'
 
 const theme = useTheme()
 const { t } = useI18n()
 const drawer = ref(false)
-const dialog = ref(false)
+const medDialog = ref(false)
 const editDialog = ref(false)
+const dataDialog = ref(false)
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const activeTab = ref('meds')
@@ -42,6 +44,11 @@ async function handleLock() {
 }
 
 onMounted(() => {
+  // Check for pending intents after session recovery
+  if (appState.pendingIntent === 'import') {
+    dataDialog.value = true;
+  }
+
   window.addEventListener('beforeunload', handleLock);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
@@ -66,8 +73,8 @@ onUnmounted(() => {
 
 
 // --- Component Logic ---
-const openDialog = () => {
-  dialog.value = true
+const openMedDialog = () => {
+  medDialog.value = true
 }
 
 const addItem = (med) => {
@@ -105,7 +112,7 @@ const openCalendarAddDialog = () => {
 </script>
 
 <template>
-  <NavDrawer v-model="drawer" />
+  <NavDrawer v-model="drawer" @open-data="dataDialog = true" />
 
   <v-app-bar
     :color="theme.global.current.value.dark ? 'surface' : 'primary'"
@@ -142,7 +149,7 @@ const openCalendarAddDialog = () => {
             class="mb-4 border-dashed"
             variant="outlined"
             color="grey"
-            @click="openDialog"
+            @click="openMedDialog"
             style="border-style: dashed !important; border-width: 2px;"
           >
             <v-card-text class="d-flex align-center justify-center py-4">
@@ -186,7 +193,7 @@ const openCalendarAddDialog = () => {
   </v-bottom-navigation>
 
   <MedDialog
-    v-model="dialog"
+    v-model="medDialog"
     :title="t('dialog.addTitle')"
     :confirm-text="t('dialog.add')"
     @confirm="addItem"
@@ -199,6 +206,8 @@ const openCalendarAddDialog = () => {
     :confirm-text="t('dialog.save')"
     @confirm="saveEdit"
   />
+
+  <DataDialog v-model="dataDialog" />
 </template>
 
 <style scoped>

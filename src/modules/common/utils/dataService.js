@@ -65,8 +65,8 @@ export async function saveAndLockDatabase(id, password, data) {
 export const deleteDatabase = dbAdapter.deleteDatabase;
 
 // --- Session Recovery ---
-export function saveRecoveryState(id, password) {
-  sessionStorage.setItem(SESSION_RECOVERY_KEY, JSON.stringify({ id, password }));
+export function saveRecoveryState(id, password, intent = null) {
+  sessionStorage.setItem(SESSION_RECOVERY_KEY, JSON.stringify({ id, password, intent }));
 }
 
 export function getRecoveryState() {

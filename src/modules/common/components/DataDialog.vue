@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
@@ -22,6 +22,15 @@ const importStats = ref(null)
 const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
+const showResumeImportMessage = ref(false)
+
+onMounted(() => {
+  if (appState.pendingIntent === 'import') {
+    showResumeImportMessage.value = true;
+    // Clear the intent so it doesn't show again on subsequent opens
+    appState.pendingIntent = null;
+  }
+});
 
 const deleteAll = async () => {
   await dataService.deleteAllData()
@@ -36,15 +45,14 @@ const handleExport = () => {
 }
 
 const triggerImport = () => {
-  // Save state before opening file picker, which might cause the app to be suspended on mobile
-  dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword);
+  dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword, 'import');
   fileInput.value.click()
 }
 
 const onFileSelected = (event) => {
   const file = event.target.files[0]
   if (!file) {
-    dataService.clearRecoveryState(); // Clear if user cancels
+    dataService.clearRecoveryState();
     return;
   }
 
@@ -56,22 +64,20 @@ const onFileSelected = (event) => {
       importDialog.value = true
     } else {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
-      dataService.clearRecoveryState(); // Clear on error
+      dataService.clearRecoveryState();
     }
-    event.target.value = '' // Reset file input
+    event.target.value = ''
   }
   reader.readAsText(file)
 }
 
 const handleConfirmImport = () => {
-  // Overwrite the in-memory data with the imported data
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
 
   alert(t('app.importSuccess'))
   importDialog.value = false
-  dataService.clearRecoveryState(); // Clean up after successful import
-  // The data will be saved automatically when the app is locked/closed
+  dataService.clearRecoveryState();
 }
 
 const close = () => {
@@ -89,6 +95,16 @@ const close = () => {
 
       <v-card-text>
         <v-container>
+          <v-alert
+            v-if="showResumeImportMessage"
+            type="info"
+            variant="tonal"
+            class="mb-6"
+            border="start"
+          >
+            Your session was restored. Please select the import file again to continue.
+          </v-alert>
+
           <!-- Import / Export -->
           <div class="text-h6 mb-4">Import / Export</div>
           <div class="d-flex flex-column gap-2 mb-6">
@@ -135,21 +151,18 @@ const close = () => {
       </v-card-text>
     </v-card>
 
-    <!-- Export Dialog -->
     <ExportDialog
       v-model="exportDialog"
       :data-content="exportDataContent"
       :file-name="exportFileName"
     />
 
-    <!-- Import Confirmation Dialog -->
     <ImportDialog
       v-model="importDialog"
       :stats="importStats"
       @confirm="handleConfirmImport"
     />
 
-    <!-- Confirm Delete All Dialog -->
     <ConfirmDialog
       v-model="confirmDeleteAllDialog"
       :title="t('app.deleteAll')"

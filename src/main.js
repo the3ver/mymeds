@@ -4,7 +4,7 @@ import './style.css'
 import App from './App.vue'
 import { messages } from './i18n'
 import * as dataService from './modules/common/utils/dataService'
-import { unlock } from './app-state'
+import { state as appState, unlock } from './app-state'
 
 // Vuetify
 import 'vuetify/styles'
@@ -24,6 +24,9 @@ async function initializeApp() {
     if (result.success) {
       console.log('[main.js] ✅ Auto-unlock successful.');
       unlock(recoveryState.id, recoveryState.password, result.data);
+      if (recoveryState.intent) {
+        appState.pendingIntent = recoveryState.intent;
+      }
     } else {
       console.warn('[main.js] ⚠️ Auto-unlock failed.');
     }

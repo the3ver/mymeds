@@ -8,6 +8,7 @@ export const state = reactive({
     meds: [],
     calendar: [],
   },
+  pendingIntent: null, // e.g., 'import'
 });
 
 export function unlock(id, password, data) {
@@ -23,4 +24,5 @@ export function lock() {
   state.activeDatabasePassword = null;
   state.decryptedData = { meds: [], calendar: [] };
   state.isLocked = true;
+  state.pendingIntent = null;
 }
