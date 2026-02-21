@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../../common/utils/dataService'
 import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
@@ -20,12 +21,9 @@ const expandedIndex = ref(-1)
 const lastAddedEntry = ref(null)
 const filterTypes = ref([])
 
-// Load entries from localStorage
-onMounted(() => {
-  const savedEntries = localStorage.getItem('myMedsCalendarEntries')
-  if (savedEntries) {
-    entries.value = JSON.parse(savedEntries)
-  }
+// Load entries from dataService
+onMounted(async () => {
+  entries.value = await dataService.getCalendarEntries()
 
   // Scroll to today separator after render
   nextTick(() => {
@@ -36,9 +34,9 @@ onMounted(() => {
   })
 })
 
-// Save entries to localStorage
+// Save entries to dataService
 watch(entries, (newVal) => {
-  localStorage.setItem('myMedsCalendarEntries', JSON.stringify(newVal))
+  dataService.saveCalendarEntries(newVal)
 }, { deep: true })
 
 const sortedEntries = computed(() => {

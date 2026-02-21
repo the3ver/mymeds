@@ -1,6 +1,7 @@
 <script setup>
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../utils/dataService'
 
 const props = defineProps({
   modelValue: Boolean
@@ -13,12 +14,12 @@ const { t, locale } = useI18n()
 
 const setTheme = (mode) => {
   theme.global.name.value = mode
-  localStorage.setItem('myMedsTheme', mode)
+  dataService.saveTheme(mode)
 }
 
 const setLanguage = (lang) => {
   locale.value = lang
-  localStorage.setItem('myMedsLocale', lang)
+  dataService.saveLocale(lang)
 }
 
 const close = () => {

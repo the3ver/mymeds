@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../../common/utils/dataService'
 import MedCard from './MedCard.vue'
 import CalendarDialog from '../../common/components/CalendarDialog.vue'
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils'
@@ -24,15 +25,11 @@ const yellowLimit = ref(21)
 const redLimit = ref(7)
 const calendarDialog = ref(false)
 
-const updateSettings = () => {
-  const savedSort = localStorage.getItem('myMedsSortMode')
-  if (savedSort) sortMode.value = savedSort
-
-  const savedYellow = localStorage.getItem('myMedsYellowLimit')
-  if (savedYellow) yellowLimit.value = parseInt(savedYellow)
-
-  const savedRed = localStorage.getItem('myMedsRedLimit')
-  if (savedRed) redLimit.value = parseInt(savedRed)
+async function updateSettings() {
+  const settings = await dataService.getSettings()
+  sortMode.value = settings.sortMode
+  yellowLimit.value = settings.yellowLimit
+  redLimit.value = settings.redLimit
 }
 
 onMounted(() => {
