@@ -40,13 +40,19 @@ const triggerImport = () => {
 }
 
 const onFileSelected = (event) => {
+  alert("DEBUG: onFileSelected triggered!");
   const file = event.target.files[0]
-  if (!file) return;
+  if (!file) {
+    alert("DEBUG: No file selected.");
+    return;
+  }
 
   const reader = new FileReader()
   reader.onload = (e) => {
+    alert("DEBUG: File read successfully.");
     const result = importExportService.processImport(e.target.result)
     if (result.success) {
+      alert("DEBUG: Import processed successfully. Opening confirm dialog.");
       result.stats.currentMedsCount = appState.decryptedData.meds.length;
       result.stats.currentCalendarCount = appState.decryptedData.calendar.length;
       importStats.value = result.stats
@@ -56,14 +62,17 @@ const onFileSelected = (event) => {
     }
     event.target.value = ''
   }
+  reader.onerror = () => {
+    alert("DEBUG: Error reading file.");
+  };
   reader.readAsText(file)
 }
 
 const handleConfirmImport = () => {
-  // Directly update the reactive app state.
+  alert("DEBUG: handleConfirmImport in DataDialog triggered!");
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
-  appState.decryptedData.version += 1; // This will trigger the re-render in App.vue
+  appState.decryptedData.version += 1;
 
   alert(t('app.importSuccess'))
   importDialog.value = false
