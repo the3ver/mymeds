@@ -1,18 +1,12 @@
 import * as dbAdapter from './indexedDbAdapter';
 import * as crypto from './cryptoService';
 
+const SESSION_RECOVERY_KEY = 'myMedsSessionRecovery';
+
 // --- Database (Tresor) Management ---
 
-/**
- * Gets the metadata list of all available databases.
- */
 export const getDatabaseList = dbAdapter.getDatabaseList;
 
-/**
- * Creates a new, empty, encrypted database with a password.
- * @param {string} name - The user-defined name for the database.
- * @param {string} password - The password to encrypt the database.
- */
 export async function createDatabaseWithPassword(name, password) {
   const salt = crypto.generateSalt();
   const key = await crypto.deriveKeyFromPassword(password, salt);
@@ -33,12 +27,6 @@ export async function createDatabaseWithPassword(name, password) {
   return dbAdapter.createDatabase(newDbEntry);
 }
 
-/**
- * Unlocks a database and returns the decrypted data.
- * @param {number} id - The ID of the database to unlock.
- * @param {string} password - The password for the database.
- * @returns {Promise<{success: boolean, data: object|null}>}
- */
 export async function unlockDatabase(id, password) {
   const dbEntry = await dbAdapter.getFullDatabase(id);
   if (!dbEntry) return { success: false, data: null };
@@ -54,16 +42,9 @@ export async function unlockDatabase(id, password) {
       return { success: false, data: null }; // Wrong password
     }
   }
-  // Placeholder for WebAuthn
   return { success: false, data: null };
 }
 
-/**
- * Saves data back into an encrypted database.
- * @param {number} id - The ID of the database.
- * @param {string} password - The password (needed to re-derive the key).
- * @param {object} data - The plain { meds, calendar } object.
- */
 export async function saveAndLockDatabase(id, password, data) {
   const dbEntry = await dbAdapter.getFullDatabase(id);
   if (!dbEntry) throw new Error("Database not found for saving.");
@@ -74,7 +55,7 @@ export async function saveAndLockDatabase(id, password, data) {
     const { iv, encryptedData } = await crypto.encryptData(data, key);
 
     dbEntry.encryptedData = encryptedData;
-    dbEntry.passwordData.iv = iv; // IV changes with each encryption
+    dbEntry.passwordData.iv = iv;
     dbEntry.modifiedAt = new Date();
     
     return dbAdapter.updateDatabase(dbEntry);
@@ -82,6 +63,20 @@ export async function saveAndLockDatabase(id, password, data) {
 }
 
 export const deleteDatabase = dbAdapter.deleteDatabase;
+
+// --- Session Recovery ---
+export function saveRecoveryState(id, password) {
+  sessionStorage.setItem(SESSION_RECOVERY_KEY, JSON.stringify({ id, password }));
+}
+
+export function getRecoveryState() {
+  const state = sessionStorage.getItem(SESSION_RECOVERY_KEY);
+  return state ? JSON.parse(state) : null;
+}
+
+export function clearRecoveryState() {
+  sessionStorage.removeItem(SESSION_RECOVERY_KEY);
+}
 
 
 // --- Settings & App Meta Data (Unencrypted) ---

@@ -36,12 +36,17 @@ const handleExport = () => {
 }
 
 const triggerImport = () => {
+  // Save state before opening file picker, which might cause the app to be suspended on mobile
+  dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword);
   fileInput.value.click()
 }
 
 const onFileSelected = (event) => {
   const file = event.target.files[0]
-  if (!file) return
+  if (!file) {
+    dataService.clearRecoveryState(); // Clear if user cancels
+    return;
+  }
 
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -51,6 +56,7 @@ const onFileSelected = (event) => {
       importDialog.value = true
     } else {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
+      dataService.clearRecoveryState(); // Clear on error
     }
     event.target.value = '' // Reset file input
   }
@@ -64,6 +70,7 @@ const handleConfirmImport = () => {
 
   alert(t('app.importSuccess'))
   importDialog.value = false
+  dataService.clearRecoveryState(); // Clean up after successful import
   // The data will be saved automatically when the app is locked/closed
 }
 
