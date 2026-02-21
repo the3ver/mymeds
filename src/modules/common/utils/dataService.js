@@ -62,17 +62,6 @@ export async function saveAndLockDatabase(id, password, data) {
 
 export const deleteDatabase = dbAdapter.deleteDatabase;
 
-// --- Session Recovery ---
-export async function saveRecoveryState(id, password, intent = null) {
-  await dbAdapter.saveRecoveryState({ id, password, intent });
-}
-
-export const getRecoveryState = dbAdapter.getRecoveryState;
-
-export async function clearRecoveryState() {
-  await dbAdapter.clearRecoveryState();
-}
-
 
 // --- Settings & App Meta Data (Unencrypted) ---
 export const getSettings = dbAdapter.getSettings;

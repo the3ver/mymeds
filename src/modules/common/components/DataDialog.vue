@@ -22,19 +22,10 @@ const importStats = ref(null)
 const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
-const showResumeImportMessage = ref(false)
-const showSaveStateMessage = ref(false)
-
-onMounted(() => {
-  if (appState.pendingIntent === 'import') {
-    showResumeImportMessage.value = true;
-    appState.pendingIntent = null;
-  }
-});
 
 const deleteAll = async () => {
   await dataService.deleteAllData()
-  window.location.reload()
+  window.location.reload() // Reload to show the empty db list
 }
 
 const handleExport = () => {
@@ -44,42 +35,39 @@ const handleExport = () => {
   exportDialog.value = true
 }
 
-const triggerImport = async () => {
-  await dataService.saveRecoveryState(appState.activeDatabaseId, appState.activeDatabasePassword, 'import');
-  showSaveStateMessage.value = true;
-  setTimeout(() => showSaveStateMessage.value = false, 3000);
+const triggerImport = () => {
   fileInput.value.click()
 }
 
-const onFileSelected = async (event) => {
+const onFileSelected = (event) => {
   const file = event.target.files[0]
-  if (!file) {
-    await dataService.clearRecoveryState();
-    return;
-  }
+  if (!file) return;
 
   const reader = new FileReader()
-  reader.onload = async (e) => {
+  reader.onload = (e) => {
     const result = importExportService.processImport(e.target.result)
     if (result.success) {
+      // Add current counts to stats for the dialog
+      result.stats.currentMedsCount = appState.decryptedData.meds.length;
+      result.stats.currentCalendarCount = appState.decryptedData.calendar.length;
       importStats.value = result.stats
       importDialog.value = true
     } else {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
-      await dataService.clearRecoveryState();
     }
     event.target.value = ''
   }
   reader.readAsText(file)
 }
 
-const handleConfirmImport = async () => {
+const handleConfirmImport = () => {
+  // Directly update the reactive app state. The UI will update automatically.
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
 
   alert(t('app.importSuccess'))
   importDialog.value = false
-  await dataService.clearRecoveryState();
+  // NO reload needed. The data will be saved automatically when the app is locked/closed.
 }
 
 const close = () => {
@@ -97,16 +85,6 @@ const close = () => {
 
       <v-card-text>
         <v-container>
-          <v-alert
-            v-if="showResumeImportMessage"
-            type="info"
-            variant="tonal"
-            class="mb-6"
-            border="start"
-          >
-            Your session was restored. Please select the import file again to continue.
-          </v-alert>
-
           <!-- Import / Export -->
           <div class="text-h6 mb-4">Import / Export</div>
           <div class="d-flex flex-column gap-2 mb-6">
@@ -175,15 +153,6 @@ const close = () => {
       :confirm-input-value="t('app.deleteConfirmValue')"
       @confirm="deleteAll"
     />
-
-    <!-- Debug Snackbar -->
-    <v-snackbar
-      v-model="showSaveStateMessage"
-      :timeout="3000"
-      color="blue-grey"
-    >
-      DEBUG: Saving recovery state...
-    </v-snackbar>
   </v-dialog>
 </template>
 

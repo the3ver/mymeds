@@ -4,7 +4,6 @@ import './style.css'
 import App from './App.vue'
 import { messages } from './i18n'
 import * as dataService from './modules/common/utils/dataService'
-import { state as appState, unlock } from './app-state'
 
 // Vuetify
 import 'vuetify/styles'
@@ -14,19 +13,6 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 async function initializeApp() {
-  // Attempt to recover session first
-  const recoveryState = await dataService.getRecoveryState();
-  if (recoveryState) {
-    const result = await dataService.unlockDatabase(recoveryState.id, recoveryState.password);
-    if (result.success) {
-      unlock(recoveryState.id, recoveryState.password, result.data);
-      if (recoveryState.intent) {
-        appState.pendingIntent = recoveryState.intent;
-      }
-    }
-    await dataService.clearRecoveryState();
-  }
-  
   // Fetch settings asynchronously
   const settings = await dataService.getSettings();
 
