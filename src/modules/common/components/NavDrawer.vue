@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../utils/dataService'
 import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
@@ -22,8 +23,9 @@ const dataDialog = ref(false)
 const appVersion = packageJson.version
 
 const toggleTheme = () => {
-  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
-  localStorage.setItem('myMedsTheme', theme.global.name.value)
+  const newTheme = theme.global.current.value.dark ? 'light' : 'dark'
+  theme.global.name.value = newTheme
+  dataService.saveTheme(newTheme)
 }
 </script>
 

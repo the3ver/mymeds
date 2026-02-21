@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../utils/dataService'
+import * as importExportService from '../utils/importExportService'
 import ConfirmDialog from './ConfirmDialog.vue'
 import ExportDialog from './ExportDialog.vue'
 import ImportDialog from './ImportDialog.vue'
@@ -22,40 +24,25 @@ const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
 
-const deleteMeds = () => {
-  localStorage.removeItem('myMedsItems')
-  localStorage.removeItem('lastDoseUpdate')
-  window.location.reload() // Reload to refresh data
+const deleteMeds = async () => {
+  await dataService.deleteMedsData()
+  window.location.reload()
 }
 
-const deleteCalendar = () => {
-  localStorage.removeItem('myMedsCalendarEntries')
-  window.location.reload() // Reload to refresh data
+const deleteCalendar = async () => {
+  await dataService.deleteCalendarData()
+  window.location.reload()
 }
 
-const deleteAll = () => {
-  localStorage.clear()
-  window.location.reload() // Reload to refresh data
+const deleteAll = async () => {
+  await dataService.deleteAllData()
+  window.location.reload()
 }
 
-const prepareExport = () => {
-  const meds = JSON.parse(localStorage.getItem('myMedsItems') || '[]')
-  const calendar = JSON.parse(localStorage.getItem('myMedsCalendarEntries') || '[]')
-
-  const data = {
-    exportDate: new Date().toISOString(),
-    meds: meds,
-    calendar: calendar
-  }
-
-  exportDataContent.value = JSON.stringify(data, null, 2)
-
-  const now = new Date()
-  const day = String(now.getDate()).padStart(2, '0')
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const year = now.getFullYear()
-  exportFileName.value = `mymeds_daten_${day}.${month}.${year}.json`
-
+const handleExport = async () => {
+  const { exportDataContent: content, exportFileName: name } = await importExportService.prepareExport()
+  exportDataContent.value = content
+  exportFileName.value = name
   exportDialog.value = true
 }
 
@@ -68,51 +55,27 @@ const onFileSelected = (event) => {
   if (!file) return
 
   const reader = new FileReader()
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result)
-
-      // Validate structure
-      if (!data.meds || !data.calendar) {
-        alert(t('app.importError'))
-        return
-      }
-
-      const currentMeds = JSON.parse(localStorage.getItem('myMedsItems') || '[]')
-      const currentCalendar = JSON.parse(localStorage.getItem('myMedsCalendarEntries') || '[]')
-
-      importStats.value = {
-        date: new Date(data.exportDate).toLocaleString(),
-        medsCount: data.meds.length,
-        currentMedsCount: currentMeds.length,
-        calendarCount: data.calendar.length,
-        currentCalendarCount: currentCalendar.length,
-        data: data
-      }
-
+  reader.onload = async (e) => {
+    const result = await importExportService.processImport(e.target.result)
+    if (result.success) {
+      importStats.value = result.stats
       importDialog.value = true
-
-    } catch (error) {
-      console.error('Import error:', error)
-      alert(t('app.importError'))
+    } else {
+      alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
     }
-    // Reset file input
-    event.target.value = ''
+    event.target.value = '' // Reset file input
   }
   reader.readAsText(file)
 }
 
-const confirmImport = () => {
-  const data = importStats.value.data
-  localStorage.setItem('myMedsItems', JSON.stringify(data.meds))
-  localStorage.setItem('myMedsCalendarEntries', JSON.stringify(data.calendar))
-
-  // We do NOT update lastDoseUpdate here.
-  // The user is responsible for the data consistency regarding daily doses.
-  // The app will keep its current lastDoseUpdate state.
-
-  alert(t('app.importSuccess'))
-  window.location.reload()
+const handleConfirmImport = async () => {
+  const success = await importExportService.confirmImport(importStats.value.data)
+  if (success) {
+    alert(t('app.importSuccess'))
+    window.location.reload()
+  } else {
+    alert(t('app.importError'))
+  }
 }
 
 const close = () => {
@@ -137,7 +100,7 @@ const close = () => {
               color="primary"
               variant="outlined"
               prepend-icon="mdi-export"
-              @click="prepareExport"
+              @click="handleExport"
             >
               {{ t('app.exportData') }}
             </v-btn>
@@ -203,7 +166,7 @@ const close = () => {
     <ImportDialog
       v-model="importDialog"
       :stats="importStats"
-      @confirm="confirmImport"
+      @confirm="handleConfirmImport"
     />
 
     <!-- Confirm Delete Meds Dialog -->

@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { checkAndUpdateDailyDose, calculateDaysRemaining } from './modules/meds/utils/medUtils'
+import * as dataService from './modules/common/utils/dataService'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import NavDrawer from './modules/common/components/NavDrawer.vue'
 import MedList from './modules/meds/components/MedList.vue'
@@ -27,52 +28,45 @@ const activeTab = ref('meds') // 'meds' or 'calendar'
 const deductions = ref({}) // Stores deductions for display
 const calendarPageRef = ref(null)
 
-// Load items from localStorage on mount
-onMounted(() => {
-  const savedItemsJson = localStorage.getItem('myMedsItems')
-  if (savedItemsJson) {
-    let savedItems = JSON.parse(savedItemsJson)
-    const lastUpdate = localStorage.getItem('lastDoseUpdate')
+// Load items from dataService on mount
+onMounted(async () => {
+  let savedItems = await dataService.getMeds()
+  const lastUpdate = await dataService.getLastDoseUpdate()
 
+  if (savedItems.length > 0) {
     // Check for daily updates
     const result = checkAndUpdateDailyDose(savedItems, lastUpdate)
 
     if (result.updated) {
-      localStorage.setItem('lastDoseUpdate', result.newDate)
+      await dataService.setLastDoseUpdate(result.newDate)
       // Store deductions to show in UI
       if (result.deductions) {
         deductions.value = result.deductions
       }
     }
-
     items.value = result.updatedItems
-
-    // Check for warnings
-    checkWarnings(items.value)
   } else {
     // Initialize last update date if no items exist yet
-    localStorage.setItem('lastDoseUpdate', new Date().toDateString())
+    await dataService.setLastDoseUpdate(new Date().toDateString())
   }
 
   // Load theme preference
-  const savedTheme = localStorage.getItem('myMedsTheme')
-  if (savedTheme) {
-    theme.global.name.value = savedTheme
-  }
+  const settings = await dataService.getSettings()
+  theme.global.name.value = settings.theme
+
+  // Check for warnings
+  checkWarnings(items.value)
 
   // Check for first run after installation
-  checkFirstRun()
+  await checkFirstRun()
 
   // Check for updates
-  checkUpdate()
+  await checkUpdate()
 })
 
-const checkWarnings = (meds) => {
-  const yellowLimit = parseInt(localStorage.getItem('myMedsYellowLimit') || '21')
-  const redLimit = parseInt(localStorage.getItem('myMedsRedLimit') || '7')
-
-  // Use the larger limit to catch all warnings
-  const warningLimit = Math.max(yellowLimit, redLimit)
+async function checkWarnings(meds) {
+  const settings = await dataService.getSettings()
+  const warningLimit = Math.max(settings.yellowLimit, settings.redLimit)
 
   let criticalMeds = []
   let minDays = Infinity
@@ -96,35 +90,34 @@ const checkWarnings = (meds) => {
   }
 }
 
-const checkFirstRun = () => {
-  // Check if running in standalone mode (installed PWA)
+async function checkFirstRun() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        window.navigator.standalone ||
                        document.referrer.includes('android-app://');
 
   if (isStandalone) {
-    const hasRunBefore = localStorage.getItem('pwa_first_run_completed')
+    const hasRunBefore = await dataService.getFirstRunCompleted()
     if (!hasRunBefore) {
       welcomeDialog.value = true
-      localStorage.setItem('pwa_first_run_completed', 'true')
+      await dataService.setFirstRunCompleted()
     }
   }
 }
 
-const checkUpdate = () => {
-  const lastVersion = localStorage.getItem('myMedsVersion')
+async function checkUpdate() {
+  const lastVersion = await dataService.getLastVersion()
   const currentVersion = packageJson.version
 
   if (lastVersion && lastVersion !== currentVersion) {
     updateDialog.value = true
   }
 
-  localStorage.setItem('myMedsVersion', currentVersion)
+  await dataService.saveLastVersion(currentVersion)
 }
 
-// Watch for changes in items and save to localStorage
+// Watch for changes in items and save to dataService
 watch(items, (newItems) => {
-  localStorage.setItem('myMedsItems', JSON.stringify(newItems))
+  dataService.saveMeds(newItems)
 }, { deep: true })
 
 const openDialog = () => {

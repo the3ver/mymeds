@@ -441,13 +441,11 @@ const messages = {
   }
 }
 
-// Determine default locale based on browser settings or saved preference
-const savedLocale = localStorage.getItem('myMedsLocale')
-const defaultLocale = savedLocale || (navigator.language.startsWith('de') ? 'de' : 'en')
-
-export default createI18n({
-  legacy: false, // Use Composition API
-  locale: defaultLocale,
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en', // Default fallback, will be set in main.js
   fallbackLocale: 'en',
   messages
 })
+
+export default i18n

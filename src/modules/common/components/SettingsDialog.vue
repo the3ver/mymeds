@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../utils/dataService'
 import ConfirmDialog from './ConfirmDialog.vue'
 
 const props = defineProps({
@@ -28,37 +29,34 @@ watch(() => props.modelValue, (val) => {
   if (val) loadSettings()
 })
 
-const loadSettings = () => {
-  language.value = localStorage.getItem('myMedsLocale') || 'de'
-  displayMode.value = localStorage.getItem('myMedsDisplayMode') || 'pills'
-  sortMode.value = localStorage.getItem('myMedsSortMode') || 'added'
-  uiScale.value = localStorage.getItem('myMedsUiScale') || 'normal'
-
-  const savedYellow = localStorage.getItem('myMedsYellowLimit')
-  if (savedYellow) yellowLimit.value = parseInt(savedYellow)
-
-  const savedRed = localStorage.getItem('myMedsRedLimit')
-  if (savedRed) redLimit.value = parseInt(savedRed)
+async function loadSettings() {
+  const settings = await dataService.getSettings()
+  language.value = settings.locale
+  displayMode.value = settings.displayMode
+  sortMode.value = settings.sortMode
+  uiScale.value = settings.uiScale
+  yellowLimit.value = settings.yellowLimit
+  redLimit.value = settings.redLimit
 }
 
 // Watchers to save settings immediately
 watch(language, (val) => {
   locale.value = val
-  localStorage.setItem('myMedsLocale', val)
+  dataService.saveLocale(val)
 })
 
 watch(displayMode, (val) => {
-  localStorage.setItem('myMedsDisplayMode', val)
+  dataService.saveDisplayMode(val)
   window.dispatchEvent(new Event('storage-display-mode-changed'))
 })
 
 watch(sortMode, (val) => {
-  localStorage.setItem('myMedsSortMode', val)
+  dataService.saveSortMode(val)
   window.dispatchEvent(new Event('storage-sort-mode-changed'))
 })
 
 watch(uiScale, (val) => {
-  localStorage.setItem('myMedsUiScale', val)
+  dataService.saveUiScale(val)
   const root = document.documentElement
   if (val === 'small') root.style.fontSize = '14px'
   else if (val === 'large') root.style.fontSize = '18px'
@@ -66,12 +64,12 @@ watch(uiScale, (val) => {
 })
 
 watch([yellowLimit, redLimit], () => {
-  localStorage.setItem('myMedsYellowLimit', yellowLimit.value)
-  localStorage.setItem('myMedsRedLimit', redLimit.value)
+  dataService.saveYellowLimit(yellowLimit.value)
+  dataService.saveRedLimit(redLimit.value)
   window.dispatchEvent(new Event('storage-limits-changed'))
 })
 
-const resetSettings = () => {
+const resetSettings = async () => {
   // Reset values to defaults
   language.value = 'de'
   displayMode.value = 'pills'
@@ -80,8 +78,21 @@ const resetSettings = () => {
   yellowLimit.value = 21
   redLimit.value = 7
 
-  // Reset overview (not in this dialog but part of settings)
-  localStorage.setItem('myMedsShowOverview', 'true')
+  // Save them
+  await Promise.all([
+    dataService.saveLocale(language.value),
+    dataService.saveDisplayMode(displayMode.value),
+    dataService.saveSortMode(sortMode.value),
+    dataService.saveUiScale(uiScale.value),
+    dataService.saveYellowLimit(yellowLimit.value),
+    dataService.saveRedLimit(redLimit.value),
+    dataService.saveShowOverview(true)
+  ]);
+
+  // Trigger updates
+  window.dispatchEvent(new Event('storage-display-mode-changed'))
+  window.dispatchEvent(new Event('storage-sort-mode-changed'))
+  window.dispatchEvent(new Event('storage-limits-changed'))
   window.dispatchEvent(new Event('storage-overview-changed'))
 }
 
