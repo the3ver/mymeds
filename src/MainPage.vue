@@ -1,152 +1,94 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
-import { checkAndUpdateDailyDose, calculateDaysRemaining } from './modules/meds/utils/medUtils'
+import { state as appState, lock } from './app-state'
 import * as dataService from './modules/common/utils/dataService'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import NavDrawer from './modules/common/components/NavDrawer.vue'
 import MedList from './modules/meds/components/MedList.vue'
-import WelcomeDialog from './modules/common/components/WelcomeDialog.vue'
-import UpdateDialog from './modules/common/components/UpdateDialog.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
-import packageJson from '../package.json'
 
 const theme = useTheme()
 const { t } = useI18n()
 const drawer = ref(false)
 const dialog = ref(false)
 const editDialog = ref(false)
-const welcomeDialog = ref(false)
-const updateDialog = ref(false)
-const items = ref([])
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
-const snackbar = ref(false)
-const snackbarText = ref('')
-const activeTab = ref('meds') // 'meds' or 'calendar'
-const deductions = ref({}) // Stores deductions for display
+const activeTab = ref('meds')
 const calendarPageRef = ref(null)
 
-// Load items from dataService on mount
-onMounted(async () => {
-  let savedItems = await dataService.getMeds()
-  const lastUpdate = await dataService.getLastDoseUpdate()
+// --- Inactivity Timer ---
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
-  if (savedItems.length > 0) {
-    // Check for daily updates
-    const result = checkAndUpdateDailyDose(savedItems, lastUpdate)
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(async () => {
+    await handleLock();
+  }, INACTIVITY_TIMEOUT);
+}
 
-    if (result.updated) {
-      await dataService.setLastDoseUpdate(result.newDate)
-      // Store deductions to show in UI
-      if (result.deductions) {
-        deductions.value = result.deductions
-      }
-    }
-    items.value = result.updatedItems
-  } else {
-    // Initialize last update date if no items exist yet
-    await dataService.setLastDoseUpdate(new Date().toDateString())
-  }
-
-  // Load theme preference
-  const settings = await dataService.getSettings()
-  theme.global.name.value = settings.theme
-
-  // Check for warnings
-  checkWarnings(items.value)
-
-  // Check for first run after installation
-  await checkFirstRun()
-
-  // Check for updates
-  await checkUpdate()
-})
-
-async function checkWarnings(meds) {
-  const settings = await dataService.getSettings()
-  const warningLimit = Math.max(settings.yellowLimit, settings.redLimit)
-
-  let criticalMeds = []
-  let minDays = Infinity
-
-  for (const med of meds) {
-    const days = calculateDaysRemaining(med)
-    if (days !== null && days <= warningLimit) {
-      if (days < minDays) {
-        minDays = days
-        criticalMeds = [med.name]
-      } else if (days === minDays) {
-        criticalMeds.push(med.name)
-      }
-    }
-  }
-
-  if (criticalMeds.length > 0) {
-    const names = criticalMeds.join(', ')
-    snackbarText.value = t('app.notification', { name: names, days: minDays })
-    snackbar.value = true
+async function handleLock() {
+  if (!appState.isLocked) {
+    await dataService.saveAndLockDatabase(
+      appState.activeDatabaseId,
+      appState.activeDatabasePassword,
+      appState.decryptedData
+    );
+    lock();
   }
 }
 
-async function checkFirstRun() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone ||
-                       document.referrer.includes('android-app://');
-
-  if (isStandalone) {
-    const hasRunBefore = await dataService.getFirstRunCompleted()
-    if (!hasRunBefore) {
-      welcomeDialog.value = true
-      await dataService.setFirstRunCompleted()
+onMounted(() => {
+  window.addEventListener('beforeunload', handleLock);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      handleLock();
     }
-  }
-}
+  });
+  // Reset timer on user activity
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer);
+  });
+  resetInactivityTimer();
+});
 
-async function checkUpdate() {
-  const lastVersion = await dataService.getLastVersion()
-  const currentVersion = packageJson.version
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleLock);
+  document.removeEventListener('visibilitychange', handleLock);
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.removeEventListener(event, resetInactivityTimer);
+  });
+  clearTimeout(inactivityTimer);
+});
 
-  if (lastVersion && lastVersion !== currentVersion) {
-    updateDialog.value = true
-  }
 
-  await dataService.saveLastVersion(currentVersion)
-}
-
-// Watch for changes in items and save to dataService
-watch(items, (newItems) => {
-  dataService.saveMeds(newItems)
-}, { deep: true })
-
+// --- Component Logic ---
 const openDialog = () => {
   dialog.value = true
 }
 
 const addItem = (med) => {
-  items.value.unshift(med)
+  appState.decryptedData.meds.unshift(med)
 }
 
 const deleteItem = (index) => {
-  items.value.splice(index, 1)
+  appState.decryptedData.meds.splice(index, 1)
 }
 
 const openEditDialog = (index) => {
   editingIndex.value = index
-  currentEditMed.value = { ...items.value[index] }
+  currentEditMed.value = { ...appState.decryptedData.meds[index] }
   editDialog.value = true
 }
 
 const saveEdit = (med) => {
   if (editingIndex.value > -1) {
-    items.value[editingIndex.value] = med
+    appState.decryptedData.meds[editingIndex.value] = med
     editingIndex.value = -1
   }
-}
-
-const refreshPage = () => {
-  window.location.reload()
 }
 
 const openCalendarFilter = () => {
@@ -168,8 +110,6 @@ const openCalendarAddDialog = () => {
   <v-app-bar
     :color="theme.global.current.value.dark ? 'surface' : 'primary'"
     density="compact"
-    scroll-behavior="hide"
-    scroll-threshold="20"
   >
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
@@ -185,38 +125,41 @@ const openCalendarAddDialog = () => {
         icon="mdi-filter-variant"
         @click="openCalendarFilter"
       ></v-btn>
-      <v-btn icon="mdi-refresh" @click="refreshPage"></v-btn>
+      <v-btn icon="mdi-lock" @click="handleLock"></v-btn>
     </template>
   </v-app-bar>
 
   <v-main>
-    <v-container v-if="activeTab === 'meds'">
-      <MedList
-        :items="items"
-        :deductions="deductions"
-        @edit="openEditDialog"
-        @delete="deleteItem"
-      />
-
-      <!-- Add Button Card -->
-      <v-card
-        class="mb-4 border-dashed"
-        variant="outlined"
-        color="grey"
-        @click="openDialog"
-        style="border-style: dashed !important; border-width: 2px;"
-      >
-        <v-card-text class="d-flex align-center justify-center py-4">
-          <v-icon start size="large">mdi-plus</v-icon>
-          <span class="text-h6">{{ t('app.addMed') }}</span>
-        </v-card-text>
-      </v-card>
-    </v-container>
-
-    <CalendarPage
-      v-if="activeTab === 'calendar'"
-      ref="calendarPageRef"
-    />
+    <v-window v-model="activeTab">
+      <v-window-item value="meds">
+        <v-container>
+          <MedList
+            :items="appState.decryptedData.meds"
+            @edit="openEditDialog"
+            @delete="deleteItem"
+          />
+          <v-card
+            class="mb-4 border-dashed"
+            variant="outlined"
+            color="grey"
+            @click="openDialog"
+            style="border-style: dashed !important; border-width: 2px;"
+          >
+            <v-card-text class="d-flex align-center justify-center py-4">
+              <v-icon start size="large">mdi-plus</v-icon>
+              <span class="text-h6">{{ t('app.addMed') }}</span>
+            </v-card-text>
+          </v-card>
+        </v-container>
+      </v-window-item>
+      <v-window-item value="calendar">
+        <CalendarPage
+          :initial-entries="appState.decryptedData.calendar"
+          @update:entries="newEntries => appState.decryptedData.calendar = newEntries"
+          ref="calendarPageRef"
+        />
+      </v-window-item>
+    </v-window>
   </v-main>
 
   <v-fab
@@ -236,14 +179,12 @@ const openCalendarAddDialog = () => {
       <v-icon>mdi-format-list-bulleted</v-icon>
       <span>{{ t('app.nav.meds') }}</span>
     </v-btn>
-
     <v-btn value="calendar">
       <v-icon>mdi-calendar-clock</v-icon>
       <span>{{ t('app.nav.calendar') }}</span>
     </v-btn>
   </v-bottom-navigation>
 
-  <!-- Add Dialog -->
   <MedDialog
     v-model="dialog"
     :title="t('dialog.addTitle')"
@@ -251,7 +192,6 @@ const openCalendarAddDialog = () => {
     @confirm="addItem"
   />
 
-  <!-- Edit Dialog -->
   <MedDialog
     v-model="editDialog"
     :med="currentEditMed"
@@ -259,38 +199,7 @@ const openCalendarAddDialog = () => {
     :confirm-text="t('dialog.save')"
     @confirm="saveEdit"
   />
-
-  <!-- Welcome Dialog -->
-  <WelcomeDialog v-model="welcomeDialog" />
-
-  <!-- Update Dialog -->
-  <UpdateDialog v-model="updateDialog" />
-
-  <!-- Notification Snackbar -->
-  <v-snackbar
-    v-model="snackbar"
-    color="warning"
-    timeout="5000"
-  >
-    {{ snackbarText }}
-    <template v-slot:actions>
-      <v-btn
-        color="white"
-        variant="text"
-        @click="snackbar = false"
-      >
-        {{ t('about.close') }}
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
-
-<style>
-/* Global style to prevent pull-to-refresh */
-html, body {
-  overscroll-behavior-y: contain;
-}
-</style>
 
 <style scoped>
 .border-dashed {

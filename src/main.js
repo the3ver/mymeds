@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
 import './style.css'
 import App from './App.vue'
-import i18n from './i18n'
+import { messages } from './i18n'
 import * as dataService from './modules/common/utils/dataService'
 
 // Vuetify
@@ -12,10 +13,21 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 async function initializeApp() {
-  // Fetch settings asynchronously
+  console.log('[main.js] 🚀 Initializing app...');
+  
+  // 1. Fetch settings asynchronously
   const settings = await dataService.getSettings();
+  console.log('[main.js] ✅ Settings loaded:', settings);
 
-  // Create Vuetify instance and set the theme
+  // 2. Create i18n instance with the loaded locale
+  const i18n = createI18n({
+    legacy: false,
+    locale: settings.locale,
+    fallbackLocale: 'en',
+    messages,
+  });
+
+  // 3. Create Vuetify instance and set the theme
   const vuetify = createVuetify({
     components,
     directives,
@@ -24,20 +36,27 @@ async function initializeApp() {
     },
   });
 
-  // Set the i18n locale
-  i18n.global.locale.value = settings.locale;
-
-  // Create and mount the Vue app
+  // 4. Create and mount the Vue app
+  console.log('[main.js]  mounting Vue app...');
   const app = createApp(App);
-  app.use(vuetify);
   app.use(i18n);
+  app.use(vuetify);
   app.mount('#app');
+  console.log('[main.js] ✅ App mounted.');
 
-  // Apply UI scale
+  // 5. Apply UI scale after app is mounted
   const root = document.documentElement;
   if (settings.uiScale === 'small') root.style.fontSize = '14px';
   else if (settings.uiScale === 'large') root.style.fontSize = '18px';
   else root.style.fontSize = '16px';
 }
 
-initializeApp();
+initializeApp().catch(error => {
+  console.error("Fatal error during app initialization:", error);
+  // Optionally, display a user-friendly error message on the page
+  document.body.innerHTML = `<div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+    <h1>Application Error</h1>
+    <p>Could not start the application. Please try clearing your browser data or contact support.</p>
+    <p><em>Error: ${error.message}</em></p>
+  </div>`;
+});

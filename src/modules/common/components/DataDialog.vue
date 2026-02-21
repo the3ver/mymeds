@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
 import * as importExportService from '../utils/importExportService'
 import ConfirmDialog from './ConfirmDialog.vue'
@@ -14,8 +15,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 
-const confirmDeleteMedsDialog = ref(false)
-const confirmDeleteCalendarDialog = ref(false)
 const confirmDeleteAllDialog = ref(false)
 const exportDialog = ref(false)
 const importDialog = ref(false)
@@ -24,23 +23,13 @@ const fileInput = ref(null)
 const exportDataContent = ref('')
 const exportFileName = ref('')
 
-const deleteMeds = async () => {
-  await dataService.deleteMedsData()
-  window.location.reload()
-}
-
-const deleteCalendar = async () => {
-  await dataService.deleteCalendarData()
-  window.location.reload()
-}
-
 const deleteAll = async () => {
   await dataService.deleteAllData()
   window.location.reload()
 }
 
-const handleExport = async () => {
-  const { exportDataContent: content, exportFileName: name } = await importExportService.prepareExport()
+const handleExport = () => {
+  const { exportDataContent: content, exportFileName: name } = importExportService.prepareExport(appState.decryptedData)
   exportDataContent.value = content
   exportFileName.value = name
   exportDialog.value = true
@@ -55,8 +44,8 @@ const onFileSelected = (event) => {
   if (!file) return
 
   const reader = new FileReader()
-  reader.onload = async (e) => {
-    const result = await importExportService.processImport(e.target.result)
+  reader.onload = (e) => {
+    const result = importExportService.processImport(e.target.result)
     if (result.success) {
       importStats.value = result.stats
       importDialog.value = true
@@ -68,14 +57,14 @@ const onFileSelected = (event) => {
   reader.readAsText(file)
 }
 
-const handleConfirmImport = async () => {
-  const success = await importExportService.confirmImport(importStats.value.data)
-  if (success) {
-    alert(t('app.importSuccess'))
-    window.location.reload()
-  } else {
-    alert(t('app.importError'))
-  }
+const handleConfirmImport = () => {
+  // Overwrite the in-memory data with the imported data
+  appState.decryptedData.meds = importStats.value.data.meds
+  appState.decryptedData.calendar = importStats.value.data.calendar
+
+  alert(t('app.importSuccess'))
+  importDialog.value = false
+  // The data will be saved automatically when the app is locked/closed
 }
 
 const close = () => {
@@ -128,22 +117,6 @@ const close = () => {
           <div class="d-flex flex-column gap-2 mb-6">
             <v-btn
               color="error"
-              variant="outlined"
-              prepend-icon="mdi-pill"
-              @click="confirmDeleteMedsDialog = true"
-            >
-              {{ t('app.deleteMeds') }}
-            </v-btn>
-            <v-btn
-              color="error"
-              variant="outlined"
-              prepend-icon="mdi-calendar"
-              @click="confirmDeleteCalendarDialog = true"
-            >
-              {{ t('app.deleteCalendar') }}
-            </v-btn>
-            <v-btn
-              color="error"
               variant="elevated"
               prepend-icon="mdi-delete-forever"
               @click="confirmDeleteAllDialog = true"
@@ -167,30 +140,6 @@ const close = () => {
       v-model="importDialog"
       :stats="importStats"
       @confirm="handleConfirmImport"
-    />
-
-    <!-- Confirm Delete Meds Dialog -->
-    <ConfirmDialog
-      v-model="confirmDeleteMedsDialog"
-      :title="t('app.deleteMeds')"
-      :message="t('app.deleteMedsConfirm')"
-      :confirm-text="t('dialog.delete')"
-      :cancel-text="t('dialog.cancel')"
-      :confirm-input-label="t('app.deleteConfirmLabel')"
-      :confirm-input-value="t('app.deleteConfirmValue')"
-      @confirm="deleteMeds"
-    />
-
-    <!-- Confirm Delete Calendar Dialog -->
-    <ConfirmDialog
-      v-model="confirmDeleteCalendarDialog"
-      :title="t('app.deleteCalendar')"
-      :message="t('app.deleteCalendarConfirm')"
-      :confirm-text="t('dialog.delete')"
-      :cancel-text="t('dialog.cancel')"
-      :confirm-input-label="t('app.deleteConfirmLabel')"
-      :confirm-input-value="t('app.deleteConfirmValue')"
-      @confirm="deleteCalendar"
     />
 
     <!-- Confirm Delete All Dialog -->

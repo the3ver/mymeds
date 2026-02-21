@@ -1,6 +1,7 @@
-import { createI18n } from 'vue-i18n'
+// This file now only exports the raw message objects.
+// The i18n instance is created asynchronously in main.js.
 
-const messages = {
+export const messages = {
   en: {
     app: {
       title: 'MyMeds',
@@ -440,12 +441,3 @@ const messages = {
     }
   }
 }
-
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en', // Default fallback, will be set in main.js
-  fallbackLocale: 'en',
-  messages
-})
-
-export default i18n

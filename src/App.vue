@@ -1,10 +1,13 @@
 <script setup>
-import MainPage from './MainPage.vue'
+import { state as appState } from './app-state';
+import DatabaseListPage from './modules/common/components/DatabaseListPage.vue';
+import MainPage from './MainPage.vue';
 </script>
 
 <template>
   <v-app>
-    <MainPage />
+    <DatabaseListPage v-if="appState.isLocked" />
+    <MainPage v-else />
   </v-app>
 </template>
 

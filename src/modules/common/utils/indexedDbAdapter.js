@@ -1,135 +1,114 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'MyMedsDB';
-const DB_VERSION = 1;
-const STORES = {
-  MEDS: 'meds',
-  CALENDAR: 'calendar',
-  SETTINGS: 'settings'
-};
+const DB_VERSION = 2;
+const DB_STORE_NAME = 'databases';
+const SETTINGS_STORE_NAME = 'settings';
 
-// --- Database Initialization ---
+console.log('[indexedDbAdapter] 🚀 Initializing DB promise...');
 const dbPromise = openDB(DB_NAME, DB_VERSION, {
-  upgrade(db) {
-    // Create stores if they don't exist
-    if (!db.objectStoreNames.contains(STORES.MEDS)) {
-      db.createObjectStore(STORES.MEDS, { keyPath: 'id', autoIncrement: true });
+  upgrade(db, oldVersion) {
+    console.log(`[indexedDbAdapter]  Upgrading DB from v${oldVersion} to v${DB_VERSION}`);
+    
+    if (!db.objectStoreNames.contains(SETTINGS_STORE_NAME)) {
+      console.log(`[indexedDbAdapter]   Creating store: ${SETTINGS_STORE_NAME}`);
+      db.createObjectStore(SETTINGS_STORE_NAME);
     }
-    if (!db.objectStoreNames.contains(STORES.CALENDAR)) {
-      db.createObjectStore(STORES.CALENDAR, { keyPath: 'id', autoIncrement: true });
-    }
-    if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-      // Use a simple key-value store for settings
-      db.createObjectStore(STORES.SETTINGS);
+    if (!db.objectStoreNames.contains(DB_STORE_NAME)) {
+      console.log(`[indexedDbAdapter]   Creating store: ${DB_STORE_NAME}`);
+      db.createObjectStore(DB_STORE_NAME, { keyPath: 'id', autoIncrement: true });
     }
   },
+  blocked() {
+    console.error("IndexedDB blocked. Please close other tabs with this app open.");
+    alert("The database needs to update, but other tabs are blocking it. Please close all other tabs with this app open and reload.");
+  }
 });
+console.log('[indexedDbAdapter] ✅ DB promise created.');
 
-// --- Private Helper Functions ---
-const getSetting = async (key, defaultValue) => {
+// --- Database (Tresor) Management ---
+
+export async function getDatabaseList() {
   const db = await dbPromise;
-  const value = await db.get(STORES.SETTINGS, key);
+  const allDbs = await db.getAll(DB_STORE_NAME);
+  return allDbs.map(({ id, name, createdAt, modifiedAt, encryptionStrategy }) => ({
+    id,
+    name,
+    createdAt,
+    modifiedAt,
+    encryptionStrategy,
+  }));
+}
+
+export async function createDatabase(dbEntry) {
+  const db = await dbPromise;
+  return db.add(DB_STORE_NAME, dbEntry);
+}
+
+export async function getFullDatabase(id) {
+  const db = await dbPromise;
+  return db.get(DB_STORE_NAME, id);
+}
+
+export async function updateDatabase(dbEntry) {
+  const db = await dbPromise;
+  return db.put(DB_STORE_NAME, dbEntry);
+}
+
+export async function deleteDatabase(id) {
+  const db = await dbPromise;
+  return db.delete(DB_STORE_NAME, id);
+}
+
+// --- Settings (remain unencrypted) ---
+
+export const getSetting = async (key, defaultValue) => {
+  const db = await dbPromise;
+  const value = await db.get(SETTINGS_STORE_NAME, key);
   return value !== undefined ? value : defaultValue;
 };
 
-const setSetting = async (key, value) => {
+export const setSetting = async (key, value) => {
   const db = await dbPromise;
-  // Ensure we are not saving a proxy
-  const valueToStore = JSON.parse(JSON.stringify(value));
-  return db.put(STORES.SETTINGS, valueToStore, key);
+  return db.put(SETTINGS_STORE_NAME, value, key);
 };
 
-// --- Meds Data ---
-export async function getMeds() {
-  const db = await dbPromise;
-  return db.getAll(STORES.MEDS);
-}
-export async function saveMeds(meds) {
-  const db = await dbPromise;
-  const tx = db.transaction(STORES.MEDS, 'readwrite');
-  await tx.store.clear();
-  // Ensure we are not saving proxies
-  const plainMeds = JSON.parse(JSON.stringify(meds));
-  await Promise.all(plainMeds.map(med => tx.store.add(med)));
-  await tx.done;
-}
-export const getLastDoseUpdate = () => getSetting('lastDoseUpdate', null);
-export const setLastDoseUpdate = (date) => setSetting('lastDoseUpdate', date);
-
-// --- Calendar Data ---
-export async function getCalendarEntries() {
-  const db = await dbPromise;
-  return db.getAll(STORES.CALENDAR);
-}
-export async function saveCalendarEntries(entries) {
-  const db = await dbPromise;
-  const tx = db.transaction(STORES.CALENDAR, 'readwrite');
-  await tx.store.clear();
-  // Ensure we are not saving proxies
-  const plainEntries = JSON.parse(JSON.stringify(entries));
-  await Promise.all(plainEntries.map(entry => tx.store.add(entry)));
-  await tx.done;
-}
-
-// --- Settings ---
 export async function getSettings() {
-  return {
+  console.log('[indexedDbAdapter] 🚀 Getting settings from DB...');
+  const settings = {
     locale: await getSetting('locale', navigator.language.startsWith('de') ? 'de' : 'en'),
     theme: await getSetting('theme', 'light'),
+    uiScale: await getSetting('uiScale', 'normal'),
+    // These were missing from the new structure
     sortMode: await getSetting('sortMode', 'added'),
     displayMode: await getSetting('displayMode', 'pills'),
-    uiScale: await getSetting('uiScale', 'normal'),
     yellowLimit: await getSetting('yellowLimit', 21),
     redLimit: await getSetting('redLimit', 7),
     showOverview: await getSetting('showOverview', true),
   };
+  console.log('[indexedDbAdapter] ✅ Got settings from DB:', settings);
+  return settings;
 }
 
 export const saveLocale = (locale) => setSetting('locale', locale);
 export const saveTheme = (theme) => setSetting('theme', theme);
+export const saveUiScale = (scale) => setSetting('uiScale', scale);
 export const saveSortMode = (mode) => setSetting('sortMode', mode);
 export const saveDisplayMode = (mode) => setSetting('displayMode', mode);
-export const saveUiScale = (scale) => setSetting('uiScale', scale);
 export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
 
-// --- App Meta Data ---
+
+// --- App Meta Data (also in settings) ---
 export const getLastVersion = () => getSetting('lastVersion', null);
 export const saveLastVersion = (version) => setSetting('lastVersion', version);
 export const getFirstRunCompleted = () => getSetting('firstRunCompleted', null);
 export const setFirstRunCompleted = () => setSetting('firstRunCompleted', 'true');
 
-// --- Bulk Data Operations ---
-export async function exportData() {
-  return {
-    exportDate: new Date().toISOString(),
-    meds: await getMeds(),
-    calendar: await getCalendarEntries(),
-  };
-}
-
-export async function importData(data) {
-  if (data && data.meds && data.calendar) {
-    await saveMeds(data.meds);
-    await saveCalendarEntries(data.calendar);
-    return true;
-  }
-  return false;
-}
-
-export async function deleteMedsData() {
+// --- Legacy data operations (to be removed or repurposed) ---
+export const deleteAllData = async () => {
   const db = await dbPromise;
-  await db.clear(STORES.MEDS);
-  await db.delete(STORES.SETTINGS, 'lastDoseUpdate');
-}
-
-export async function deleteCalendarData() {
-  const db = await dbPromise;
-  await db.clear(STORES.CALENDAR);
-}
-
-export async function deleteAllData() {
-  const db = await dbPromise;
-  await Promise.all(Object.values(STORES).map(store => db.clear(store)));
-}
+  await db.clear(DB_STORE_NAME);
+  await db.clear(SETTINGS_STORE_NAME);
+};
