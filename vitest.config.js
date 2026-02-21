@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    setupFiles: './tests/setup.js', // Add this line
     deps: {
       inline: ['vuetify']
     }

@@ -29,13 +29,19 @@ export function appendLink(currentText, { url, label }) {
  * @returns {string} HTML string with <a> tags.
  */
 export function renderMarkdownLinks(text) {
-  if (!text) return ''
+  if (!text) return '';
 
-  const escapeHtml = (str) => str.replace(/[&<>"']/g, (match) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[match]));
+  const escapeHtml = (str) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, (match) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[match]));
+  };
 
-  const combinedRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s)]+)/g;
+  // This regex finds both markdown links and standalone URLs.
+  // Group 1 & 2: Markdown link [label](url)
+  // Group 3: Standalone URL
+  const combinedRegex = /(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s]+)/g;
 
   let result = '';
   let lastIndex = 0;
@@ -45,13 +51,29 @@ export function renderMarkdownLinks(text) {
     // Append the text before the link
     result += escapeHtml(text.substring(lastIndex, match.index));
 
-    if (match[1] && match[2]) { // Markdown link: [label](url)
-      result += `<a href="${escapeHtml(match[2])}" target="_blank" rel="noopener noreferrer">${escapeHtml(match[1])}</a>`;
-    } else if (match[3]) { // Standalone URL
-      result += `<a href="${escapeHtml(match[3])}" target="_blank" rel="noopener noreferrer">${escapeHtml(match[3])}</a>`;
+    let url, label, fullMatch;
+    let trailingChars = '';
+
+    if (match[1]) { // Markdown link [label](url)
+      fullMatch = match[1];
+      label = match[2];
+      url = match[3];
+    } else { // Standalone URL
+      fullMatch = url = match[4];
+      label = url;
+      
+      // Trim trailing punctuation from standalone URLs
+      const punctuationRegex = /[.,?!;:]*$/;
+      const trailing = url.match(punctuationRegex)[0];
+      if (trailing) {
+        url = url.slice(0, -trailing.length);
+        label = url;
+        trailingChars = trailing;
+      }
     }
 
-    lastIndex = match.index + match[0].length;
+    result += `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>${escapeHtml(trailingChars)}`;
+    lastIndex = match.index + fullMatch.length;
   }
 
   // Append the remaining text after the last link
