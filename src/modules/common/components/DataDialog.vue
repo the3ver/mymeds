@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
@@ -25,7 +25,7 @@ const exportFileName = ref('')
 
 const deleteAll = async () => {
   await dataService.deleteAllData()
-  window.location.reload() // Reload to show the empty db list
+  window.location.reload()
 }
 
 const handleExport = () => {
@@ -47,7 +47,6 @@ const onFileSelected = (event) => {
   reader.onload = (e) => {
     const result = importExportService.processImport(e.target.result)
     if (result.success) {
-      // Add current counts to stats for the dialog
       result.stats.currentMedsCount = appState.decryptedData.meds.length;
       result.stats.currentCalendarCount = appState.decryptedData.calendar.length;
       importStats.value = result.stats
@@ -61,13 +60,13 @@ const onFileSelected = (event) => {
 }
 
 const handleConfirmImport = () => {
-  // Directly update the reactive app state. The UI will update automatically.
+  // Directly update the reactive app state.
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
+  appState.decryptedData.version += 1; // This will trigger the re-render in App.vue
 
   alert(t('app.importSuccess'))
   importDialog.value = false
-  // NO reload needed. The data will be saved automatically when the app is locked/closed.
 }
 
 const close = () => {
