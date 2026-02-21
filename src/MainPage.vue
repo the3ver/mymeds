@@ -33,6 +33,9 @@ function resetInactivityTimer() {
 }
 
 async function handleLock() {
+  // Do not lock if a sensitive action (like file picking) is in progress
+  if (appState.isActionPending) return;
+
   if (!appState.isLocked) {
     await dataService.saveAndLockDatabase(
       appState.activeDatabaseId,
@@ -44,7 +47,6 @@ async function handleLock() {
 }
 
 onMounted(() => {
-  // Check for pending intents after session recovery
   if (appState.pendingIntent === 'import') {
     dataDialog.value = true;
   }
@@ -55,7 +57,6 @@ onMounted(() => {
       handleLock();
     }
   });
-  // Reset timer on user activity
   ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
     document.addEventListener(event, resetInactivityTimer);
   });

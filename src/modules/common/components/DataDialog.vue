@@ -36,23 +36,21 @@ const handleExport = () => {
 }
 
 const triggerImport = () => {
+  appState.isActionPending = true; // Signal that we are about to leave the app intentionally
   fileInput.value.click()
 }
 
 const onFileSelected = (event) => {
-  alert("DEBUG: onFileSelected triggered!");
   const file = event.target.files[0]
   if (!file) {
-    alert("DEBUG: No file selected.");
+    appState.isActionPending = false; // Reset if user cancels
     return;
   }
 
   const reader = new FileReader()
   reader.onload = (e) => {
-    alert("DEBUG: File read successfully.");
     const result = importExportService.processImport(e.target.result)
     if (result.success) {
-      alert("DEBUG: Import processed successfully. Opening confirm dialog.");
       result.stats.currentMedsCount = appState.decryptedData.meds.length;
       result.stats.currentCalendarCount = appState.decryptedData.calendar.length;
       importStats.value = result.stats
@@ -61,15 +59,17 @@ const onFileSelected = (event) => {
       alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
     }
     event.target.value = ''
+    // The action is complete once the dialog is shown or an error is alerted
+    appState.isActionPending = false;
   }
   reader.onerror = () => {
-    alert("DEBUG: Error reading file.");
+    alert("Error reading file.");
+    appState.isActionPending = false;
   };
   reader.readAsText(file)
 }
 
 const handleConfirmImport = () => {
-  alert("DEBUG: handleConfirmImport in DataDialog triggered!");
   appState.decryptedData.meds = importStats.value.data.meds
   appState.decryptedData.calendar = importStats.value.data.calendar
   appState.decryptedData.version += 1;
