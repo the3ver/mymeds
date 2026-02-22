@@ -1,0 +1,23 @@
+name: Renovate
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  schedule:
+    # Runs "at minute 0 past every 4th hour"
+    - cron: '0 */4 * * *'
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Required for Renovate to be able to push branch to the repository
+          fetch-depth: 0
+
+      - name: Renovate
+        uses: renovatebot/github-action@v40.2.2
+        with:
+          # The token is needed to create pull requests
+          token: ${{ secrets.GITHUB_TOKEN }}

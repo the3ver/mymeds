@@ -33,7 +33,8 @@ const minimalCalendarData = {
 
 const mockDataToExport = {
   meds: [fullMedData, minimalMedData],
-  calendar: [fullCalendarData, minimalCalendarData]
+  calendar: [fullCalendarData, minimalCalendarData],
+  lastDoseUpdate: new Date().toDateString(),
 };
 
 describe('importExportService', () => {
@@ -48,6 +49,7 @@ describe('importExportService', () => {
       const parsedContent = JSON.parse(exportDataContent);
       expect(parsedContent.meds).toEqual(mockDataToExport.meds);
       expect(parsedContent.calendar).toEqual(mockDataToExport.calendar);
+      expect(parsedContent.lastDoseUpdate).toBe(mockDataToExport.lastDoseUpdate);
       expect(parsedContent.exportDate).toBeDefined();
       expect(exportFileName).toMatch(/mymeds_daten_\d{2}\.\d{2}\.\d{4}\.json/);
     });
@@ -69,8 +71,26 @@ describe('importExportService', () => {
         date: expect.any(String),
         medsCount: 2,
         calendarCount: 2,
-        data: mockDataToExport
+        data: {
+          meds: mockDataToExport.meds,
+          calendar: mockDataToExport.calendar,
+          lastDoseUpdate: expect.any(String) // Check for the presence of the date
+        }
       });
+    });
+
+    it('should add a lastDoseUpdate date if it is missing from import file', () => {
+      // Arrange
+      const dataWithoutDate = { ...mockDataToExport };
+      delete dataWithoutDate.lastDoseUpdate;
+      const fileContent = JSON.stringify({ exportDate: new Date().toISOString(), ...dataWithoutDate });
+
+      // Act
+      const result = processImport(fileContent);
+
+      // Assert
+      expect(result.success).toBe(true);
+      expect(result.stats.data.lastDoseUpdate).toEqual(expect.any(String));
     });
 
     it('should return an error for invalid JSON', () => {

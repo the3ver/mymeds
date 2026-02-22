@@ -39,18 +39,15 @@ function openCalendarFilter() {
 
     <v-app-bar :color="theme.global.current.value.dark ? 'surface' : 'primary'" density="compact">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer" data-testid="nav-drawer-toggle"></v-app-bar-nav-icon>
       </template>
-      <v-app-bar-title>
-        {{ t('app.title') }}
-        <span v-if="!appState.isLocked && activeTab === 'meds'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.meds') }}</span>
-        <span v-if="!appState.isLocked && activeTab === 'calendar'" class="text-subtitle-1 ml-2 opacity-70">- {{ t('app.nav.calendar') }}</span>
-      </v-app-bar-title>
+      <v-app-bar-title>{{ t('app.title') }}</v-app-bar-title>
       <template v-slot:append>
         <v-btn
           v-if="!appState.isLocked && activeTab === 'calendar'"
           icon="mdi-filter-variant"
           @click="openCalendarFilter"
+          data-testid="calendar-filter-btn"
         ></v-btn>
         <v-btn v-if="!appState.isLocked" icon="mdi-lock" @click="handleLock"></v-btn>
       </template>
@@ -69,9 +66,3 @@ function openCalendarFilter() {
     </v-main>
   </v-app>
 </template>
-
-<style scoped>
-.opacity-70 {
-  opacity: 0.7;
-}
-</style>
