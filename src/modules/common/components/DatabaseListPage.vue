@@ -64,6 +64,7 @@ function onDatabaseUnlocked(data, password) {
         :title="db.name"
         :subtitle="`Last modified: ${new Date(db.modifiedAt).toLocaleString()}`"
         @click="handleDbClick(db)"
+        data-testid="db-list-item"
       >
         <template v-slot:prepend>
           <v-avatar :color="db.encryptionStrategy === 'password' ? 'primary' : 'secondary'">
@@ -117,3 +118,10 @@ function onDatabaseUnlocked(data, password) {
     @confirm="confirmDelete"
   />
 </template>
+
+<style>
+/* Global style to prevent pull-to-refresh on this page */
+html, body {
+  overscroll-behavior-y: contain;
+}
+</style>

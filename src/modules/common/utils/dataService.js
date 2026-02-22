@@ -32,7 +32,7 @@ export async function createDatabaseWithPassword(name, password) {
 
 export async function unlockDatabase(id, password) {
   const dbEntry = await dbAdapter.getFullDatabase(id);
-  if (!dbEntry) return { success: false, data: null };
+  if (!dbEntry) return { success: false, data: null, deductions: {} };
 
   if (dbEntry.encryptionStrategy === 'password') {
     const { salt, iv } = dbEntry.passwordData;
@@ -40,22 +40,20 @@ export async function unlockDatabase(id, password) {
       const key = await crypto.deriveKeyFromPassword(password, salt);
       let data = await crypto.decryptData(dbEntry.encryptedData, iv, key);
 
-      // --- This is the new, correct place for the dose update logic ---
       const updateResult = checkAndUpdateDailyDose(data.meds, data.lastDoseUpdate);
       if (updateResult.updated) {
         console.log("Doses updated upon unlock.");
         data.meds = updateResult.updatedItems;
         data.lastDoseUpdate = updateResult.newDate;
       }
-      // ----------------------------------------------------------------
-
-      return { success: true, data };
+      
+      return { success: true, data, deductions: updateResult.deductions || {} };
     } catch (e) {
       console.error("Decryption failed:", e);
-      return { success: false, data: null }; // Wrong password
+      return { success: false, data: null, deductions: {} }; // Wrong password
     }
   }
-  return { success: false, data: null };
+  return { success: false, data: null, deductions: {} };
 }
 
 export async function saveAndLockDatabase(id, password, data) {

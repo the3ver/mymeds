@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
@@ -20,10 +20,50 @@ const currentEditMed = ref({})
 const activeTab = ref('meds')
 const calendarPageRef = ref(null)
 
-// Inform the parent component about the active tab
-watch(activeTab, (newTab) => {
-  emit('update:activeTab', newTab);
+// --- Inactivity Timer & Auto-Lock ---
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(handleLock, INACTIVITY_TIMEOUT);
+}
+
+async function handleLock() {
+  if (appState.isLocked || appState.isActionPending) return;
+
+  await dataService.saveAndLockDatabase(
+    appState.activeDatabaseId,
+    appState.activeDatabasePassword,
+    appState.decryptedData
+  );
+  lock();
+}
+
+onMounted(() => {
+  if (appState.pendingIntent === 'import') {
+    emit('update:dataDialogOpen', true);
+  }
+
+  window.addEventListener('beforeunload', handleLock);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') handleLock();
+  });
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer);
+  });
+  resetInactivityTimer();
 });
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleLock);
+  document.removeEventListener('visibilitychange', handleLock);
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.removeEventListener(event, resetInactivityTimer);
+  });
+  clearTimeout(inactivityTimer);
+});
+
 
 // --- Component Logic ---
 const openMedDialog = () => {
@@ -62,11 +102,6 @@ const openCalendarAddDialog = () => {
     calendarPageRef.value.openTypeDialog()
   }
 }
-
-// Expose methods for the parent component (App.vue)
-defineExpose({
-  openCalendarFilter
-});
 </script>
 
 <template>
@@ -76,8 +111,10 @@ defineExpose({
         <v-container>
           <MedList
             :items="appState.decryptedData.meds"
+            :deductions="appState.deductions"
             @edit="openEditDialog"
             @delete="deleteItem"
+            data-testid="med-list"
           />
           <v-card
             class="mb-4 border-dashed"
@@ -115,11 +152,11 @@ defineExpose({
     ></v-fab>
 
     <v-bottom-navigation v-model="activeTab" color="primary" grow>
-      <v-btn value="meds" data-testid="nav-meds-btn">
+      <v-btn value="meds">
         <v-icon>mdi-format-list-bulleted</v-icon>
         <span>{{ t('app.nav.meds') }}</span>
       </v-btn>
-      <v-btn value="calendar" data-testid="nav-calendar-btn">
+      <v-btn value="calendar">
         <v-icon>mdi-calendar-clock</v-icon>
         <span>{{ t('app.nav.calendar') }}</span>
       </v-btn>
