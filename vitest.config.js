@@ -7,14 +7,25 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: './tests/setup.js', // Add this line
-    deps: {
-      inline: ['vuetify']
-    }
+    setupFiles: './tests/setup.js',
+    // This is the key change: force Vuetify to be transformed by Vite during tests
+    server: {
+      deps: {
+        inline: [/vuetify/],
+      },
+    },
   },
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+    alias: [
+      { 
+        find: '@', 
+        replacement: fileURLToPath(new URL('./src', import.meta.url)) 
+      },
+      // This alias is still needed to handle the CSS files once they are inlined
+      { 
+        find: /.*\.css$/, 
+        replacement: fileURLToPath(new URL('./tests/mocks/style.js', import.meta.url))
+      }
+    ]
   }
 })

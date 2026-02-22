@@ -120,3 +120,6 @@ dist
 .idea
 *.iml
 *.iws
+
+#secrets
+pat.txt

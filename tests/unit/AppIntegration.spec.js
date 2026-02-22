@@ -38,7 +38,7 @@ describe('App Integration Tests', () => {
       redLimit: 7,
       showOverview: true,
     });
-    dataService.getDatabaseList.mockResolvedValue([]); // <-- ADD THIS LINE
+    dataService.getDatabaseList.mockResolvedValue([]);
 
     if (wrapper) {
       wrapper.unmount();
