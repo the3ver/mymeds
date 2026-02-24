@@ -67,6 +67,10 @@ const openCalendarAddDialog = () => {
     calendarPageRef.value.openTypeDialog()
   }
 }
+
+defineExpose({
+  openCalendarFilter,
+});
 </script>
 
 <template>
