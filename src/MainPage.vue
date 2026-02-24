@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
@@ -19,6 +19,10 @@ const editingIndex = ref(-1)
 const currentEditMed = ref({})
 const activeTab = ref('meds')
 const calendarPageRef = ref(null)
+
+watch(activeTab, (newTab) => {
+  emit('update:activeTab', newTab);
+});
 
 onMounted(() => {
   if (appState.pendingIntent === 'import') {
