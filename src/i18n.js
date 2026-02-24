@@ -49,6 +49,12 @@ export const messages = {
         meds: 'Medications',
         calendar: 'Calendar'
       },
+      db: {
+        created: 'Created',
+        modified: 'Modified',
+        meds: 'Medications',
+        entries: 'Entries'
+      },
       dataManagement: 'Data Management',
       deleteConfirmLabel: 'Type "Delete" to confirm',
       deleteConfirmValue: 'Delete',
@@ -94,7 +100,12 @@ export const messages = {
       next: 'Next',
       download: 'Download',
       yes: 'Yes',
-      no: 'No'
+      no: 'No',
+      createDbTitle: 'Create New Database',
+      createDbWarning: 'Important: There is no way to recover your password if you forget it. Access to your data will be permanently lost, as your medical data is stored exclusively on your device and not sent over the network to any servers.',
+      dbNameLabel: 'Database Name',
+      passwordLabel: 'Password',
+      passwordConfirmLabel: 'Confirm Password'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -270,6 +281,12 @@ export const messages = {
         meds: 'Medikamente',
         calendar: 'Kalender'
       },
+      db: {
+        created: 'Erstellt',
+        modified: 'Geändert',
+        meds: 'Medikamente',
+        entries: 'Einträge'
+      },
       dataManagement: 'Datenverwaltung',
       deleteConfirmLabel: 'Tippe "Löschen" zum Bestätigen',
       deleteConfirmValue: 'Löschen',
@@ -315,7 +332,12 @@ export const messages = {
       next: 'Weiter',
       download: 'Download',
       yes: 'Ja',
-      no: 'Nein'
+      no: 'Nein',
+      createDbTitle: 'Neue Datenbank erstellen',
+      createDbWarning: 'Wichtig: Es gibt keine Möglichkeit, Ihr Passwort wiederherzustellen, wenn Sie es vergessen. Der Zugriff auf Ihre Daten geht dann für immer verloren, da die eingegebenen medizinischen Daten ausschließlich auf Ihrem Endgerät gespeichert und nicht übers Netz an irgendwelche Server geschickt werden.',
+      dbNameLabel: 'Name der Datenbank',
+      passwordLabel: 'Passwort',
+      passwordConfirmLabel: 'Passwort bestätigen'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',

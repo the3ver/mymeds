@@ -26,12 +26,15 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, {
 export async function getDatabaseList() {
   const db = await dbPromise;
   const allDbs = await db.getAll(DB_STORE_NAME);
-  return allDbs.map(({ id, name, createdAt, modifiedAt, encryptionStrategy }) => ({
+  // Destructure all required fields, providing defaults for older entries
+  return allDbs.map(({ id, name, createdAt, modifiedAt, encryptionStrategy, medsCount, calendarCount }) => ({
     id,
     name,
     createdAt,
     modifiedAt,
     encryptionStrategy,
+    medsCount: medsCount || 0,
+    calendarCount: calendarCount || 0,
   }));
 }
 
@@ -48,6 +51,19 @@ export async function getFullDatabase(id) {
 export async function updateDatabase(dbEntry) {
   const db = await dbPromise;
   return db.put(DB_STORE_NAME, dbEntry);
+}
+
+export async function renameDatabase(id, newName) {
+  const db = await dbPromise;
+  const tx = db.transaction(DB_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(DB_STORE_NAME);
+  const dbEntry = await store.get(id);
+  if (dbEntry) {
+    dbEntry.name = newName;
+    dbEntry.modifiedAt = new Date();
+    await store.put(dbEntry);
+  }
+  return tx.done;
 }
 
 export async function deleteDatabase(id) {

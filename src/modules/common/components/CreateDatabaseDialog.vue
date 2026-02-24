@@ -44,25 +44,35 @@ async function createDatabase() {
 <template>
   <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px" persistent>
     <v-card :loading="loading">
-      <v-card-title>Create New Database</v-card-title>
+      <v-card-title>{{ t('dialog.createDbTitle') }}</v-card-title>
       <v-card-text>
         <v-alert v-if="error" type="error" density="compact" class="mb-4">{{ error }}</v-alert>
+
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="mb-4"
+          icon="mdi-key-alert"
+        >
+          {{ t('dialog.createDbWarning') }}
+        </v-alert>
+
         <v-text-field
           v-model="dbName"
-          label="Database Name"
+          :label="t('dialog.dbNameLabel')"
           variant="outlined"
           autofocus
         ></v-text-field>
         <v-text-field
           v-model="password"
-          label="Password"
+          :label="t('dialog.passwordLabel')"
           type="password"
           variant="outlined"
           class="mt-2"
         ></v-text-field>
         <v-text-field
           v-model="passwordConfirm"
-          label="Confirm Password"
+          :label="t('dialog.passwordConfirmLabel')"
           type="password"
           variant="outlined"
           class="mt-2"
@@ -70,8 +80,8 @@ async function createDatabase() {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="close" :disabled="loading">Cancel</v-btn>
-        <v-btn color="primary" @click="createDatabase" :loading="loading">Create</v-btn>
+        <v-btn text @click="close" :disabled="loading">{{ t('dialog.cancel') }}</v-btn>
+        <v-btn color="primary" @click="createDatabase" :loading="loading">{{ t('dialog.create') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

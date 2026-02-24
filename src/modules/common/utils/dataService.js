@@ -5,6 +5,7 @@ import { checkAndUpdateDailyDose } from '../../meds/utils/medUtils';
 // --- Database (Tresor) Management ---
 
 export const getDatabaseList = dbAdapter.getDatabaseList;
+export const renameDatabase = dbAdapter.renameDatabase; // Export the new function
 
 export async function createDatabaseWithPassword(name, password) {
   const salt = crypto.generateSalt();
@@ -22,6 +23,8 @@ export async function createDatabaseWithPassword(name, password) {
     name,
     createdAt: now,
     modifiedAt: now,
+    medsCount: 0,
+    calendarCount: 0,
     encryptionStrategy: 'password',
     passwordData: { salt, iv },
     encryptedData,
@@ -68,6 +71,9 @@ export async function saveAndLockDatabase(id, password, data) {
     dbEntry.encryptedData = encryptedData;
     dbEntry.passwordData.iv = iv;
     dbEntry.modifiedAt = new Date();
+    // Add counts for the overview
+    dbEntry.medsCount = data.meds?.length || 0;
+    dbEntry.calendarCount = data.calendar?.length || 0;
     
     return dbAdapter.updateDatabase(dbEntry);
   }
