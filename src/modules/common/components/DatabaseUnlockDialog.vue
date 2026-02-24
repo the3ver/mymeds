@@ -31,7 +31,8 @@ async function unlock() {
   try {
     const result = await dataService.unlockDatabase(props.database.id, password.value);
     if (result.success) {
-      emit('unlocked', result.data, password.value, result.deductions);
+      // Emit the full result object and the password
+      emit('unlocked', result, password.value);
       close();
     } else {
       error.value = "Incorrect password.";

@@ -110,4 +110,21 @@ describe('checkAndUpdateDailyDose', () => {
     expect(deductions['TestMed']).toBe(1);
     expect(updatedItems.find(m => m.name === 'TestMed').count).toBe(4.5);
   });
+
+  it('should handle missing lastUpdateDate by setting it to today and not deducting', () => {
+    const { updated, updatedItems, newDate, deductions } = checkAndUpdateDailyDose(
+      mockMeds,
+      undefined, // Simulate missing date
+      today
+    );
+
+    // It should mark as "updated" because the date is being fixed
+    expect(updated).toBe(true); 
+    // The items themselves should not be changed
+    expect(updatedItems).toEqual(mockMeds); 
+    // The new date should be set to today
+    expect(newDate).toBe(today.toDateString());
+    // No deductions should be calculated
+    expect(deductions).toEqual({});
+  });
 });

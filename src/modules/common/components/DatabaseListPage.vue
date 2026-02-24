@@ -48,8 +48,9 @@ function onDatabaseCreated() {
   createDialog.value = false;
 }
 
-function onDatabaseUnlocked(data, password) {
-  unlock(selectedDb.value.id, password, data);
+function onDatabaseUnlocked(result, password) {
+  // Correctly destructure the result and pass all parts to the unlock function
+  unlock(selectedDb.value.id, password, result.data, result.deductions);
   unlockDialog.value = false;
 }
 </script>

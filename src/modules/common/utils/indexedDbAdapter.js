@@ -91,12 +91,6 @@ export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
 
-// --- App Meta Data (also in settings) ---
-export const getLastVersion = () => getSetting('lastVersion', null);
-export const saveLastVersion = (version) => setSetting('lastVersion', version);
-export const getFirstRunCompleted = () => getSetting('firstRunCompleted', null);
-export const setFirstRunCompleted = () => setSetting('firstRunCompleted', 'true');
-
 // --- Session Recovery ---
 export const saveRecoveryState = (state) => setSetting('sessionRecovery', state);
 export const getRecoveryState = () => getSetting('sessionRecovery', null);

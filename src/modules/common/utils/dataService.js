@@ -41,8 +41,8 @@ export async function unlockDatabase(id, password) {
       let data = await crypto.decryptData(dbEntry.encryptedData, iv, key);
 
       const updateResult = checkAndUpdateDailyDose(data.meds, data.lastDoseUpdate);
+
       if (updateResult.updated) {
-        console.log("Doses updated upon unlock.");
         data.meds = updateResult.updatedItems;
         data.lastDoseUpdate = updateResult.newDate;
       }
@@ -86,8 +86,4 @@ export const saveDisplayMode = dbAdapter.saveDisplayMode;
 export const saveYellowLimit = dbAdapter.saveYellowLimit;
 export const saveRedLimit = dbAdapter.saveRedLimit;
 export const saveShowOverview = dbAdapter.saveShowOverview;
-export const getLastVersion = dbAdapter.getLastVersion;
-export const saveLastVersion = dbAdapter.saveLastVersion;
-export const getFirstRunCompleted = dbAdapter.getFirstRunCompleted;
-export const setFirstRunCompleted = dbAdapter.setFirstRunCompleted;
 export const deleteAllData = dbAdapter.deleteAllData;

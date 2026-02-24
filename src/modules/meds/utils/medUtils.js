@@ -32,6 +32,11 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
   const todayStr = currentDate.toDateString()
   const deductions = {} // Map of item name -> amount deducted
 
+  // Handle case where lastUpdateDate is missing (e.g., from older data)
+  if (!lastUpdateDate) {
+    return { updatedItems: savedItems, newDate: todayStr, updated: true, deductions: {} };
+  }
+
   if (lastUpdateDate !== todayStr) {
     // Normalize dates to midnight to ignore time differences
     const lastDate = new Date(lastUpdateDate)
