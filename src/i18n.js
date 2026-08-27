@@ -284,10 +284,16 @@ export const messages = {
       saveVault: 'Save Vault',
       importSuccess: 'Vault "{name}" successfully saved to this device!',
       errorInvalidCode: 'Please enter a valid 6-character code.',
-      errorConnectionFailed: 'Connection failed. Please check the code and try again.',
+      errorConnectionFailed: 'Connection failed. Please check the code, try again or use the encrypted code copy/paste fallback.',
       errorTransfer: 'Error during vault synchronization: {error}',
       scanQrCode: 'Scan QR Code',
-      stopScanning: 'Stop Camera'
+      stopScanning: 'Stop Camera',
+      copyEncryptedText: 'Copy Encrypted Code (Offline Fallback)',
+      encryptedTextCopied: 'Encrypted code copied to clipboard!',
+      orManualPaste: 'Or paste encrypted code manually',
+      pasteInstructions: 'If WebRTC direct connection is blocked by your network/firewall, you can paste the encrypted code here:',
+      pasteCodePlaceholder: 'Paste encrypted sync payload here...',
+      importFromCode: 'Import from Code'
     }
   },
   de: {
@@ -572,10 +578,16 @@ export const messages = {
       saveVault: 'Tresor speichern',
       importSuccess: 'Tresor „{name}“ wurde erfolgreich auf diesem Gerät gespeichert!',
       errorInvalidCode: 'Bitte gib einen gültigen 6-stelligen Code ein.',
-      errorConnectionFailed: 'Verbindung fehlgeschlagen. Bitte prüfe den Code und versuche es erneut.',
+      errorConnectionFailed: 'Verbindung fehlgeschlagen. Bitte prüfe den Code, versuche es erneut oder nutze den verschlüsselten Code zum Kopieren.',
       errorTransfer: 'Fehler bei der Synchronisation: {error}',
       scanQrCode: 'QR-Code scannen',
-      stopScanning: 'Kamera schließen'
+      stopScanning: 'Kamera schließen',
+      copyEncryptedText: 'Verschlüsselten Code kopieren (Offline-Fallback)',
+      encryptedTextCopied: 'Verschlüsselter Code in die Zwischenablage kopiert!',
+      orManualPaste: 'Oder verschlüsselten Code manuell einfügen',
+      pasteInstructions: 'Falls die Direktverbindung durch dein Netzwerk/Firewall blockiert wird, kannst du den Code hier einfügen:',
+      pasteCodePlaceholder: 'Verschlüsselten Sync-Code hier einfügen...',
+      importFromCode: 'Aus Code importieren'
     }
   }
 }

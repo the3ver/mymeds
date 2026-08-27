@@ -197,6 +197,32 @@ export async function generateQrCodeDataUrl(text) {
 }
 
 /**
+ * Robust public STUN and OpenRelay TURN servers for reliable cross-network NAT traversal.
+ */
+export const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun.cloudflare.com:3478' },
+  { urls: 'stun:openrelay.metered.ca:80' },
+  {
+    urls: 'turn:openrelay.metered.ca:80',
+    username: 'openrelay',
+    credential: 'openrelay',
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443',
+    username: 'openrelay',
+    credential: 'openrelay',
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelay',
+    credential: 'openrelay',
+  },
+];
+
+/**
  * Creates a WebRTC Sender Peer Session using PeerJS.
  * Listens for an incoming connection, then sends the vault payload.
  * 
@@ -218,6 +244,9 @@ export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransf
   try {
     peer = new Peer(peerId, {
       debug: 1,
+      config: {
+        iceServers: ICE_SERVERS,
+      },
     });
 
     peer.on('open', () => {
@@ -286,6 +315,9 @@ export function startReceiverSession({ syncCode, onConnected, onPayloadReceived,
   try {
     peer = new Peer(undefined, {
       debug: 1,
+      config: {
+        iceServers: ICE_SERVERS,
+      },
     });
 
     peer.on('open', () => {

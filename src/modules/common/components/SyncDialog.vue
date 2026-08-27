@@ -120,6 +120,19 @@
               />
             </div>
 
+            <!-- Copy Encrypted Payload Button (Fallback) -->
+            <div class="mt-2 mb-2">
+              <v-btn
+                variant="text"
+                size="small"
+                prepend-icon="mdi-content-copy"
+                color="primary"
+                @click="copyEncryptedPayload"
+              >
+                {{ t('sync.copyEncryptedText') }}
+              </v-btn>
+            </div>
+
             <!-- Status Indicator -->
             <div class="d-flex align-center justify-center text-caption text-medium-emphasis py-2">
               <v-progress-circular
@@ -186,6 +199,32 @@
               />
               <span>{{ receiverStatusText }}</span>
             </div>
+
+            <v-divider class="my-4"></v-divider>
+
+            <div class="text-caption font-weight-medium mb-1 text-medium-emphasis">
+              {{ t('sync.orManualPaste') }}
+            </div>
+            <v-textarea
+              v-model="pastePayloadText"
+              :placeholder="t('sync.pasteCodePlaceholder')"
+              rows="2"
+              variant="outlined"
+              density="compact"
+              class="font-monospace text-caption mb-2"
+              hide-details
+            />
+            <v-btn
+              block
+              variant="tonal"
+              color="primary"
+              size="default"
+              prepend-icon="mdi-import"
+              :disabled="!pastePayloadText.trim()"
+              @click="handleImportFromPastedText"
+            >
+              {{ t('sync.importFromCode') }}
+            </v-btn>
           </div>
 
           <!-- State 2: Preview & Import Options -->
@@ -249,6 +288,7 @@
 import { ref, computed, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as syncService from '../utils/syncService';
+import * as dbAdapter from '../utils/indexedDbAdapter';
 
 const props = defineProps({
   modelValue: {
@@ -282,6 +322,7 @@ let senderSession = null;
 
 // Receive State
 const receiveCode = ref('');
+const pastePayloadText = ref('');
 const receiverStatus = ref('idle'); // 'idle' | 'connecting' | 'receiving' | 'received' | 'error'
 const receivedPayload = ref(null);
 const receivedVault = ref(null);
@@ -407,6 +448,44 @@ async function copySyncCode() {
     }, 3000);
   } catch (e) {
     console.error('Clipboard copy failed:', e);
+  }
+}
+
+async function copyEncryptedPayload() {
+  if (!selectedVaultId.value) return;
+  try {
+    const vaultEntry = await dbAdapter.getFullDatabase(selectedVaultId.value);
+    if (!vaultEntry) throw new Error('Vault not found');
+    const payload = syncService.exportVaultForSync(vaultEntry);
+    const jsonString = JSON.stringify(payload);
+    await navigator.clipboard.writeText(jsonString);
+    successMessage.value = t('sync.encryptedTextCopied');
+    setTimeout(() => {
+      successMessage.value = '';
+    }, 4000);
+  } catch (err) {
+    errorMessage.value = t('sync.errorTransfer', { error: err.message || err });
+  }
+}
+
+function handleImportFromPastedText() {
+  errorMessage.value = '';
+  try {
+    const raw = pastePayloadText.value.trim();
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    const validation = syncService.validateSyncPayload(parsed);
+    if (!validation.isValid) {
+      errorMessage.value = validation.error || t('sync.errorInvalidCode');
+      return;
+    }
+    receivedPayload.value = parsed;
+    receivedVault.value = parsed.vault;
+    if (existingConflictDb.value) {
+      conflictMode.value = 'copy';
+    }
+  } catch (err) {
+    errorMessage.value = t('sync.errorTransfer', { error: err.message || 'Invalid format' });
   }
 }
 
