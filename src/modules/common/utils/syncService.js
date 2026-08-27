@@ -1,11 +1,16 @@
 import QRCode from 'qrcode';
-import { Peer } from 'peerjs';
+import mqtt from 'mqtt';
 import * as dbAdapter from './indexedDbAdapter';
 
 /**
- * Prefix used for PeerJS IDs to prevent collision with other applications.
+ * Public WSS MQTT brokers for instant cross-device E2EE relay.
  */
-const PEER_PREFIX = 'mymeds-sync-';
+export const BROKERS = [
+  'wss://broker.emqx.io:8084/mqtt',
+  'wss://broker.hivemq.com:8884/mqtt',
+];
+
+const TOPIC_PREFIX = 'mymeds/v1/sync/';
 
 /**
  * Generates a random 6-character alphanumeric sync code (uppercase).
@@ -197,34 +202,8 @@ export async function generateQrCodeDataUrl(text) {
 }
 
 /**
- * Robust public STUN and OpenRelay TURN servers for reliable cross-network NAT traversal.
- */
-export const ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'stun:openrelay.metered.ca:80' },
-  {
-    urls: 'turn:openrelay.metered.ca:80',
-    username: 'openrelay',
-    credential: 'openrelay',
-  },
-  {
-    urls: 'turn:openrelay.metered.ca:443',
-    username: 'openrelay',
-    credential: 'openrelay',
-  },
-  {
-    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-    username: 'openrelay',
-    credential: 'openrelay',
-  },
-];
-
-/**
- * Creates a WebRTC Sender Peer Session using PeerJS.
- * Listens for an incoming connection, then sends the vault payload.
+ * Creates an E2EE Sender Session using WebSocket MQTT broker.
+ * Listens for an incoming connection request, then sends the encrypted vault payload.
  * 
  * @param {object} params
  * @param {number} params.vaultId
@@ -236,26 +215,28 @@ export const ICE_SERVERS = [
  */
 export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransferred, onError }) {
   const syncCode = generateSyncCode();
-  const peerId = `${PEER_PREFIX}${syncCode}`;
+  const baseTopic = `${TOPIC_PREFIX}${syncCode}`;
 
-  let peer = null;
-  let connection = null;
+  let client = null;
+  let isClosed = false;
 
   try {
-    peer = new Peer(peerId, {
-      debug: 1,
-      config: {
-        iceServers: ICE_SERVERS,
-      },
+    if (onCodeReady) onCodeReady(syncCode);
+
+    client = mqtt.connect(BROKERS[0], {
+      clientId: `mymeds-snd-${syncCode}-${Math.random().toString(36).substring(2, 6)}`,
+      clean: true,
+      connectTimeout: 10000,
     });
 
-    peer.on('open', () => {
-      onCodeReady(syncCode);
+    client.on('connect', () => {
+      if (isClosed) return;
+      client.subscribe([`${baseTopic}/request`, `${baseTopic}/ack`], { qos: 1 });
     });
 
-    peer.on('connection', async (conn) => {
-      connection = conn;
-      conn.on('open', async () => {
+    client.on('message', async (topic) => {
+      if (isClosed) return;
+      if (topic === `${baseTopic}/request`) {
         if (onConnected) onConnected();
         try {
           const vaultEntry = await dbAdapter.getFullDatabase(vaultId);
@@ -263,20 +244,18 @@ export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransf
             throw new Error('Vault not found in database.');
           }
           const payload = exportVaultForSync(vaultEntry);
-          conn.send(payload);
+          client.publish(`${baseTopic}/data`, JSON.stringify(payload), { qos: 1 });
           if (onTransferred) onTransferred();
         } catch (err) {
           if (onError) onError(err);
         }
-      });
-
-      conn.on('error', (err) => {
-        if (onError) onError(err);
-      });
+      } else if (topic === `${baseTopic}/ack`) {
+        if (onTransferred) onTransferred();
+      }
     });
 
-    peer.on('error', (err) => {
-      if (onError) onError(err);
+    client.on('error', (err) => {
+      if (onError && !isClosed) onError(err);
     });
   } catch (err) {
     if (onError) onError(err);
@@ -284,19 +263,17 @@ export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransf
 
   return {
     close: () => {
-      if (connection) {
-        try { connection.close(); } catch (e) { /* ignore */ }
-      }
-      if (peer) {
-        try { peer.destroy(); } catch (e) { /* ignore */ }
+      isClosed = true;
+      if (client) {
+        try { client.end(true); } catch (e) { /* ignore */ }
       }
     }
   };
 }
 
 /**
- * Creates a WebRTC Receiver Peer Session using PeerJS.
- * Connects to the sender's code and awaits the vault payload.
+ * Creates an E2EE Receiver Session using WebSocket MQTT broker.
+ * Connects to the sender's code topic and requests the encrypted vault payload.
  * 
  * @param {object} params
  * @param {string} params.syncCode
@@ -307,44 +284,48 @@ export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransf
  */
 export function startReceiverSession({ syncCode, onConnected, onPayloadReceived, onError }) {
   const normalized = normalizeSyncCode(syncCode);
-  const targetPeerId = `${PEER_PREFIX}${normalized}`;
+  const baseTopic = `${TOPIC_PREFIX}${normalized}`;
 
-  let peer = null;
-  let connection = null;
+  let client = null;
+  let isClosed = false;
 
   try {
-    peer = new Peer(undefined, {
-      debug: 1,
-      config: {
-        iceServers: ICE_SERVERS,
-      },
+    client = mqtt.connect(BROKERS[0], {
+      clientId: `mymeds-rcv-${normalized}-${Math.random().toString(36).substring(2, 6)}`,
+      clean: true,
+      connectTimeout: 10000,
     });
 
-    peer.on('open', () => {
-      connection = peer.connect(targetPeerId, {
-        reliable: true
-      });
+    client.on('connect', () => {
+      if (isClosed) return;
+      if (onConnected) onConnected();
 
-      connection.on('open', () => {
-        if (onConnected) onConnected();
+      client.subscribe(`${baseTopic}/data`, { qos: 1 }, () => {
+        // Send request message to trigger sender
+        client.publish(`${baseTopic}/request`, JSON.stringify({ action: 'request' }), { qos: 1 });
       });
+    });
 
-      connection.on('data', (data) => {
-        const validation = validateSyncPayload(data);
-        if (validation.isValid) {
-          if (onPayloadReceived) onPayloadReceived(data);
-        } else {
-          if (onError) onError(new Error(validation.error || 'Invalid payload received'));
+    client.on('message', (topic, message) => {
+      if (isClosed) return;
+      if (topic === `${baseTopic}/data`) {
+        try {
+          const payload = JSON.parse(message.toString());
+          const validation = validateSyncPayload(payload);
+          if (validation.isValid) {
+            client.publish(`${baseTopic}/ack`, JSON.stringify({ action: 'ack' }), { qos: 1 });
+            if (onPayloadReceived) onPayloadReceived(payload);
+          } else {
+            if (onError) onError(new Error(validation.error || 'Invalid payload received'));
+          }
+        } catch (e) {
+          if (onError) onError(e);
         }
-      });
-
-      connection.on('error', (err) => {
-        if (onError) onError(err);
-      });
+      }
     });
 
-    peer.on('error', (err) => {
-      if (onError) onError(err);
+    client.on('error', (err) => {
+      if (onError && !isClosed) onError(err);
     });
   } catch (err) {
     if (onError) onError(err);
@@ -352,12 +333,12 @@ export function startReceiverSession({ syncCode, onConnected, onPayloadReceived,
 
   return {
     close: () => {
-      if (connection) {
-        try { connection.close(); } catch (e) { /* ignore */ }
-      }
-      if (peer) {
-        try { peer.destroy(); } catch (e) { /* ignore */ }
+      isClosed = true;
+      if (client) {
+        try { client.end(true); } catch (e) { /* ignore */ }
       }
     }
   };
 }
+
+
