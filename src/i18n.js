@@ -110,11 +110,22 @@ export const messages = {
     welcome: {
       title: 'Welcome to MyMeds!',
       thankYou: 'Thank you for installing the app.',
+      existingUserTitle: 'Important Update & Terms',
+      existingUserIntro: 'Please review and confirm the updated medical disclaimer to continue using MyMeds.',
       explanation: 'MyMeds automatically deducts the daily dose from your inventory every day to warn you when supplies are running low.',
       chooseLanguage: 'Please choose your language:',
       chooseTheme: 'Please choose your preferred theme:',
       light: 'Light',
       dark: 'Dark',
+      disclaimer: {
+        title: 'Important Medical Disclaimer & Terms',
+        pointNoAdvice: 'No Medical Advice: MyMeds is a personal organizational tool and does not provide medical advice, diagnosis, dosage recommendations, or treatment plans.',
+        pointResponsibility: 'User Responsibility: All supply calculations and reminders are based solely on your own manual data entry.',
+        pointSoftwareErrors: 'Potential Software Errors: Despite greatest care during development, software errors, display issues, or calculation bugs cannot be completely ruled out. Always verify your supplies and intake independently.',
+        pointConsult: 'Consult Professionals: Always consult your physician or pharmacist regarding medications, dosages, side effects, or health concerns.',
+        pointEmergency: 'Emergencies: In a life-threatening medical emergency, contact emergency services immediately.',
+        checkbox: 'I have read and understand the medical disclaimer and agree to the terms.'
+      },
       getStarted: 'Get Started'
     },
     about: {
@@ -129,31 +140,43 @@ export const messages = {
     },
     help: {
       title: 'User Manual',
-      intro: 'Welcome to the MyMeds User Manual. Here you can find information on how to use the app.',
+      intro: 'Welcome to the MyMeds User Manual. Here you will find all information on how to manage your medications, schedule appointments, and secure your data.',
       sections: {
+        security: {
+          title: 'Encryption & Data Security',
+          content: 'All sensitive medical data (medications, stocks, appointments, notes) are stored locally in your browser’s IndexedDB using state-of-the-art 256-bit AES-GCM encryption derived from your password with PBKDF2 (100,000 iterations).\nThere is no backend server or cloud transmission – your health data belongs exclusively to you.\nImportant: Your vault password cannot be recovered or reset. If you lose your password, access to your encrypted data is permanently lost.'
+        },
         basics: {
-          title: 'Basics',
-          content: 'MyMeds helps you keep track of your medication stock. The app works offline and saves all data locally on your device.'
+          title: 'Basics & Offline Use',
+          content: 'MyMeds is a Progressive Web App (PWA) designed to work completely offline. You can install it on your mobile device or desktop via your browser’s "Add to Home Screen" or "Install App" feature.'
         },
         adding: {
-          title: 'Adding Medications',
-          content: 'Click the "Add Medication" card at the bottom of the list to add a new medication. Enter the name, current stock, and your daily dose.'
+          title: 'Managing Medications',
+          content: 'Tap the "Add Medication" card at the bottom of the list to record a new medication. Alongside name and active ingredient, you can set the package size, current stock, daily dose, color tag, and custom notes.\nTapping any medication card expands it to reveal details, days remaining, empty date estimate, and editing options.'
         },
         dose: {
-          title: 'Daily Dose',
-          content: 'You can enter the daily dose as a single number (e.g. "1") or as a schedule (Morning-Noon-Evening-Night, e.g. "1-0-1-0"). The app automatically calculates the total daily consumption.'
+          title: 'Dose Schedules & Fractions',
+          content: 'You can set single daily amounts or flexible 4-slot schedules (Morning - Noon - Evening - Night, e.g. 1-0-1 or 1-1-1-1/2).\nFractions (e.g. 1/2, 3/4) and decimal doses (e.g. 0.5, 1.5) are fully supported and automatically calculated into your daily consumption.'
+        },
+        display: {
+          title: 'Display & Sort Modes',
+          content: 'In App Preferences, you can customize the badge on medication cards:\n• Pills: Shows remaining tablet count.\n• Days: Shows calculated days of remaining supply.\n• Packages: Displays full and partial package symbols.\nYou can also sort your medication list alphabetically, by date added, or by shortest remaining days.'
         },
         tracking: {
-          title: 'Automatic Tracking',
-          content: 'Every day you open the app, the daily dose is automatically deducted from the stock. You don\'t need to do anything manually.'
+          title: 'Automatic Daily Deductions',
+          content: 'Every time you unlock your vault, MyMeds checks the elapsed days since your last session and automatically subtracts the required daily dose from each medication.\nA floating deduction badge provides instant visual confirmation of the subtracted units.'
         },
         warnings: {
-          title: 'Warnings',
-          content: 'The app warns you when your stock is running low. You can customize the warning limits (yellow and red) in the settings.'
+          title: 'Warning Thresholds & Overview Banner',
+          content: 'The overview banner at the top shows the exact date your overall medication supply runs out.\nWhen a medication falls below the yellow (default: 21 days) or red warning limit (default: 7 days), the banner and card highlight in warning/error colors. You can customize these thresholds in Settings.'
         },
         calendar: {
-          title: 'Calendar',
-          content: 'The calendar allows you to track doctor appointments, vaccinations, illnesses, and notes. You can add entries by clicking the "Add" button below the "Today" separator. Entries are sorted chronologically.'
+          title: 'Health Calendar & ICS Export',
+          content: 'The Calendar tab tracks doctor visits, vaccinations, illnesses, and general health notes.\n• Timeline: Entries are organized into quarter sections with a dedicated "Today" divider.\n• Filtering: Use the filter button in the top bar to filter entries by type.\n• Calendar Export (.ics): Tap the calendar icon on any entry or restock warning to export an .ics file or share it directly into your device calendar (Google Calendar, Apple Calendar, Outlook).'
+        },
+        exportImport: {
+          title: 'Backups & Data Management',
+          content: 'Through the Navigation Drawer (Data Management), you can export your data as an unencrypted JSON backup file or import existing backups.\nThis is ideal for creating regular local backups or transferring your vaults to a new device.'
         }
       },
       close: 'Close'
@@ -232,6 +255,39 @@ export const messages = {
         labelPlaceholder: 'Text to display',
         add: 'Add'
       }
+    },
+    sync: {
+      title: 'Device Sync',
+      menuItem: 'Sync / Transfer Vault',
+      transferToDevice: 'Transfer to other device',
+      tabSend: 'Send Vault',
+      tabReceive: 'Receive Vault',
+      selectVault: 'Select Vault to send',
+      sendInstructions: 'Open MyMeds on the target device, navigate to "Receive Vault", and scan the QR code or enter the 6-digit code below.',
+      syncCodeLabel: '6-digit Sync Code',
+      copyCode: 'Copy Code',
+      codeCopied: 'Sync Code copied to clipboard!',
+      waitingForReceiver: 'Waiting for partner device to connect...',
+      connected: 'Device connected. Transferring encrypted vault...',
+      sendSuccess: 'Vault "{name}" transferred successfully!',
+      receiveInstructions: 'Enter the 6-digit code shown on the sending device or scan the QR code.',
+      enterCode: 'Enter 6-digit code',
+      connectAndReceive: 'Connect & Receive',
+      connecting: 'Connecting to sender...',
+      receiving: 'Receiving encrypted vault...',
+      previewTitle: 'Vault Received',
+      previewDetails: 'Name: {name}\nMedications: {medsCount}\nCalendar Entries: {calendarCount}\nLast modified: {modifiedAt}',
+      conflictTitle: 'Vault exists already',
+      conflictMessage: 'A database named "{name}" already exists on this device. What would you like to do?',
+      modeOverwrite: 'Overwrite existing vault',
+      modeCopy: 'Save as new copy',
+      saveVault: 'Save Vault',
+      importSuccess: 'Vault "{name}" successfully saved to this device!',
+      errorInvalidCode: 'Please enter a valid 6-character code.',
+      errorConnectionFailed: 'Connection failed. Please check the code and try again.',
+      errorTransfer: 'Error during vault synchronization: {error}',
+      scanQrCode: 'Scan QR Code',
+      stopScanning: 'Stop Camera'
     }
   },
   de: {
@@ -342,11 +398,22 @@ export const messages = {
     welcome: {
       title: 'Willkommen bei MyMeds!',
       thankYou: 'Danke, dass du die App installiert hast.',
+      existingUserTitle: 'Wichtiger Hinweis zur Nutzung',
+      existingUserIntro: 'Bitte bestätige den aktualisierten medizinischen Hinweis, um MyMeds wie gewohnt weiterzunutzen.',
       explanation: 'MyMeds zieht jeden Tag automatisch die Tagesdosis von deinem Bestand ab, um dich rechtzeitig zu warnen, wenn der Vorrat knapp wird.',
       chooseLanguage: 'Bitte wähle deine Sprache:',
       chooseTheme: 'Bitte wähle dein bevorzugtes Design:',
       light: 'Hell',
       dark: 'Dunkel',
+      disclaimer: {
+        title: 'Wichtiger medizinischer Hinweis & Haftungsausschluss',
+        pointNoAdvice: 'Keine medizinische Beratung: MyMeds ist ein rein organisatorisches Hilfsmittel und erteilt keine medizinischen Ratschläge, Diagnosen, Dosierungsempfehlungen oder Behandlungshinweise.',
+        pointResponsibility: 'Eigenverantwortung: Alle Vorratsberechnungen und Erinnerungen basieren ausschließlich auf deinen eigenen manuellen Eingaben.',
+        pointSoftwareErrors: 'Mögliche Softwarefehler: Trotz größter Sorgfalt bei der Entwicklung können Softwarefehler, Darstellungs- oder Rechenfehler in der App nicht vollständig ausgeschlossen werden. Prüfe Bestände und Einnahmen stets eigenständig.',
+        pointConsult: 'Fachliche Rücksprache: Wende dich bei allen Fragen zu deiner Medikation, Dosierung, Nebenwirkungen oder Beschwerden immer an deine Ärztin, deinen Arzt oder deine Apotheke.',
+        pointEmergency: 'Notfall: In lebensbedrohlichen Notfällen wende dich bitte umgehend an den Notruf (112).',
+        checkbox: 'Ich habe den medizinischen Hinweis verstanden und akzeptiere die Nutzungsbedingungen.'
+      },
       getStarted: 'Loslegen'
     },
     about: {
@@ -361,31 +428,43 @@ export const messages = {
     },
     help: {
       title: 'Benutzerhandbuch',
-      intro: 'Willkommen im MyMeds Benutzerhandbuch. Hier findest du Informationen zur Bedienung der App.',
+      intro: 'Willkommen im MyMeds Benutzerhandbuch. Hier findest du alle Informationen zur Erfassung von Medikamenten, Terminplanung und Datensicherheit.',
       sections: {
+        security: {
+          title: 'Verschlüsselung & Datensicherheit',
+          content: 'Alle sensiblen medizinischen Daten (Medikamente, Bestände, Termine, Notizen) werden nach modernsten Standards (AES-GCM 256-Bit) direkt auf deinem Endgerät in der lokalen IndexedDB verschlüsselt.\nEs gibt keinen Server und keine Cloud-Übertragung – deine Gesundheitsdaten gehören ausschließlich dir.\nWichtig: Das Tresor-Passwort kann nicht wiederhergestellt werden. Geht das Passwort verloren, sind auch deine Daten unwiderruflich verloren.'
+        },
         basics: {
-          title: 'Grundlagen',
-          content: 'MyMeds hilft dir, deinen Medikamentenvorrat im Blick zu behalten. Die App funktioniert offline und speichert alle Daten lokal auf deinem Gerät.'
+          title: 'Grundlagen & Offline-Nutzung',
+          content: 'MyMeds ist eine Progressive Web App (PWA), die vollständig offline funktioniert. Du kannst die App auf deinem Smartphone oder Desktop installieren (über das Browsermenü "Zum Startbildschirm hinzufügen" oder "Installieren").'
         },
         adding: {
-          title: 'Medikamente hinzufügen',
-          content: 'Klicke auf die "Medikament hinzufügen" Karte am Ende der Liste, um ein neues Medikament hinzuzufügen. Gib den Namen, den aktuellen Bestand und deine Tagesdosis ein.'
+          title: 'Medikamente erfassen & verwalten',
+          content: 'Über die Karte "Medikament hinzufügen" trägst du neue Medikamente ein. Neben Name und Wirkstoff kannst du die Packungsgröße, den aktuellen Tablettenbestand, die Dosis, eine Farbmarkierung sowie individuelle Notizen hinterlegen.\nDurch Antippen einer Medikamentenkarte klappen die Detailinfos, die Resttage-Berechnung und die Bearbeitungsfunktionen auf.'
         },
         dose: {
-          title: 'Tagesdosis',
-          content: 'Du kannst die Tagesdosis als einzelne Zahl (z.B. "1") oder als Einnahmeplan (Morgens-Mittags-Abends-Nachts, z.B. "1-0-1-0") eingeben. Die App berechnet automatisch den täglichen Gesamtverbrauch.'
+          title: 'Dosis, Einnahmepläne & Bruchteile',
+          content: 'Du kannst feste Tagesdosen oder flexible 4-fach-Einnahmepläne (Morgens - Mittags - Abends - Nachts, z. B. 1-0-1 oder 1-1-1-1/2) hinterlegen.\nAuch halbe oder viertel Tabletten (z. B. 0,5, 1,5 oder Brüche wie 1/2, 3/4) werden automatisch korrekt in den Tagesverbrauch eingerechnet.'
+        },
+        display: {
+          title: 'Anzeige- & Sortiermodi',
+          content: 'In den Einstellungen kannst du die Anzeige auf den Medikamentenkarten anpassen:\n• Pillen: Zeigt die verbleibende Tablettenanzahl.\n• Tage: Zeigt die verbleibende Reichweite in Tagen.\n• Packungen: Zeigt die Anzahl voller und angebrochener Packungen als Symbole.\nZudem lässt sich die Liste alphabetisch, nach Hinzufügedatum oder nach den geringsten Resttagen sortieren.'
         },
         tracking: {
-          title: 'Automatische Verfolgung',
-          content: 'Jeden Tag, an dem du die App öffnest, wird automatisch die Tagesdosis vom Bestand abgezogen. Du musst nichts manuell austragen.'
+          title: 'Automatischer Tagesabzug',
+          content: 'Beim Entsperren des Tresors berechnet MyMeds automatisch die seit dem letzten Öffnen vergangenen Tage und zieht die entsprechende Dosis von jedem Medikament ab.\nEine kurze Einblendung am rechten Rand zeigt dir direkt, wie viele Einheiten abgezogen wurden.'
         },
         warnings: {
-          title: 'Warnungen',
-          content: 'Die App warnt dich, wenn dein Vorrat zur Neige geht. Die Warngrenzen (gelb und rot) kannst du in den Einstellungen anpassen.'
+          title: 'Warnschwellen & Vorrats-Banner',
+          content: 'Die Übersichtskarte am oberen Rand informiert dich auf einen Blick, bis zu welchem Datum dein gesamter Medikamentenvorrat ausreicht.\nSinkt ein Medikament unter die gelbe (Standard: 21 Tage) oder rote Warnschwelle (Standard: 7 Tage), wechselt die Farbmarkierung auf Gelb bzw. Rot. Die Schwellenwerte können in den Einstellungen individuell festgelegt werden.'
         },
         calendar: {
-          title: 'Kalender',
-          content: 'Der Kalender ermöglicht es dir, Arzttermine, Impfungen, Erkrankungen und Notizen zu erfassen. Du kannst Einträge hinzufügen, indem du auf den "Hinzufügen"-Button unter dem "Heute"-Trenner klickst. Die Einträge werden chronologisch sortiert.'
+          title: 'Gesundheitskalender & ICS-Export',
+          content: 'Im Reiter "Kalender" protokollierst und planst du Arztbesuche, Impfungen, Erkrankungen und Notizen.\n• Timeline: Termine sind nach Quartalen gegliedert und durch eine "Heute"-Trennlinie getrennt.\n• Filter: Über das Filtersymbol in der oberen Leiste kannst du gezielt nach bestimmten Eintragstypen filtern.\n• Kalender-Export (.ics): Über das Kalendersymbol kannst du Termine oder Nachbestell-Erinnerungen direkt über die Teilen-Funktion in deinen Smartphone- oder Desktop-Kalender (Google Kalender, Apple Kalender, Outlook) exportieren.'
+        },
+        exportImport: {
+          title: 'Datensicherung & Import/Export',
+          content: 'Über das Hauptmenü (Datenverwaltung) kannst du jederzeit eine unverschlüsselte JSON-Sicherungsdatei deiner Daten exportieren oder ein bestehendes Backup importieren.\nDies eignet sich ideal für regelmäßige lokale Backups oder den Umzug auf ein neues Endgerät.'
         }
       },
       close: 'Schließen'
@@ -464,6 +543,39 @@ export const messages = {
         labelPlaceholder: 'Anzuzeigender Text',
         add: 'Hinzufügen'
       }
+    },
+    sync: {
+      title: 'Geräte-Synchronisation',
+      menuItem: 'Tresor übertragen / Sync',
+      transferToDevice: 'Auf anderes Gerät übertragen',
+      tabSend: 'Tresor senden',
+      tabReceive: 'Tresor empfangen',
+      selectVault: 'Tresor zum Senden auswählen',
+      sendInstructions: 'Öffne MyMeds auf dem Zielgerät, gehe auf „Tresor empfangen“ und scanne den QR-Code oder tippe den 6-stelligen Code ein.',
+      syncCodeLabel: '6-stelliger Sync-Code',
+      copyCode: 'Code kopieren',
+      codeCopied: 'Sync-Code in die Zwischenablage kopiert!',
+      waitingForReceiver: 'Warte auf Partnergerät...',
+      connected: 'Gerät verbunden. Verschlüsselter Tresor wird übertragen...',
+      sendSuccess: 'Tresor „{name}“ wurde erfolgreich übertragen!',
+      receiveInstructions: 'Gib den 6-stelligen Code des sendenden Geräts ein oder scanne den QR-Code.',
+      enterCode: '6-stelligen Code eingeben',
+      connectAndReceive: 'Verbinden & Empfangen',
+      connecting: 'Verbindung zum Sender wird aufgebaut...',
+      receiving: 'Verschlüsselter Tresor wird empfangen...',
+      previewTitle: 'Tresor empfangen',
+      previewDetails: 'Name: {name}\nMedikamente: {medsCount}\nKalendereinträge: {calendarCount}\nZuletzt geändert: {modifiedAt}',
+      conflictTitle: 'Tresor bereits vorhanden',
+      conflictMessage: 'Ein Tresor mit dem Namen „{name}“ existiert bereits auf diesem Gerät. Wie möchtest du vorgehen?',
+      modeOverwrite: 'Bestehenden Tresor überschreiben',
+      modeCopy: 'Als neue Kopie speichern',
+      saveVault: 'Tresor speichern',
+      importSuccess: 'Tresor „{name}“ wurde erfolgreich auf diesem Gerät gespeichert!',
+      errorInvalidCode: 'Bitte gib einen gültigen 6-stelligen Code ein.',
+      errorConnectionFailed: 'Verbindung fehlgeschlagen. Bitte prüfe den Code und versuche es erneut.',
+      errorTransfer: 'Fehler bei der Synchronisation: {error}',
+      scanQrCode: 'QR-Code scannen',
+      stopScanning: 'Kamera schließen'
     }
   }
 }

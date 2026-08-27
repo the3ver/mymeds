@@ -6,6 +6,8 @@ import { messages } from '../../src/i18n';
 import App from '../../src/App.vue';
 import * as components from 'vuetify/components';
 import { state as appState } from '../../src/app-state';
+import * as dataService from '../../src/modules/common/utils/dataService';
+
 
 // Minimal DOM mocks
 if (typeof global.window === 'undefined') global.window = {};
@@ -73,5 +75,29 @@ describe('App.vue', () => {
     // 2. Assert
     expect(wrapper.find('[data-testid="db-list-page"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="main-page"]').exists()).toBe(true);
+  });
+
+  it('should show WelcomeDialog with isExistingUser=false when no databases exist and disclaimer not accepted', async () => {
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ disclaimerAccepted: false });
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([]);
+    const wrapper = mountApp();
+    await flushPromises();
+
+    const welcomeComponent = wrapper.findComponent({ name: 'WelcomeDialog' });
+    expect(welcomeComponent.exists()).toBe(true);
+    expect(welcomeComponent.props('modelValue')).toBe(true);
+    expect(welcomeComponent.props('isExistingUser')).toBe(false);
+  });
+
+  it('should show WelcomeDialog with isExistingUser=true when existing databases exist and disclaimer not accepted', async () => {
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ disclaimerAccepted: false });
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([{ id: 1, name: 'Mein Tresor' }]);
+    const wrapper = mountApp();
+    await flushPromises();
+
+    const welcomeComponent = wrapper.findComponent({ name: 'WelcomeDialog' });
+    expect(welcomeComponent.exists()).toBe(true);
+    expect(welcomeComponent.props('modelValue')).toBe(true);
+    expect(welcomeComponent.props('isExistingUser')).toBe(true);
   });
 });

@@ -1,19 +1,33 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
 import { useI18n } from 'vue-i18n';
 import { state as appState, lock } from './app-state';
 import * as dataService from './modules/common/utils/dataService';
 import NavDrawer from './modules/common/components/NavDrawer.vue';
 import DatabaseListPage from './modules/common/components/DatabaseListPage.vue';
+import WelcomeDialog from './modules/common/components/WelcomeDialog.vue';
 import MainPage from './MainPage.vue';
 
 const theme = useTheme();
 const { t } = useI18n();
 const drawer = ref(false);
 const dataDialog = ref(false);
+const welcomeDialog = ref(false);
+const isExistingUser = ref(false);
 const mainPageRef = ref(null);
 const activeTab = ref('meds');
+
+onMounted(async () => {
+  const [settings, dbs] = await Promise.all([
+    dataService.getSettings(),
+    dataService.getDatabaseList()
+  ]);
+  isExistingUser.value = Array.isArray(dbs) && dbs.length > 0;
+  if (!settings.disclaimerAccepted) {
+    welcomeDialog.value = true;
+  }
+});
 
 async function handleLock() {
   if (!appState.isLocked) {
@@ -64,5 +78,7 @@ function openCalendarFilter() {
         @update:active-tab="activeTab = $event"
       />
     </v-main>
+
+    <WelcomeDialog v-model="welcomeDialog" :is-existing-user="isExistingUser" />
   </v-app>
 </template>

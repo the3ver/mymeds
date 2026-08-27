@@ -84,7 +84,10 @@ export const setSetting = async (key, value) => {
   return db.put(SETTINGS_STORE_NAME, value, key);
 };
 
+export const CURRENT_DISCLAIMER_VERSION = 1;
+
 export async function getSettings() {
+  const disclaimerVersion = await getSetting('disclaimerVersion', 0);
   const settings = {
     locale: await getSetting('locale', navigator.language.startsWith('de') ? 'de' : 'en'),
     theme: await getSetting('theme', 'light'),
@@ -94,6 +97,8 @@ export async function getSettings() {
     yellowLimit: await getSetting('yellowLimit', 21),
     redLimit: await getSetting('redLimit', 7),
     showOverview: await getSetting('showOverview', true),
+    disclaimerVersion,
+    disclaimerAccepted: disclaimerVersion >= CURRENT_DISCLAIMER_VERSION,
   };
   return settings;
 }
@@ -106,6 +111,8 @@ export const saveDisplayMode = (mode) => setSetting('displayMode', mode);
 export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
+export const saveDisclaimerVersion = (version = CURRENT_DISCLAIMER_VERSION) => setSetting('disclaimerVersion', version);
+export const saveDisclaimerAccepted = (accepted) => saveDisclaimerVersion(accepted ? CURRENT_DISCLAIMER_VERSION : 0);
 
 // --- Session Recovery ---
 export const saveRecoveryState = (state) => setSetting('sessionRecovery', state);

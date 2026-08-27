@@ -131,3 +131,109 @@ describe('dataService.unlockDatabase', () => {
     expect(checkAndUpdateDailyDose).not.toHaveBeenCalled(); // Should not be called on failure
   });
 });
+
+describe('dataService.createDatabaseWithPassword', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should generate salt, encrypt initial empty structure and create database', async () => {
+    crypto.generateSalt.mockReturnValue('mockSalt');
+    crypto.deriveKeyFromPassword.mockResolvedValue('mockKey');
+    crypto.encryptData.mockResolvedValue({ iv: 'mockIv', encryptedData: 'mockEncrypted' });
+    dbAdapter.createDatabase.mockResolvedValue(123);
+
+    const result = await dataService.createDatabaseWithPassword('Neuer Tresor', 'secret123');
+
+    expect(crypto.generateSalt).toHaveBeenCalled();
+    expect(crypto.deriveKeyFromPassword).toHaveBeenCalledWith('secret123', 'mockSalt');
+    expect(crypto.encryptData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meds: [],
+        calendar: [],
+        lastDoseUpdate: expect.any(String),
+      }),
+      'mockKey'
+    );
+    expect(dbAdapter.createDatabase).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Neuer Tresor',
+        medsCount: 0,
+        calendarCount: 0,
+        encryptionStrategy: 'password',
+        passwordData: { salt: 'mockSalt', iv: 'mockIv' },
+        encryptedData: 'mockEncrypted',
+      })
+    );
+    expect(result).toBe(123);
+  });
+});
+
+describe('dataService.saveAndLockDatabase', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should re-encrypt data and update database entry with counts and modified date', async () => {
+    const existingDb = {
+      id: 1,
+      name: 'Tresor',
+      encryptionStrategy: 'password',
+      passwordData: { salt: 'salt123', iv: 'oldIv' },
+      encryptedData: 'oldEncrypted',
+      medsCount: 0,
+      calendarCount: 0,
+    };
+
+    dbAdapter.getFullDatabase.mockResolvedValue(existingDb);
+    crypto.deriveKeyFromPassword.mockResolvedValue('derivedKey');
+    crypto.encryptData.mockResolvedValue({ iv: 'newIv', encryptedData: 'newEncrypted' });
+    dbAdapter.updateDatabase.mockResolvedValue(true);
+
+    const payload = {
+      meds: [{ name: 'Aspirin' }, { name: 'Ibuprofen' }],
+      calendar: [{ title: 'Arzt' }],
+      version: 2,
+    };
+
+    await dataService.saveAndLockDatabase(1, 'password', payload);
+
+    expect(dbAdapter.getFullDatabase).toHaveBeenCalledWith(1);
+    expect(crypto.deriveKeyFromPassword).toHaveBeenCalledWith('password', 'salt123');
+    expect(crypto.encryptData).toHaveBeenCalledWith(payload, 'derivedKey');
+    expect(dbAdapter.updateDatabase).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 1,
+        passwordData: { salt: 'salt123', iv: 'newIv' },
+        encryptedData: 'newEncrypted',
+        medsCount: 2,
+        calendarCount: 1,
+        modifiedAt: expect.any(Date),
+      })
+    );
+  });
+
+  it('should throw an error when database to save is not found', async () => {
+    dbAdapter.getFullDatabase.mockResolvedValue(null);
+
+    await expect(
+      dataService.saveAndLockDatabase(999, 'password', { meds: [] })
+    ).rejects.toThrow('Database not found for saving.');
+  });
+});
+
+describe('dataService.saveDisclaimerAccepted', () => {
+  it('should delegate to dbAdapter.saveDisclaimerAccepted', async () => {
+    dbAdapter.saveDisclaimerAccepted.mockResolvedValue(true);
+    await dataService.saveDisclaimerAccepted(true);
+    expect(dbAdapter.saveDisclaimerAccepted).toHaveBeenCalledWith(true);
+  });
+
+  it('should delegate to dbAdapter.saveDisclaimerVersion', async () => {
+    dbAdapter.saveDisclaimerVersion.mockResolvedValue(true);
+    await dataService.saveDisclaimerVersion(1);
+    expect(dbAdapter.saveDisclaimerVersion).toHaveBeenCalledWith(1);
+  });
+});
+
+

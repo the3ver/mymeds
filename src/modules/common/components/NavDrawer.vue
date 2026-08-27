@@ -7,19 +7,35 @@ import * as dataService from '../utils/dataService'
 import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
+import SyncDialog from './SyncDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean
 })
 
-const emit = defineEmits(['update:modelValue', 'open-data'])
+const emit = defineEmits(['update:modelValue', 'open-data', 'vault-imported'])
 
 const theme = useTheme()
 const { t } = useI18n()
 const aboutDialog = ref(false)
 const helpDialog = ref(false)
 const settingsDialog = ref(false)
+const syncDialog = ref(false)
+const databases = ref([])
 const appVersion = packageJson.version
+
+async function loadDatabasesForSync() {
+  try {
+    databases.value = await dataService.getDatabaseList();
+  } catch (e) {
+    databases.value = [];
+  }
+}
+
+function handleOpenSync() {
+  loadDatabasesForSync();
+  syncDialog.value = true;
+}
 
 const toggleTheme = () => {
   const newTheme = theme.global.current.value.dark ? 'light' : 'dark'
@@ -54,6 +70,13 @@ const toggleTheme = () => {
         <v-list-item-title>{{ t('app.settings') }}</v-list-item-title>
       </v-list-item>
 
+      <v-list-item @click="handleOpenSync">
+        <template v-slot:prepend>
+          <v-icon>mdi-sync</v-icon>
+        </template>
+        <v-list-item-title>{{ t('sync.title') }}</v-list-item-title>
+      </v-list-item>
+
       <v-list-item v-if="!appState.isLocked" @click="emit('open-data')">
         <template v-slot:prepend>
           <v-icon>mdi-database</v-icon>
@@ -81,6 +104,13 @@ const toggleTheme = () => {
 
   <!-- Settings Dialog -->
   <SettingsDialog v-model="settingsDialog" />
+
+  <!-- Sync Dialog -->
+  <SyncDialog
+    v-model="syncDialog"
+    :databases="databases"
+    @vault-imported="emit('vault-imported', $event)"
+  />
 
   <!-- Help Dialog -->
   <HelpDialog v-model="helpDialog" />

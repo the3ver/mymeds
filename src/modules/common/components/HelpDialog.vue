@@ -8,6 +8,18 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 
+const sectionKeys = [
+  'security',
+  'basics',
+  'adding',
+  'dose',
+  'display',
+  'tracking',
+  'warnings',
+  'calendar',
+  'exportImport'
+]
+
 const close = () => {
   emit('update:modelValue', false)
 }
@@ -26,34 +38,13 @@ const close = () => {
           <p class="text-body-1 mb-6">{{ t('help.intro') }}</p>
 
           <v-expansion-panels variant="accordion">
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.basics.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.basics.content') }}</v-expansion-panel-text>
-            </v-expansion-panel>
-
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.adding.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.adding.content') }}</v-expansion-panel-text>
-            </v-expansion-panel>
-
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.dose.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.dose.content') }}</v-expansion-panel-text>
-            </v-expansion-panel>
-
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.tracking.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.tracking.content') }}</v-expansion-panel-text>
-            </v-expansion-panel>
-
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.warnings.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.warnings.content') }}</v-expansion-panel-text>
-            </v-expansion-panel>
-
-            <v-expansion-panel>
-              <v-expansion-panel-title class="font-weight-bold">{{ t('help.sections.calendar.title') }}</v-expansion-panel-title>
-              <v-expansion-panel-text>{{ t('help.sections.calendar.content') }}</v-expansion-panel-text>
+            <v-expansion-panel v-for="key in sectionKeys" :key="key">
+              <v-expansion-panel-title class="font-weight-bold">
+                {{ t(`help.sections.${key}.title`) }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text class="text-body-2 help-content">
+                {{ t(`help.sections.${key}.content`) }}
+              </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
         </v-container>
@@ -63,4 +54,8 @@ const close = () => {
 </template>
 
 <style scoped>
+.help-content {
+  white-space: pre-line;
+  line-height: 1.6;
+}
 </style>

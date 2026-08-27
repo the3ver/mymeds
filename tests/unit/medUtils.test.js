@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { checkAndUpdateDailyDose } from '../../src/modules/meds/utils/medUtils';
+import {
+  checkAndUpdateDailyDose,
+  parseDose,
+  calculateDaysRemaining,
+  getStatusColor,
+} from '../../src/modules/meds/utils/medUtils';
 
 describe('checkAndUpdateDailyDose', () => {
 
@@ -128,3 +132,84 @@ describe('checkAndUpdateDailyDose', () => {
     expect(deductions).toEqual({});
   });
 });
+
+describe('parseDose', () => {
+  it('should return 0 for empty or invalid dose strings', () => {
+    expect(parseDose('')).toBe(0);
+    expect(parseDose(null)).toBe(0);
+    expect(parseDose(undefined)).toBe(0);
+    expect(parseDose('invalid')).toBe(0);
+  });
+
+  it('should parse single integer doses', () => {
+    expect(parseDose('1')).toBe(1);
+    expect(parseDose('3')).toBe(3);
+    expect(parseDose('0')).toBe(0);
+  });
+
+  it('should parse decimals with dots and commas', () => {
+    expect(parseDose('0.5')).toBe(0.5);
+    expect(parseDose('1.5')).toBe(1.5);
+    expect(parseDose('0,5')).toBe(0.5);
+    expect(parseDose('2,25')).toBe(2.25);
+  });
+
+  it('should parse fraction values', () => {
+    expect(parseDose('1/2')).toBe(0.5);
+    expect(parseDose('3/4')).toBe(0.75);
+    expect(parseDose('1/4')).toBe(0.25);
+  });
+
+  it('should sum multi-part dose schedules separated by dashes', () => {
+    expect(parseDose('1-0-1')).toBe(2);
+    expect(parseDose('1-1-1-1')).toBe(4);
+    expect(parseDose('0.5-0-0.5')).toBe(1);
+    expect(parseDose('1/2-0-1/2')).toBe(1);
+    expect(parseDose(' 1 - 0 - 1 ')).toBe(2);
+  });
+});
+
+describe('calculateDaysRemaining', () => {
+  it('should calculate whole days remaining accurately', () => {
+    expect(calculateDaysRemaining({ count: 20, dose: '2' })).toBe(10);
+    expect(calculateDaysRemaining({ count: 25, dose: '1-0-1' })).toBe(12); // 25 / 2 = 12.5 -> 12
+    expect(calculateDaysRemaining({ count: 5, dose: '1/2' })).toBe(10); // 5 / 0.5 = 10
+  });
+
+  it('should return null when dose is 0 or invalid', () => {
+    expect(calculateDaysRemaining({ count: 20, dose: '0' })).toBeNull();
+    expect(calculateDaysRemaining({ count: 20, dose: '' })).toBeNull();
+    expect(calculateDaysRemaining({ count: 20, dose: null })).toBeNull();
+  });
+
+  it('should return 0 when count is 0 with valid dose', () => {
+    expect(calculateDaysRemaining({ count: 0, dose: '1' })).toBe(0);
+  });
+});
+
+describe('getStatusColor', () => {
+  const yellowLimit = 21;
+  const redLimit = 7;
+
+  it('should return null when daysRemaining is null', () => {
+    expect(getStatusColor(null, yellowLimit, redLimit)).toBeNull();
+  });
+
+  it('should return error when daysRemaining is less than or equal to redLimit', () => {
+    expect(getStatusColor(0, yellowLimit, redLimit)).toBe('error');
+    expect(getStatusColor(5, yellowLimit, redLimit)).toBe('error');
+    expect(getStatusColor(7, yellowLimit, redLimit)).toBe('error');
+  });
+
+  it('should return warning when daysRemaining is between redLimit and yellowLimit', () => {
+    expect(getStatusColor(8, yellowLimit, redLimit)).toBe('warning');
+    expect(getStatusColor(14, yellowLimit, redLimit)).toBe('warning');
+    expect(getStatusColor(21, yellowLimit, redLimit)).toBe('warning');
+  });
+
+  it('should return null when daysRemaining is greater than yellowLimit', () => {
+    expect(getStatusColor(22, yellowLimit, redLimit)).toBeNull();
+    expect(getStatusColor(60, yellowLimit, redLimit)).toBeNull();
+  });
+});
+

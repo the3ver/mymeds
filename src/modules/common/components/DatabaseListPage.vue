@@ -7,6 +7,7 @@ import CreateDatabaseDialog from './CreateDatabaseDialog.vue';
 import DatabaseUnlockDialog from './DatabaseUnlockDialog.vue';
 import ConfirmDialog from './ConfirmDialog.vue';
 import RenameDatabaseDialog from './RenameDatabaseDialog.vue';
+import SyncDialog from './SyncDialog.vue';
 
 const { t, locale } = useI18n();
 const databases = ref([]);
@@ -14,6 +15,8 @@ const createDialog = ref(false);
 const unlockDialog = ref(false);
 const confirmDeleteDialog = ref(false);
 const renameDialog = ref(false);
+const syncDialog = ref(false);
+const syncDbId = ref(null);
 const selectedDb = ref(null);
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'error', 'info'];
@@ -74,6 +77,15 @@ function handleCreateNew() {
   createDialog.value = true;
 }
 
+function handleSyncClick(db) {
+  syncDbId.value = db.id;
+  syncDialog.value = true;
+}
+
+function onVaultImported() {
+  loadDatabases();
+}
+
 function onDatabaseCreated() {
   loadDatabases();
   createDialog.value = false;
@@ -100,11 +112,11 @@ function onDatabaseUnlocked(result, password) {
           :color="getRandomColor(db.id)"
           variant="tonal"
         >
-          <v-card-title class="text-h5 font-weight-bold" @click="handleDbClick(db)">
+          <v-card-title class="text-h5 font-weight-bold cursor-pointer" @click="handleDbClick(db)">
             {{ db.name }}
           </v-card-title>
 
-          <v-card-text class="flex-grow-1" @click="handleDbClick(db)">
+          <v-card-text class="flex-grow-1 cursor-pointer" @click="handleDbClick(db)">
             <div class="d-flex align-center mb-2">
               <v-icon start>mdi-calendar-plus</v-icon>
               <span>{{ t('app.db.created') }}: {{ formatDate(db.createdAt) }}</span>
@@ -124,6 +136,12 @@ function onDatabaseUnlocked(result, password) {
           </v-card-text>
 
           <v-card-actions>
+            <v-btn
+              icon="mdi-sync"
+              variant="text"
+              :title="t('sync.transferToDevice')"
+              @click.stop="handleSyncClick(db)"
+            ></v-btn>
             <v-spacer></v-spacer>
             <v-btn
               icon="mdi-pencil"
@@ -174,6 +192,13 @@ function onDatabaseUnlocked(result, password) {
     @save="handleSaveName"
   />
 
+  <SyncDialog
+    v-model="syncDialog"
+    :initial-vault-id="syncDbId"
+    :databases="databases"
+    @vault-imported="onVaultImported"
+  />
+
   <ConfirmDialog
     v-model="confirmDeleteDialog"
     :title="t('app.deleteDatabaseTitle')"
@@ -189,5 +214,8 @@ function onDatabaseUnlocked(result, password) {
 /* Global style to prevent pull-to-refresh on this page */
 html, body {
   overscroll-behavior-y: contain;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

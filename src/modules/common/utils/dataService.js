@@ -92,4 +92,8 @@ export const saveDisplayMode = dbAdapter.saveDisplayMode;
 export const saveYellowLimit = dbAdapter.saveYellowLimit;
 export const saveRedLimit = dbAdapter.saveRedLimit;
 export const saveShowOverview = dbAdapter.saveShowOverview;
+export const saveDisclaimerAccepted = dbAdapter.saveDisclaimerAccepted;
+export const saveDisclaimerVersion = dbAdapter.saveDisclaimerVersion;
 export const deleteAllData = dbAdapter.deleteAllData;
+
+
