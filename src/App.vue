@@ -17,6 +17,11 @@ const welcomeDialog = ref(false);
 const isExistingUser = ref(false);
 const mainPageRef = ref(null);
 const activeTab = ref('meds');
+const dbListKey = ref(0);
+
+function handleVaultImported() {
+  dbListKey.value++;
+}
 
 onMounted(async () => {
   const [settings, dbs] = await Promise.all([
@@ -49,7 +54,11 @@ function openCalendarFilter() {
 
 <template>
   <v-app>
-    <NavDrawer v-model="drawer" @open-data="dataDialog = true" />
+    <NavDrawer
+      v-model="drawer"
+      @open-data="dataDialog = true"
+      @vault-imported="handleVaultImported"
+    />
 
     <v-app-bar :color="theme.global.current.value.dark ? 'surface' : 'primary'" density="compact">
       <template v-slot:prepend>
@@ -68,7 +77,7 @@ function openCalendarFilter() {
     </v-app-bar>
 
     <v-main>
-      <DatabaseListPage v-if="appState.isLocked" />
+      <DatabaseListPage v-if="appState.isLocked" :key="dbListKey" />
       <MainPage
         v-else
         ref="mainPageRef"
