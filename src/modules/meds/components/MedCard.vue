@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as dataService from '../../common/utils/dataService'
 import { parseDose, getStatusColor } from '../utils/medUtils'
 
 const props = defineProps({
@@ -23,15 +24,11 @@ const yellowLimit = ref(21)
 const redLimit = ref(7)
 const showDeduction = ref(false)
 
-const updateSettings = () => {
-  const savedMode = localStorage.getItem('myMedsDisplayMode')
-  if (savedMode) displayMode.value = savedMode
-
-  const savedYellow = localStorage.getItem('myMedsYellowLimit')
-  if (savedYellow) yellowLimit.value = parseInt(savedYellow)
-
-  const savedRed = localStorage.getItem('myMedsRedLimit')
-  if (savedRed) redLimit.value = parseInt(savedRed)
+async function updateSettings() {
+  const settings = await dataService.getSettings()
+  if (settings.displayMode) displayMode.value = settings.displayMode
+  if (settings.yellowLimit !== undefined) yellowLimit.value = settings.yellowLimit
+  if (settings.redLimit !== undefined) redLimit.value = settings.redLimit
 }
 
 onMounted(() => {

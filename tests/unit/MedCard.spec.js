@@ -7,6 +7,8 @@ import * as directives from 'vuetify/directives';
 import { messages } from '../../src/i18n';
 import MedCard from '../../src/modules/meds/components/MedCard.vue';
 
+import * as dataService from '../../src/modules/common/utils/dataService';
+
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
 
@@ -42,22 +44,23 @@ describe('MedCard.vue', () => {
     expect(wrapper.text()).toContain('1-0-1');
   });
 
-  it('should display count and pills unit in default pills display mode', () => {
-    localStorage.setItem('myMedsDisplayMode', 'pills');
+  it('should display count and pills unit in default pills display mode', async () => {
+    await dataService.saveDisplayMode('pills');
     const wrapper = mountComponent();
+    await new Promise(r => setTimeout(r, 20));
 
     expect(wrapper.text()).toContain('20');
   });
 
   it('should display remaining days when display mode is set to days', async () => {
-    localStorage.setItem('myMedsDisplayMode', 'days');
+    await dataService.saveDisplayMode('days');
     const wrapper = mountComponent({
       item: { ...defaultItem, count: 20, dose: '2' }, // 20 / 2 = 10 days
     });
 
     // Dispatch event to trigger setting update listener
     window.dispatchEvent(new Event('storage-display-mode-changed'));
-    await wrapper.vm.$nextTick();
+    await new Promise(r => setTimeout(r, 30));
 
     expect(wrapper.text()).toContain('10');
   });
