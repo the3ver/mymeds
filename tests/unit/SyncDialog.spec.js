@@ -16,6 +16,14 @@ describe('SyncDialog.vue', () => {
   beforeEach(async () => {
     await dbAdapter.deleteAllData();
     document.body.innerHTML = '';
+    vi.spyOn(syncService, 'startSenderSession').mockImplementation(({ onCodeReady }) => {
+      if (onCodeReady) onCodeReady('123456');
+      return { close: vi.fn() };
+    });
+    vi.spyOn(syncService, 'startReceiverSession').mockImplementation(() => {
+      return { close: vi.fn() };
+    });
+    vi.spyOn(syncService, 'generateQrCodeDataUrl').mockResolvedValue('data:image/png;base64,mockqr');
   });
 
   afterEach(() => {

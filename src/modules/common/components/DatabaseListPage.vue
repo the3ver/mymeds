@@ -82,6 +82,12 @@ function handleSyncClick(db) {
   syncDialog.value = true;
 }
 
+function onSyncDialogClosed(val) {
+  if (!val) {
+    syncDbId.value = null;
+  }
+}
+
 function onVaultImported() {
   loadDatabases();
 }
@@ -197,6 +203,7 @@ function onDatabaseUnlocked(result, password) {
     :initial-vault-id="syncDbId"
     :databases="databases"
     @vault-imported="onVaultImported"
+    @update:model-value="onSyncDialogClosed"
   />
 
   <ConfirmDialog

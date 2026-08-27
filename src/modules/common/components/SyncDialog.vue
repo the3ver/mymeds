@@ -299,6 +299,10 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  initialTab: {
+    type: String,
+    default: null, // 'send' | 'receive'
+  },
   databases: {
     type: Array,
     default: () => [],
@@ -377,13 +381,25 @@ function formatTimestamp(isoStr) {
   }
 }
 
-// Close and clean up sessions
-function handleClose() {
+// Reset all internal form and session state
+function resetState() {
   cleanupSessions();
   errorMessage.value = '';
   successMessage.value = '';
   receivedPayload.value = null;
   receivedVault.value = null;
+  receiveCode.value = '';
+  pastePayloadText.value = '';
+  receiverStatus.value = 'idle';
+  senderStatus.value = 'idle';
+  currentSyncCode.value = '';
+  qrCodeDataUrl.value = '';
+  codeCopied.value = false;
+}
+
+// Close and clean up sessions
+function handleClose() {
+  resetState();
   emit('update:modelValue', false);
 }
 
@@ -494,6 +510,8 @@ async function handleConnectAndReceive() {
   cleanupSessions();
   errorMessage.value = '';
   successMessage.value = '';
+  receivedPayload.value = null;
+  receivedVault.value = null;
 
   const normalized = syncService.normalizeSyncCode(receiveCode.value);
   if (normalized.length !== 6) {
@@ -561,29 +579,58 @@ async function handleSaveReceivedVault() {
   }
 }
 
-// Watch dialog open to auto-init sender if tab is send
+// Watch dialog open to setup tab and auto-init sender if appropriate
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
+    resetState();
+
+    // Determine default tab
+    if (props.initialTab) {
+      activeTab.value = props.initialTab;
+    } else if (props.initialVaultId) {
+      activeTab.value = 'send';
+    } else if (props.databases.length === 0) {
+      activeTab.value = 'receive';
+    } else {
+      activeTab.value = 'send';
+    }
+
+    // Determine selected vault
     if (props.initialVaultId) {
       selectedVaultId.value = props.initialVaultId;
-    } else if (props.databases.length > 0 && !selectedVaultId.value) {
+    } else if (props.databases.length > 0) {
       selectedVaultId.value = props.databases[0].id;
+    } else {
+      selectedVaultId.value = null;
     }
-    if (activeTab.value === 'send') {
+
+    if (activeTab.value === 'send' && selectedVaultId.value) {
       initSenderSession();
     }
   } else {
-    cleanupSessions();
+    resetState();
   }
 }, { immediate: true });
 
+// Watch tab change by user
 watch(activeTab, (tab) => {
   errorMessage.value = '';
   successMessage.value = '';
-  if (tab === 'send' && props.modelValue) {
+  if (tab === 'send' && props.modelValue && selectedVaultId.value) {
     initSenderSession();
   } else {
     cleanupSessions();
+  }
+});
+
+// Watch initialVaultId prop update
+watch(() => props.initialVaultId, (newId) => {
+  if (newId) {
+    selectedVaultId.value = newId;
+    activeTab.value = 'send';
+    if (props.modelValue) {
+      initSenderSession();
+    }
   }
 });
 
