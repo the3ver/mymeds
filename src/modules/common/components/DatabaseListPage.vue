@@ -166,7 +166,7 @@ function onDatabaseUnlocked(result, password) {
 
           <v-card-actions>
             <v-btn
-              icon="mdi-sync"
+              icon="mdi-swap-vertical"
               variant="text"
               :title="t('sync.transferToDevice')"
               @click.stop="handleSyncClick(db)"

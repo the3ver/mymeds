@@ -5,6 +5,22 @@
 
 export const changelog = [
   {
+    version: '1.5.3',
+    date: '2026-09-05',
+    title: {
+      de: 'Neues Icon für die Tresor-Synchronisation',
+      en: 'New Icon for Vault Synchronization'
+    },
+    highlights: {
+      de: [
+        'Klareres Hoch-Runter-Pfeil-Icon (mdi-swap-vertical) auf den Tresorkarten für den Datentransfer'
+      ],
+      en: [
+        'Clearer up-down transfer arrow icon (mdi-swap-vertical) on vault cards for synchronization'
+      ]
+    }
+  },
+  {
     version: '1.5.2',
     date: '2026-09-05',
     title: {
