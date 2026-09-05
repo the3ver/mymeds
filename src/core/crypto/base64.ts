@@ -3,7 +3,9 @@
  */
 export function bufferToBase64(buffer: Uint8Array | ArrayBuffer | null | undefined): string {
   if (!buffer) return '';
-  const uint8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  const uint8 = buffer instanceof Uint8Array
+    ? new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+    : new Uint8Array(buffer);
   let binary = '';
   const len = uint8.byteLength;
   for (let i = 0; i < len; i++) {

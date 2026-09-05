@@ -156,6 +156,82 @@ describe('syncService', () => {
       expect(updated.medsCount).toBe(6);
       expect(updated.calendarCount).toBe(3);
     });
+
+    it('safely imports a Vue reactive Proxy payload and structuredClone passes', async () => {
+      const rawPayload = {
+        type: 'mymeds-vault-sync',
+        version: 1,
+        vault: {
+          name: 'Proxy Vault',
+          createdAt: new Date().toISOString(),
+          modifiedAt: new Date().toISOString(),
+          medsCount: 3,
+          calendarCount: 1,
+          encryptionStrategy: 'password',
+          passwordData: {
+            salt: 'AQIDBAUG',
+            iv: 'BwgJCgsM',
+          },
+          encryptedData: 'DQ4PEBES',
+          metadata: { customField: 'test' }
+        }
+      };
+
+      // Wrap in deep Proxy to simulate Vue 3 ref reactivity
+      const reactiveProxy = new Proxy(rawPayload, {
+        get(target, prop) {
+          const val = target[prop];
+          if (val && typeof val === 'object') return new Proxy(val, {});
+          return val;
+        }
+      });
+
+      const newId = await syncService.importVaultFromSync(reactiveProxy, { mode: 'create' });
+      expect(newId).toBeDefined();
+
+      const stored = await dbAdapter.getFullDatabase(newId);
+      expect(stored).toBeDefined();
+      expect(stored.name).toBe('Proxy Vault');
+      expect(stored.metadata).toEqual({ customField: 'test' });
+      // Structured clone must succeed on the stored database object
+      expect(() => structuredClone(stored)).not.toThrow();
+    });
+
+    it('round-trips a real encrypted vault through sync and unlocks successfully with dataService', async () => {
+      const { createDatabaseWithPassword, unlockDatabase } = await import('../../src/modules/common/utils/dataService');
+      
+      // 1. Create real vault with password
+      const originalId = await createDatabaseWithPassword('Echt-Tresor', 'geheim123');
+      const originalVault = await dbAdapter.getFullDatabase(originalId);
+
+      // 2. Export for sync
+      const payload = syncService.exportVaultForSync(originalVault);
+
+      // 3. Wrap in reactive proxy to simulate Vue ref
+      const reactivePayload = new Proxy(payload, {
+        get(target, prop) {
+          const val = target[prop];
+          if (val && typeof val === 'object') return new Proxy(val, {});
+          return val;
+        }
+      });
+
+      // 4. Import on receiving end
+      const importedId = await syncService.importVaultFromSync(reactivePayload, {
+        mode: 'create',
+        newName: 'Echt-Tresor (Empfangen)'
+      });
+
+      // 5. Unlock the imported vault using the original password
+      const unlockResult = await unlockDatabase(importedId, 'geheim123');
+      expect(unlockResult.success).toBe(true);
+      expect(unlockResult.data).toBeDefined();
+      expect(unlockResult.data.meds).toEqual([]);
+
+      // 6. Test wrong password fails gracefully
+      const wrongResult = await unlockDatabase(importedId, 'falsch');
+      expect(wrongResult.success).toBe(false);
+    });
   });
 
   describe('generateQrCodeDataUrl', () => {

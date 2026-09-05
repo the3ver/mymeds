@@ -107,7 +107,10 @@ export function syncPayloadToVaultRecord(
   payload: SyncPayload,
   newName?: string
 ): Omit<VaultRecord, 'id'> {
-  const { vault } = payload;
+  // Deep-clone to plain vanilla object to strip any Vue reactive proxies / getters
+  // which would otherwise cause IndexedDB structuredClone to throw DataCloneError
+  const cleanPayload: SyncPayload = JSON.parse(JSON.stringify(payload));
+  const { vault } = cleanPayload;
   const salt = base64ToBuffer(vault.passwordData.salt);
   const iv = base64ToBuffer(vault.passwordData.iv);
   const encryptedData = base64ToBuffer(vault.encryptedData);
@@ -123,6 +126,12 @@ export function syncPayloadToVaultRecord(
     }
   }
 
+  // Safe isolated ArrayBuffer slice to prevent buffer-pooling or offset mismatches in WebCrypto
+  const cleanEncryptedBuffer = encryptedData.buffer.slice(
+    encryptedData.byteOffset,
+    encryptedData.byteOffset + encryptedData.byteLength
+  );
+
   return {
     ...extraProps,
     name,
@@ -130,11 +139,11 @@ export function syncPayloadToVaultRecord(
     modifiedAt: now,
     encryptionStrategy: (vault.encryptionStrategy as any) || 'password',
     passwordData: {
-      salt,
-      iv,
-      credentialId: vault.passwordData.credentialId,
+      salt: new Uint8Array(salt.buffer, salt.byteOffset, salt.byteLength),
+      iv: new Uint8Array(iv.buffer, iv.byteOffset, iv.byteLength),
+      credentialId: vault.passwordData?.credentialId,
     },
-    encryptedData: encryptedData.buffer as ArrayBuffer,
+    encryptedData: cleanEncryptedBuffer,
     metadata: vault.metadata || {},
   };
 }

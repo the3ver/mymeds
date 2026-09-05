@@ -41,7 +41,7 @@ export function generateIv(byteLength = 12): Uint8Array {
  */
 export async function deriveKeyFromPassword(
   password: string,
-  salt: Uint8Array,
+  salt: ArrayBuffer | Uint8Array,
   iterations = 100000
 ): Promise<CryptoKey> {
   const subtle = getSubtleCrypto();
@@ -93,11 +93,11 @@ export async function encryptData<T = unknown>(
 }
 
 /**
- * Decrypts an AES-GCM encrypted ArrayBuffer back into the original typed object.
+ * Decrypts an AES-GCM encrypted payload (ArrayBuffer or Uint8Array) back into the original typed object.
  */
 export async function decryptData<T = unknown>(
-  encryptedData: ArrayBuffer,
-  iv: Uint8Array,
+  encryptedData: ArrayBuffer | Uint8Array,
+  iv: ArrayBuffer | Uint8Array,
   key: CryptoKey
 ): Promise<T> {
   const subtle = getSubtleCrypto();
@@ -108,7 +108,7 @@ export async function decryptData<T = unknown>(
       iv: iv as BufferSource,
     },
     key,
-    encryptedData
+    encryptedData as BufferSource
   );
 
   return JSON.parse(decoder.decode(decryptedBuffer)) as T;

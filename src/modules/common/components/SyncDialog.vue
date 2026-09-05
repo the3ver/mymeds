@@ -566,7 +566,9 @@ async function handleSaveReceivedVault() {
       };
     }
 
-    const savedId = await syncService.importVaultFromSync(receivedPayload.value, importOptions);
+    // Pass plain non-reactive payload clone to prevent Vue proxy leakage into IndexedDB
+    const rawPayload = JSON.parse(JSON.stringify(receivedPayload.value));
+    const savedId = await syncService.importVaultFromSync(rawPayload, importOptions);
     emit('vault-imported', savedId);
     successMessage.value = t('sync.importSuccess', { name: receivedVault.value.name });
     

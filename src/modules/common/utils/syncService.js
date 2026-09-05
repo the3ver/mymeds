@@ -37,12 +37,13 @@ export function validateSyncPayload(payload) {
  * @returns {Promise<number>} Saved database ID
  */
 export async function importVaultFromSync(payload, options = { mode: 'create' }) {
-  const validation = validateSyncPayload(payload);
+  const plainPayload = JSON.parse(JSON.stringify(payload));
+  const validation = validateSyncPayload(plainPayload);
   if (!validation.isValid) {
     throw new Error(`Cannot import invalid sync payload: ${validation.error}`);
   }
 
-  const restored = syncPayloadToVaultRecord(payload, options.newName);
+  const restored = syncPayloadToVaultRecord(plainPayload, options.newName);
   const now = new Date();
 
   if (options.mode === 'overwrite' && options.targetId) {
