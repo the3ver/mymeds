@@ -30,10 +30,11 @@ echo "📦 New version will be: $TAG_NAME"
 echo "⚙️  Running npm install to sync lockfile..."
 npm install
 
-# 6. Stage changes and ask for commit message
+# 6. Stage changes and commit
 git add package.json package-lock.json
-echo "✍️ Please enter a commit message for the version bump (e.g., 'chore: release $TAG_NAME')."
-git commit
+COMMIT_MSG="${2:-chore: release $TAG_NAME}"
+echo "✍️ Commit message: $COMMIT_MSG"
+git commit -m "$COMMIT_MSG"
 
 # 7. Create the git tag
 echo "🏷️  Tagging new version as $TAG_NAME..."
