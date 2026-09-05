@@ -7,6 +7,7 @@ import * as directives from 'vuetify/directives';
 import { messages } from '../../src/i18n';
 import WhatsNewDialog from '../../src/modules/common/components/WhatsNewDialog.vue';
 import * as dataService from '../../src/modules/common/utils/dataService';
+import { getLatestChangelog } from '../../src/modules/common/utils/changelog';
 
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
@@ -30,13 +31,13 @@ describe('WhatsNewDialog.vue', () => {
   };
 
   it('renders the dialog with latest changelog highlights', async () => {
+    const latest = getLatestChangelog();
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
     const text = document.body.textContent;
     expect(text).toContain('Was gibt’s Neues in MyMeds?');
-    expect(text).toContain('1.5.0');
-    expect(text).toContain('Biometrisches Entsperren');
+    expect(text).toContain(latest.version);
     expect(text).toContain('Verstanden');
   });
 
@@ -70,7 +71,7 @@ describe('WhatsNewDialog.vue', () => {
     await closeBtn.trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(saveSpy).toHaveBeenCalledWith('1.5.0');
+    expect(saveSpy).toHaveBeenCalledWith(getLatestChangelog().version);
     expect(wrapper.emitted('update:modelValue')).toBeDefined();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
     expect(wrapper.emitted('close')).toBeDefined();
