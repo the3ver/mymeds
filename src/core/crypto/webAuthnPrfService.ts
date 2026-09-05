@@ -60,9 +60,12 @@ export async function deriveAesKeyFromPrfOutput(
 ): Promise<CryptoKey> {
   const subtle = getSubtleCrypto();
 
+  const keyBytes = prfOutput instanceof Uint8Array ? prfOutput : new Uint8Array(prfOutput);
+  const saltBytes = salt instanceof Uint8Array ? salt : new Uint8Array(salt);
+
   const hkdfKey = await subtle.importKey(
     'raw',
-    prfOutput as BufferSource,
+    keyBytes as BufferSource,
     { name: 'HKDF' },
     false,
     ['deriveKey']
@@ -72,7 +75,7 @@ export async function deriveAesKeyFromPrfOutput(
     {
       name: 'HKDF',
       hash: 'SHA-256',
-      salt: salt as BufferSource,
+      salt: saltBytes as BufferSource,
       info: encoder.encode('MyMeds-Biometric-Session-SWK'),
     },
     hkdfKey,
@@ -114,13 +117,16 @@ export async function unwrapPassword(
 ): Promise<string> {
   const subtle = getSubtleCrypto();
 
+  const wrappedBytes = wrappedPassword instanceof Uint8Array ? wrappedPassword : new Uint8Array(wrappedPassword);
+  const ivBytes = iv instanceof Uint8Array ? iv : new Uint8Array(iv);
+
   const decryptedBuffer = await subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: iv as BufferSource,
+      iv: ivBytes as BufferSource,
     },
     key,
-    wrappedPassword as BufferSource
+    wrappedBytes as BufferSource
   );
 
   return decoder.decode(decryptedBuffer);

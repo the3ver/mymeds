@@ -95,6 +95,24 @@ describe('core/crypto/webAuthnPrfService', () => {
 
       await expect(unwrapPassword(wrappedPassword, iv, key2)).rejects.toThrow();
     });
+
+    it('derives key when prfOutput or salt is an ArrayBuffer or Uint8Array', async () => {
+      const prfBuffer = new ArrayBuffer(32);
+      new Uint8Array(prfBuffer).fill(99);
+      const saltBuffer = new ArrayBuffer(16);
+      new Uint8Array(saltBuffer).fill(11);
+
+      const keyFromBuffer = await deriveAesKeyFromPrfOutput(prfBuffer, new Uint8Array(saltBuffer));
+      expect(keyFromBuffer).toBeDefined();
+      expect(keyFromBuffer.algorithm.name).toBe('AES-GCM');
+
+      const keyFromUint8 = await deriveAesKeyFromPrfOutput(new Uint8Array(prfBuffer), new Uint8Array(saltBuffer));
+      expect(keyFromUint8).toBeDefined();
+
+      const { wrappedPassword, iv } = await wrapPassword('test-password', keyFromBuffer);
+      const unwrapped = await unwrapPassword(wrappedPassword, iv, keyFromUint8);
+      expect(unwrapped).toBe('test-password');
+    });
   });
 
   describe('WebAuthn Credential Mocking', () => {

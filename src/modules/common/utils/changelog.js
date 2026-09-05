@@ -5,6 +5,26 @@
 
 export const changelog = [
   {
+    version: '1.5.1',
+    date: '2026-09-05',
+    title: {
+      de: 'Kompatibilitäts-Fix für WebAuthn PRF & CI/CD Update',
+      en: 'Compatibility Fix for WebAuthn PRF & CI/CD Update'
+    },
+    highlights: {
+      de: [
+        'Verbesserte Puffer-Kompatibilität bei der biometrischen Schlüsselableitung',
+        'Behebung von Cross-Realm-ArrayBuffer-Problemen unter verschiedenen Runtimes',
+        'Aktualisierung der CI/CD-Pipelines auf Node.js 22 LTS'
+      ],
+      en: [
+        'Improved buffer compatibility during biometric key derivation',
+        'Resolved cross-realm ArrayBuffer issues across different runtimes',
+        'Updated CI/CD pipelines to Node.js 22 LTS'
+      ]
+    }
+  },
+  {
     version: '1.5.0',
     date: '2026-09-05',
     title: {
