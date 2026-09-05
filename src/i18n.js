@@ -294,6 +294,24 @@ export const messages = {
       pasteInstructions: 'If WebRTC direct connection is blocked by your network/firewall, you can paste the encrypted code here:',
       pasteCodePlaceholder: 'Paste encrypted sync payload here...',
       importFromCode: 'Import from Code'
+    },
+    updates: {
+      check: 'Check for Updates',
+      checking: 'Checking for updates...',
+      upToDate: 'MyMeds is up to date (v{version})',
+      updateFound: 'New update available! Downloading...',
+      updateReady: 'New update ready! Reload to apply.',
+      reloadNow: 'Reload Now',
+      offline: 'Cannot check for updates while offline.',
+      error: 'Failed to check for updates.'
+    },
+    whatsNew: {
+      title: "What's New in MyMeds?",
+      versionBadge: 'Version {version}',
+      releasedOn: 'Released on {date}',
+      showPrevious: 'View previous versions',
+      hidePrevious: 'Hide previous versions',
+      close: 'Got it'
     }
   },
   de: {
@@ -588,6 +606,24 @@ export const messages = {
       pasteInstructions: 'Falls die Direktverbindung durch dein Netzwerk/Firewall blockiert wird, kannst du den Code hier einfügen:',
       pasteCodePlaceholder: 'Verschlüsselten Sync-Code hier einfügen...',
       importFromCode: 'Aus Code importieren'
+    },
+    updates: {
+      check: 'Auf Updates prüfen',
+      checking: 'Prüfe auf Updates...',
+      upToDate: 'MyMeds ist auf dem neuesten Stand (v{version})',
+      updateFound: 'Neues Update verfügbar! Wird heruntergeladen...',
+      updateReady: 'Neues Update bereit! Jetzt neu laden.',
+      reloadNow: 'Jetzt neu laden',
+      offline: 'Offline: Update-Prüfung nicht möglich.',
+      error: 'Fehler bei der Update-Prüfung.'
+    },
+    whatsNew: {
+      title: 'Was gibt’s Neues in MyMeds?',
+      versionBadge: 'Version {version}',
+      releasedOn: 'Veröffentlicht am {date}',
+      showPrevious: 'Ältere Versionen anzeigen',
+      hidePrevious: 'Ältere Versionen verbergen',
+      close: 'Verstanden'
     }
   }
 }

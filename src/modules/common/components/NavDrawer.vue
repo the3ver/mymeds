@@ -4,6 +4,7 @@ import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
+import { checkForAppUpdates, applyUpdateAndReload } from '../utils/updateService'
 import packageJson from '../../../../package.json'
 import HelpDialog from './HelpDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
@@ -13,7 +14,7 @@ const props = defineProps({
   modelValue: Boolean
 })
 
-const emit = defineEmits(['update:modelValue', 'open-data', 'vault-imported'])
+const emit = defineEmits(['update:modelValue', 'open-data', 'vault-imported', 'open-whats-new'])
 
 const theme = useTheme()
 const { t } = useI18n()
@@ -23,6 +24,55 @@ const settingsDialog = ref(false)
 const syncDialog = ref(false)
 const databases = ref([])
 const appVersion = packageJson.version
+
+const isCheckingUpdates = ref(false)
+const updateSnackbar = ref(false)
+const updateSnackbarText = ref('')
+const updateSnackbarColor = ref('info')
+const updateReady = ref(false)
+const updateRegistration = ref(null)
+
+async function handleCheckUpdates() {
+  if (isCheckingUpdates.value) return
+  isCheckingUpdates.value = true
+  updateReady.value = false
+
+  const [res] = await Promise.all([
+    checkForAppUpdates(),
+    new Promise(resolve => setTimeout(resolve, 500))
+  ])
+
+  isCheckingUpdates.value = false
+
+  if (res.status === 'update_ready') {
+    updateReady.value = true
+    updateRegistration.value = res.registration
+    updateSnackbarColor.value = 'primary'
+    updateSnackbarText.value = t('updates.updateReady')
+    updateSnackbar.value = true
+  } else if (res.status === 'update_found') {
+    updateSnackbarColor.value = 'info'
+    updateSnackbarText.value = t('updates.updateFound')
+    updateSnackbar.value = true
+  } else if (res.status === 'offline') {
+    updateSnackbarColor.value = 'warning'
+    updateSnackbarText.value = t('updates.offline')
+    updateSnackbar.value = true
+  } else if (res.status === 'error') {
+    updateSnackbarColor.value = 'error'
+    updateSnackbarText.value = t('updates.error')
+    updateSnackbar.value = true
+  } else {
+    // up_to_date or no_registration
+    updateSnackbarColor.value = 'success'
+    updateSnackbarText.value = t('updates.upToDate', { version: appVersion })
+    updateSnackbar.value = true
+  }
+}
+
+function handleApplyUpdate() {
+  applyUpdateAndReload(updateRegistration.value)
+}
 
 async function loadDatabasesForSync() {
   try {
@@ -99,6 +149,30 @@ const toggleTheme = () => {
         </template>
         <v-list-item-title>{{ t('app.about') }}</v-list-item-title>
       </v-list-item>
+
+      <v-list-item @click="emit('open-whats-new'); emit('update:modelValue', false)" data-testid="nav-whats-new-btn">
+        <template v-slot:prepend>
+          <v-icon color="primary">mdi-sparkles</v-icon>
+        </template>
+        <v-list-item-title>{{ t('whatsNew.title') }}</v-list-item-title>
+      </v-list-item>
+
+      <v-list-item @click="handleCheckUpdates" :disabled="isCheckingUpdates" data-testid="nav-check-updates-btn">
+        <template v-slot:prepend>
+          <v-progress-circular
+            v-if="isCheckingUpdates"
+            indeterminate
+            size="20"
+            width="2"
+            color="primary"
+            class="mr-3"
+          ></v-progress-circular>
+          <v-icon v-else>mdi-update</v-icon>
+        </template>
+        <v-list-item-title>
+          {{ isCheckingUpdates ? t('updates.checking') : t('updates.check') }}
+        </v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 
@@ -153,6 +227,29 @@ const toggleTheme = () => {
             target="_blank"
           ></v-list-item>
         </v-list>
+
+        <div class="d-flex flex-column mt-4">
+          <v-btn
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-sparkles"
+            @click="emit('open-whats-new'); aboutDialog = false; emit('update:modelValue', false)"
+            class="mb-2 text-none"
+            data-testid="about-whats-new-btn"
+          >
+            {{ t('whatsNew.title') }}
+          </v-btn>
+          <v-btn
+            variant="outlined"
+            prepend-icon="mdi-update"
+            :loading="isCheckingUpdates"
+            @click="handleCheckUpdates"
+            class="text-none"
+            data-testid="about-check-updates-btn"
+          >
+            {{ t('updates.check') }}
+          </v-btn>
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -160,6 +257,34 @@ const toggleTheme = () => {
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Update Feedback Snackbar -->
+  <v-snackbar
+    v-model="updateSnackbar"
+    :color="updateSnackbarColor"
+    :timeout="updateReady ? -1 : 4000"
+    location="bottom center"
+  >
+    {{ updateSnackbarText }}
+    <template v-slot:actions>
+      <v-btn
+        v-if="updateReady"
+        variant="elevated"
+        color="white"
+        class="text-primary font-weight-bold"
+        @click="handleApplyUpdate"
+        data-testid="snackbar-reload-btn"
+      >
+        {{ t('updates.reloadNow') }}
+      </v-btn>
+      <v-btn
+        variant="text"
+        @click="updateSnackbar = false"
+      >
+        {{ t('about.close') }}
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>

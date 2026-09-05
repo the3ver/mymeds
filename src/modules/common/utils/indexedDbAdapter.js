@@ -99,6 +99,7 @@ export async function getSettings() {
     showOverview: await getSetting('showOverview', true),
     disclaimerVersion,
     disclaimerAccepted: disclaimerVersion >= CURRENT_DISCLAIMER_VERSION,
+    lastSeenChangelogVersion: await getSetting('lastSeenChangelogVersion', ''),
   };
   return settings;
 }
@@ -113,6 +114,7 @@ export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
 export const saveDisclaimerVersion = (version = CURRENT_DISCLAIMER_VERSION) => setSetting('disclaimerVersion', version);
 export const saveDisclaimerAccepted = (accepted) => saveDisclaimerVersion(accepted ? CURRENT_DISCLAIMER_VERSION : 0);
+export const saveLastSeenChangelogVersion = (version) => setSetting('lastSeenChangelogVersion', version);
 
 // --- Session Recovery ---
 export const saveRecoveryState = (state) => setSetting('sessionRecovery', state);
