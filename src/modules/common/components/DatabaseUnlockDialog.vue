@@ -119,7 +119,7 @@ async function unlockWithPassword() {
     if (result.success) {
       if (rememberBiometrics.value) {
         try {
-          await biometricService.enrollBiometrics(props.database.id, password.value);
+          await biometricService.enrollBiometrics(props.database.id, password.value, props.database.name);
           emit('biometric-updated', { vaultId: props.database.id, enabled: true });
         } catch (enrollErr) {
           console.warn('[DatabaseUnlockDialog] Biometric enrollment error:', enrollErr);

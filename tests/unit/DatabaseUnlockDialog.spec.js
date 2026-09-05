@@ -134,7 +134,7 @@ describe('DatabaseUnlockDialog.vue', () => {
     await wrapper.vm.$nextTick();
 
     expect(dataService.unlockDatabase).toHaveBeenCalledWith(1, 'my-secret-pw');
-    expect(biometricService.enrollBiometrics).toHaveBeenCalledWith(1, 'my-secret-pw');
+    expect(biometricService.enrollBiometrics).toHaveBeenCalledWith(1, 'my-secret-pw', 'Mein Medikamenten-Tresor');
     expect(wrapper.emitted('unlocked')).toBeTruthy();
   });
 });

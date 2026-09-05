@@ -92,6 +92,19 @@ describe('biometricSessionService', () => {
       expect(dataService.unlockDatabase).toHaveBeenCalledWith(42, 'secret-master-pw');
     });
 
+    it('uses user-given vault name for WebAuthn credential name during enrollment', async () => {
+      const mockKey = await webAuthnPrf.deriveAesKeyFromPrfOutput(generateSalt(32), generateSalt(16));
+      const createSpy = vi.spyOn(webAuthnPrf, 'createPrfCredential').mockResolvedValue({
+        credentialId: 'test-named-cred',
+        rawId: new Uint8Array([1, 2, 3]),
+        prfEnabled: true,
+        initialPrfKey: mockKey,
+      });
+
+      await biometricService.enrollBiometrics(43, 'secret-pw', 'Hausapotheke');
+      expect(createSpy).toHaveBeenCalledWith('MyMeds', 'Hausapotheke', expect.any(Uint8Array));
+    });
+
     it('handles user cancellation gracefully', async () => {
       const session = {
         vaultId: 50,

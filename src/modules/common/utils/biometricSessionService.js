@@ -50,13 +50,33 @@ export async function getBiometricSession(vaultId) {
  * 2. Obtains the PRF-derived AES-GCM key.
  * 3. Wraps the master password and persists the session object in IndexedDB.
  */
-export async function enrollBiometrics(vaultId, password, ttlDays = 30) {
+export async function enrollBiometrics(vaultId, password, vaultName = null, ttlDays = 30) {
   if (!password) {
     throw new Error('Password is required for biometric enrollment.');
   }
 
+  let name = vaultName;
+  let ttl = ttlDays;
+  if (typeof vaultName === 'number') {
+    ttl = vaultName;
+    name = null;
+  }
+
+  if (!name) {
+    try {
+      const db = await dbAdapter.getFullDatabase(vaultId);
+      if (db?.name) {
+        name = db.name;
+      }
+    } catch (e) {
+      // Fallback to vaultId if lookup fails
+    }
+  }
+
+  const credentialName = name && name.trim() ? name.trim() : `Vault ${vaultId}`;
+
   const prfSalt = generateSalt(32);
-  const credential = await createPrfCredential('MyMeds', `MyMeds Vault ${vaultId}`, prfSalt);
+  const credential = await createPrfCredential('MyMeds', credentialName, prfSalt);
 
   let prfKey = credential.initialPrfKey;
   if (!prfKey) {

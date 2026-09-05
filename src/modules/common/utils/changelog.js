@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.5.2',
+    date: '2026-09-05',
+    title: {
+      de: 'Tresorname für biometrische Schlüssel (Windows Hello & Touch ID)',
+      en: 'Vault Name for Biometric Credentials (Windows Hello & Touch ID)'
+    },
+    highlights: {
+      de: [
+        'Biometrische Schlüssel werden nun mit dem vergebenen Namen des Tresors benannt statt mit einer generischen ID',
+        'Bessere Übersicht bei mehreren Tresoren in den Windows- und Browser-Passkey-Einstellungen'
+      ],
+      en: [
+        'Biometric credentials are now labeled with the user-defined vault name instead of a generic ID',
+        'Improved clarity when managing multiple vaults in Windows and browser passkey settings'
+      ]
+    }
+  },
+  {
     version: '1.5.1',
     date: '2026-09-05',
     title: {
