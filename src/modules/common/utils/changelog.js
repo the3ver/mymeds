@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.5.0',
+    date: '2026-09-05',
+    title: {
+      de: 'Biometrisches Entsperren mit Fingerabdruck & Face ID',
+      en: 'Biometric Unlock with Fingerprint & Face ID'
+    },
+    highlights: {
+      de: [
+        'Hardware-geschützte Entsperrung via WebAuthn PRF (Windows Hello, Touch ID, Face ID)',
+        'Optionale Merk-Funktion pro Gerät beim regulären Entsperren mit Passwort',
+        'Biometrie-Statusanzeige und gezieltes Deaktivieren direkt auf der Tresor-Karte',
+        'Einstellung zum schnellen Aufheben aller biometrischen Gerätekopplungen'
+      ],
+      en: [
+        'Hardware-backed unlocking via WebAuthn PRF (Windows Hello, Touch ID, Face ID)',
+        'Optional "Remember on this device" toggle during standard password unlock',
+        'Biometric badge and quick revocation directly on vault cards',
+        'Settings option to clear all biometric device pairings at once'
+      ]
+    }
+  },
+  {
     version: '1.4.2',
     date: '2026-09-05',
     title: {

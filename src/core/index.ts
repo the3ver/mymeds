@@ -4,6 +4,7 @@ export * from './types/sync';
 
 // Crypto
 export * from './crypto/cryptoService';
+export * from './crypto/webAuthnPrfService';
 export * from './crypto/base64';
 
 // Storage

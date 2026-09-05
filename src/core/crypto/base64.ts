@@ -19,7 +19,12 @@ export function bufferToBase64(buffer: Uint8Array | ArrayBuffer | null | undefin
  */
 export function base64ToBuffer(base64: string | null | undefined): Uint8Array {
   if (!base64 || typeof base64 !== 'string') return new Uint8Array(0);
-  const binary = atob(base64);
+  // Normalize base64url to standard base64 with padding
+  let normalized = base64.replace(/-/g, '+').replace(/_/g, '/');
+  while (normalized.length % 4 !== 0) {
+    normalized += '=';
+  }
+  const binary = atob(normalized);
   const len = binary.length;
   const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {

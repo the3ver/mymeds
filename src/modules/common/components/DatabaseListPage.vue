@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
+import * as biometricService from '../utils/biometricSessionService';
 import { unlock } from '../../../app-state';
 import CreateDatabaseDialog from './CreateDatabaseDialog.vue';
 import DatabaseUnlockDialog from './DatabaseUnlockDialog.vue';
@@ -11,6 +12,7 @@ import SyncDialog from './SyncDialog.vue';
 
 const { t, locale } = useI18n();
 const databases = ref([]);
+const activeBiometricVaults = ref(new Set());
 const createDialog = ref(false);
 const unlockDialog = ref(false);
 const confirmDeleteDialog = ref(false);
@@ -38,10 +40,20 @@ const formatDate = (dateString) => {
 
 onMounted(async () => {
   await loadDatabases();
+  await loadBiometrics();
 });
 
 async function loadDatabases() {
   databases.value = await dataService.getDatabaseList();
+}
+
+async function loadBiometrics() {
+  activeBiometricVaults.value = await biometricService.getActiveBiometricVaultIds();
+}
+
+async function handleRevokeBiometrics(db) {
+  await biometricService.revokeBiometrics(db.id);
+  await loadBiometrics();
 }
 
 function handleDbClick(db) {
@@ -118,8 +130,19 @@ function onDatabaseUnlocked(result, password) {
           :color="getRandomColor(db.id)"
           variant="tonal"
         >
-          <v-card-title class="text-h5 font-weight-bold cursor-pointer" @click="handleDbClick(db)">
-            {{ db.name }}
+          <v-card-title class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between" @click="handleDbClick(db)">
+            <span class="text-truncate">{{ db.name }}</span>
+            <v-chip
+              v-if="activeBiometricVaults.has(db.id)"
+              size="x-small"
+              color="primary"
+              variant="flat"
+              prepend-icon="mdi-fingerprint"
+              class="ml-2 flex-shrink-0"
+              :title="t('biometrics.activeOnThisDevice')"
+            >
+              {{ t('biometrics.title') }}
+            </v-chip>
           </v-card-title>
 
           <v-card-text class="flex-grow-1 cursor-pointer" @click="handleDbClick(db)">
@@ -147,6 +170,14 @@ function onDatabaseUnlocked(result, password) {
               variant="text"
               :title="t('sync.transferToDevice')"
               @click.stop="handleSyncClick(db)"
+            ></v-btn>
+            <v-btn
+              v-if="activeBiometricVaults.has(db.id)"
+              icon="mdi-fingerprint-off"
+              variant="text"
+              color="warning"
+              :title="t('biometrics.disabled')"
+              @click.stop="handleRevokeBiometrics(db)"
             ></v-btn>
             <v-spacer></v-spacer>
             <v-btn
@@ -190,6 +221,7 @@ function onDatabaseUnlocked(result, password) {
     v-model="unlockDialog"
     :database="selectedDb"
     @unlocked="onDatabaseUnlocked"
+    @biometric-updated="loadBiometrics"
   />
 
   <RenameDatabaseDialog

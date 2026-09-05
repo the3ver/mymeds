@@ -105,7 +105,11 @@ export const messages = {
       createDbWarning: 'Important: There is no way to recover your password if you forget it. Access to your data will be permanently lost, as your medical data is stored exclusively on your device and not sent over the network to any servers.',
       dbNameLabel: 'Database Name',
       passwordLabel: 'Password',
-      passwordConfirmLabel: 'Confirm Password'
+      passwordConfirmLabel: 'Confirm Password',
+      unlockTitle: "Unlock '{name}'",
+      unlock: 'Unlock',
+      passwordRequired: 'Password is required.',
+      incorrectPassword: 'Incorrect password.'
     },
     welcome: {
       title: 'Welcome to MyMeds!',
@@ -312,6 +316,23 @@ export const messages = {
       showPrevious: 'View previous versions',
       hidePrevious: 'Hide previous versions',
       close: 'Got it'
+    },
+    biometrics: {
+      title: 'Biometric Unlock',
+      unlockWith: 'Unlock with Biometrics',
+      unlockPrompt: 'Touch fingerprint sensor or use Face ID to unlock',
+      rememberOnDevice: 'Remember with biometrics on this device',
+      usePasswordInstead: 'Use password instead',
+      enrollSuccess: 'Biometric unlock enabled on this device.',
+      disabled: 'Biometrics disabled for this vault.',
+      notSupported: 'Biometrics is not supported on this device/browser.',
+      sessionRevoked: 'Biometric session removed.',
+      clearAllSessions: 'Remove all biometric sessions',
+      clearAllSuccess: 'All biometric pairings on this device have been cleared.',
+      clearAllConfirm: 'Do you really want to remove all biometric pairings on this device? You will need to unlock your vaults with their master password.',
+      activeOnThisDevice: 'Biometric unlock is active on this device',
+      error: 'Biometric authentication failed: {message}',
+      cancelled: 'Biometric authentication cancelled.'
     }
   },
   de: {
@@ -417,7 +438,11 @@ export const messages = {
       createDbWarning: 'Wichtig: Es gibt keine Möglichkeit, Ihr Passwort wiederherzustellen, wenn Sie es vergessen. Der Zugriff auf Ihre Daten geht dann für immer verloren, da die eingegebenen medizinischen Daten ausschließlich auf Ihrem Endgerät gespeichert und nicht übers Netz an irgendwelche Server geschickt werden.',
       dbNameLabel: 'Name der Datenbank',
       passwordLabel: 'Passwort',
-      passwordConfirmLabel: 'Passwort bestätigen'
+      passwordConfirmLabel: 'Passwort bestätigen',
+      unlockTitle: "'{name}' entsperren",
+      unlock: 'Entsperren',
+      passwordRequired: 'Passwort ist erforderlich.',
+      incorrectPassword: 'Falsches Passwort.'
     },
     welcome: {
       title: 'Willkommen bei MyMeds!',
@@ -624,6 +649,23 @@ export const messages = {
       showPrevious: 'Ältere Versionen anzeigen',
       hidePrevious: 'Ältere Versionen verbergen',
       close: 'Verstanden'
+    },
+    biometrics: {
+      title: 'Biometrisches Entsperren',
+      unlockWith: 'Mit Biometrie entsperren',
+      unlockPrompt: 'Bitte Fingerabdrucksensor berühren oder Face ID nutzen',
+      rememberOnDevice: 'Auf diesem Gerät mit Biometrie merken',
+      usePasswordInstead: 'Stattdessen Passwort eingeben',
+      enrollSuccess: 'Biometrisches Entsperren auf diesem Gerät aktiviert.',
+      disabled: 'Biometrie für diesen Tresor deaktiviert.',
+      notSupported: 'Biometrie wird von diesem Browser/Gerät nicht unterstützt.',
+      sessionRevoked: 'Biometrische Sitzung aufgehoben.',
+      clearAllSessions: 'Alle biometrischen Kopplungen aufheben',
+      clearAllSuccess: 'Alle biometrischen Kopplungen wurden gelöscht.',
+      clearAllConfirm: 'Möchtest du wirklich alle biometrischen Kopplungen auf diesem Gerät aufheben? Du musst Tresore danach wieder mit dem Passwort entsperren.',
+      activeOnThisDevice: 'Biometrisches Entsperren auf diesem Gerät aktiv',
+      error: 'Biometrische Authentifizierung fehlgeschlagen: {message}',
+      cancelled: 'Biometrische Authentifizierung abgebrochen.'
     }
   }
 }

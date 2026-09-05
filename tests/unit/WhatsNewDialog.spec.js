@@ -35,8 +35,8 @@ describe('WhatsNewDialog.vue', () => {
 
     const text = document.body.textContent;
     expect(text).toContain('Was gibt’s Neues in MyMeds?');
-    expect(text).toContain('1.4.2');
-    expect(text).toContain('Manuelle Update-Prüfung');
+    expect(text).toContain('1.5.0');
+    expect(text).toContain('Biometrisches Entsperren');
     expect(text).toContain('Verstanden');
   });
 
@@ -53,8 +53,8 @@ describe('WhatsNewDialog.vue', () => {
     await wrapper.vm.$nextTick();
 
     const text = document.body.textContent;
+    expect(text).toContain('1.4.2');
     expect(text).toContain('1.4.1');
-    expect(text).toContain('1.4.0');
   });
 
   it('saves last seen version and emits close when close button is clicked', async () => {
@@ -70,7 +70,7 @@ describe('WhatsNewDialog.vue', () => {
     await closeBtn.trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(saveSpy).toHaveBeenCalledWith('1.4.2');
+    expect(saveSpy).toHaveBeenCalledWith('1.5.0');
     expect(wrapper.emitted('update:modelValue')).toBeDefined();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
     expect(wrapper.emitted('close')).toBeDefined();

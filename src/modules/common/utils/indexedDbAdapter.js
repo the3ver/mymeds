@@ -124,6 +124,52 @@ export const clearRecoveryState = async () => {
   return db.delete(SETTINGS_STORE_NAME, 'sessionRecovery');
 };
 
+// --- Biometric Sessions (Hardware-bound Session-Wrapping) ---
+export const getBiometricSession = async (vaultId) => {
+  return getSetting(`biometric_session_${vaultId}`, null);
+};
+
+export const saveBiometricSession = async (sessionData) => {
+  if (!sessionData || sessionData.vaultId === undefined) {
+    throw new Error("Invalid biometric session: vaultId is required.");
+  }
+  return setSetting(`biometric_session_${sessionData.vaultId}`, sessionData);
+};
+
+export const deleteBiometricSession = async (vaultId) => {
+  const db = await dbPromise;
+  return db.delete(SETTINGS_STORE_NAME, `biometric_session_${vaultId}`);
+};
+
+export const getAllBiometricSessions = async () => {
+  const db = await dbPromise;
+  const tx = db.transaction(SETTINGS_STORE_NAME, 'readonly');
+  const store = tx.objectStore(SETTINGS_STORE_NAME);
+  const sessions = [];
+  let cursor = await store.openCursor();
+  while (cursor) {
+    if (typeof cursor.key === 'string' && cursor.key.startsWith('biometric_session_')) {
+      sessions.push(cursor.value);
+    }
+    cursor = await cursor.continue();
+  }
+  return sessions;
+};
+
+export const clearAllBiometricSessions = async () => {
+  const db = await dbPromise;
+  const tx = db.transaction(SETTINGS_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(SETTINGS_STORE_NAME);
+  let cursor = await store.openCursor();
+  while (cursor) {
+    if (typeof cursor.key === 'string' && cursor.key.startsWith('biometric_session_')) {
+      await cursor.delete();
+    }
+    cursor = await cursor.continue();
+  }
+  await tx.done;
+};
+
 // --- Bulk Delete ---
 export const deleteAllData = async () => {
   const db = await dbPromise;

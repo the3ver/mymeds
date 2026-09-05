@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../utils/dataService'
+import * as biometricService from '../utils/biometricSessionService'
 import ConfirmDialog from './ConfirmDialog.vue'
 
 const props = defineProps({
@@ -19,6 +20,13 @@ const uiScale = ref('normal')
 const yellowLimit = ref(21)
 const redLimit = ref(7)
 const confirmResetDialog = ref(false)
+const confirmClearBiometricsDialog = ref(false)
+const biometricsClearedSnackbar = ref(false)
+
+async function clearAllBiometrics() {
+  await biometricService.clearAllBiometrics()
+  biometricsClearedSnackbar.value = true
+}
 
 // Load settings when dialog opens or component mounts
 onMounted(() => {
@@ -199,6 +207,24 @@ const close = () => {
 
           <v-divider class="mb-6"></v-divider>
 
+          <!-- Biometrics -->
+          <div class="mb-6">
+            <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('biometrics.title') }}</div>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              {{ t('biometrics.activeOnThisDevice') }}
+            </p>
+            <v-btn
+              color="warning"
+              variant="outlined"
+              prepend-icon="mdi-fingerprint-off"
+              @click="confirmClearBiometricsDialog = true"
+            >
+              {{ t('biometrics.clearAllSessions') }}
+            </v-btn>
+          </div>
+
+          <v-divider class="mb-6"></v-divider>
+
           <!-- Reset Button -->
           <div class="d-flex justify-center">
             <v-btn
@@ -215,6 +241,16 @@ const close = () => {
       </v-card-text>
     </v-card>
 
+    <!-- Confirm Clear Biometrics Dialog -->
+    <ConfirmDialog
+      v-model="confirmClearBiometricsDialog"
+      :title="t('biometrics.clearAllSessions')"
+      :message="t('biometrics.clearAllConfirm')"
+      :confirm-text="t('dialog.confirm')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="clearAllBiometrics"
+    />
+
     <!-- Confirm Reset Dialog -->
     <ConfirmDialog
       v-model="confirmResetDialog"
@@ -224,5 +260,9 @@ const close = () => {
       :cancel-text="t('dialog.cancel')"
       @confirm="resetSettings"
     />
+
+    <v-snackbar v-model="biometricsClearedSnackbar" color="success" :timeout="3000">
+      {{ t('biometrics.clearAllSuccess') }}
+    </v-snackbar>
   </v-dialog>
 </template>
