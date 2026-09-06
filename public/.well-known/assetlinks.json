@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.mymeds.app",
+      "sha256_cert_fingerprints": [
+        "7D:F1:FE:2C:D8:5E:68:9D:8F:50:8E:CC:E2:51:C1:CB:D3:E8:7C:FC:A4:5D:AA:DA:AF:45:19:73:14:4B:CE:66"
+      ]
+    }
+  }
+]

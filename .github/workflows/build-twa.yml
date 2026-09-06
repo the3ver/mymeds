@@ -1,0 +1,60 @@
+name: Build Android TWA (AAB & APK)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-android:
+    name: Build Android App Bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Restore Keystore
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "Restoring keystore from secret..."
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > mymeds-release-key.keystore
+          elif [ -f "mymeds-release-key.keystore" ]; then
+            echo "Using existing repository keystore..."
+          else
+            echo "Generating fallback keystore..."
+            keytool -genkeypair -v -keystore mymeds-release-key.keystore -alias mymeds -keyalg RSA -keysize 2048 -validity 10000 -storepass 'mymeds-playstore-key' -keypass 'mymeds-playstore-key' -dname 'CN=MyMeds, OU=MyMeds, O=MyMeds, L=Berlin, ST=Berlin, C=DE'
+          fi
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Build TWA Android App Bundle (.aab)
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'mymeds-playstore-key' }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'mymeds-playstore-key' }}
+        run: |
+          bubblewrap build --skipPwaValidation
+
+      - name: Upload AAB and APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mymeds-android-release
+          path: |
+            *.aab
+            *.apk

@@ -1,0 +1,44 @@
+{
+  "packageId": "org.mymeds.app",
+  "host": "the3ver.github.io",
+  "name": "MyMeds",
+  "launcherName": "MyMeds",
+  "display": "standalone",
+  "themeColor": "#ffffff",
+  "themeColorDark": "#121212",
+  "navigationColor": "#ffffff",
+  "navigationColorDark": "#121212",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#ffffff",
+  "enableNotifications": true,
+  "startUrl": "/mymeds/?utm_source=twa",
+  "iconUrl": "https://the3ver.github.io/mymeds/pwa-512x512.png",
+  "maskableIconUrl": "https://the3ver.github.io/mymeds/maskable-icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "mymeds-release-key.keystore",
+    "alias": "mymeds"
+  },
+  "appVersionName": "1.6.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://the3ver.github.io/mymeds/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "fullScopeUrl": "https://the3ver.github.io/mymeds/",
+  "minSdkVersion": 21
+}

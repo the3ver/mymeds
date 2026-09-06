@@ -123,3 +123,6 @@ dist
 
 #secrets
 pat.txt
+*.keystore
+*.jks
+android-build/
