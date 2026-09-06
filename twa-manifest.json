@@ -20,8 +20,8 @@
     "path": "mymeds-release-key.keystore",
     "alias": "mymeds"
   },
-  "appVersionName": "1.6.0",
-  "appVersionCode": 1,
+  "appVersionName": "1.6.1",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://the3ver.github.io/mymeds/manifest.webmanifest",
