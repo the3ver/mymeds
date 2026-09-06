@@ -104,6 +104,30 @@ export async function getSettings() {
   return settings;
 }
 
+export const DEFAULT_REMINDER_SETTINGS = {
+  enabled: false,
+  slots: [
+    { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
+    { id: 'noon', labelKey: 'reminders.noon', time: '12:00', enabled: true },
+    { id: 'evening', labelKey: 'reminders.evening', time: '18:00', enabled: true },
+    { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false },
+  ],
+  lastNotified: {}
+};
+
+export async function getReminderSettings() {
+  const current = await getSetting('reminderSettings', null);
+  if (!current) return JSON.parse(JSON.stringify(DEFAULT_REMINDER_SETTINGS));
+  return {
+    ...DEFAULT_REMINDER_SETTINGS,
+    ...current,
+    slots: Array.isArray(current.slots) ? current.slots : DEFAULT_REMINDER_SETTINGS.slots,
+    lastNotified: current.lastNotified || {}
+  };
+}
+
+export const saveReminderSettings = (settings) => setSetting('reminderSettings', settings);
+
 export const saveLocale = (locale) => setSetting('locale', locale);
 export const saveTheme = (theme) => setSetting('theme', theme);
 export const saveUiScale = (scale) => setSetting('uiScale', scale);

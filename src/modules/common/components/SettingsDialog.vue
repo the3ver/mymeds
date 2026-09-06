@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../utils/dataService'
 import * as biometricService from '../utils/biometricSessionService'
+import * as reminderService from '../utils/reminderService'
 import ConfirmDialog from './ConfirmDialog.vue'
 
 const props = defineProps({
@@ -22,6 +23,14 @@ const redLimit = ref(7)
 const confirmResetDialog = ref(false)
 const confirmClearBiometricsDialog = ref(false)
 const biometricsClearedSnackbar = ref(false)
+
+// Reminders State
+const isReminderSupported = ref(false)
+const reminderEnabled = ref(false)
+const reminderSlots = ref([])
+const notificationPermission = ref('default')
+const timeOptions = reminderService.generateHalfHourOptions()
+const testNotificationSnackbar = ref(false)
 
 async function clearAllBiometrics() {
   await biometricService.clearAllBiometrics()
@@ -45,6 +54,67 @@ async function loadSettings() {
   uiScale.value = settings.uiScale
   yellowLimit.value = settings.yellowLimit
   redLimit.value = settings.redLimit
+
+  // Check reminders support
+  isReminderSupported.value = reminderService.isReminderSupported()
+  if (typeof window !== 'undefined' && 'Notification' in window) {
+    notificationPermission.value = Notification.permission
+  }
+  const reminders = await dataService.getReminderSettings()
+  reminderEnabled.value = !!reminders.enabled
+  reminderSlots.value = Array.isArray(reminders.slots) ? JSON.parse(JSON.stringify(reminders.slots)) : []
+}
+
+async function saveReminderConfig() {
+  const current = await dataService.getReminderSettings()
+  await dataService.saveReminderSettings({
+    ...current,
+    enabled: reminderEnabled.value,
+    slots: reminderSlots.value
+  })
+}
+
+async function toggleReminders(val) {
+  if (val) {
+    const perm = await reminderService.requestNotificationPermission()
+    notificationPermission.value = perm
+    if (perm !== 'granted') {
+      reminderEnabled.value = false
+      await saveReminderConfig()
+      return
+    }
+    reminderEnabled.value = true
+    await reminderService.registerPeriodicSync()
+    await saveReminderConfig()
+  } else {
+    reminderEnabled.value = false
+    await reminderService.unregisterPeriodicSync()
+    await saveReminderConfig()
+  }
+}
+
+function addCustomSlot() {
+  reminderSlots.value.push({
+    id: 'custom_' + Date.now(),
+    time: '14:00',
+    enabled: true
+  })
+  saveReminderConfig()
+}
+
+function removeCustomSlot(slotId) {
+  reminderSlots.value = reminderSlots.value.filter(s => s.id !== slotId)
+  saveReminderConfig()
+}
+
+async function triggerTestNotification() {
+  const success = await reminderService.sendTestNotification(
+    t('reminders.notificationTitle'),
+    t('reminders.notificationBody')
+  )
+  if (success) {
+    testNotificationSnackbar.value = true
+  }
 }
 
 // Watchers to save settings immediately
@@ -77,6 +147,10 @@ watch([yellowLimit, redLimit], () => {
   window.dispatchEvent(new Event('storage-limits-changed'))
 })
 
+watch(reminderSlots, () => {
+  saveReminderConfig()
+}, { deep: true })
+
 const resetSettings = async () => {
   // Reset values to defaults
   language.value = 'de'
@@ -86,6 +160,14 @@ const resetSettings = async () => {
   yellowLimit.value = 21
   redLimit.value = 7
 
+  reminderEnabled.value = false
+  reminderSlots.value = [
+    { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
+    { id: 'noon', labelKey: 'reminders.noon', time: '12:00', enabled: true },
+    { id: 'evening', labelKey: 'reminders.evening', time: '18:00', enabled: true },
+    { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false },
+  ]
+
   // Save them
   await Promise.all([
     dataService.saveLocale(language.value),
@@ -94,7 +176,13 @@ const resetSettings = async () => {
     dataService.saveUiScale(uiScale.value),
     dataService.saveYellowLimit(yellowLimit.value),
     dataService.saveRedLimit(redLimit.value),
-    dataService.saveShowOverview(true)
+    dataService.saveShowOverview(true),
+    dataService.saveReminderSettings({
+      enabled: false,
+      slots: reminderSlots.value,
+      lastNotified: {}
+    }),
+    reminderService.unregisterPeriodicSync()
   ]);
 
   // Trigger updates
@@ -225,6 +313,134 @@ const close = () => {
 
           <v-divider class="mb-6"></v-divider>
 
+          <!-- Reminders (Only visible if supported / Android TWA or debug flag) -->
+          <div v-if="isReminderSupported" class="mb-6">
+            <div class="text-subtitle-1 font-weight-bold mb-1">{{ t('reminders.title') }}</div>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              {{ t('reminders.description') }}
+            </p>
+
+            <!-- Permission Warning if blocked -->
+            <v-alert
+              v-if="notificationPermission === 'denied'"
+              type="warning"
+              variant="tonal"
+              density="compact"
+              class="mb-3"
+            >
+              {{ t('reminders.permissionDenied') }}
+            </v-alert>
+
+            <!-- Main Toggle Switch -->
+            <v-switch
+              v-model="reminderEnabled"
+              color="primary"
+              :label="t('reminders.enable')"
+              hide-details
+              class="mb-4"
+              @update:model-value="toggleReminders"
+            ></v-switch>
+
+            <!-- Slot Configuration (Visible when enabled) -->
+            <div v-if="reminderEnabled" class="pl-2">
+              <div class="text-caption text-medium-emphasis text-uppercase font-weight-bold mb-2">
+                {{ t('reminders.standardTimes') }}
+              </div>
+
+              <!-- Standard Slots -->
+              <div
+                v-for="slot in reminderSlots.filter(s => ['morning', 'noon', 'evening', 'night'].includes(s.id))"
+                :key="slot.id"
+                class="d-flex align-center justify-space-between mb-2"
+              >
+                <v-checkbox
+                  v-model="slot.enabled"
+                  :label="t(slot.labelKey || ('reminders.' + slot.id))"
+                  hide-details
+                  density="compact"
+                  color="primary"
+                  class="mr-2"
+                ></v-checkbox>
+                <v-select
+                  v-model="slot.time"
+                  :items="timeOptions"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                  :disabled="!slot.enabled"
+                  style="max-width: 130px;"
+                ></v-select>
+              </div>
+
+              <!-- Custom Slots -->
+              <div class="text-caption text-medium-emphasis text-uppercase font-weight-bold mt-4 mb-2">
+                {{ t('reminders.customTimes') }}
+              </div>
+
+              <div
+                v-for="slot in reminderSlots.filter(s => !['morning', 'noon', 'evening', 'night'].includes(s.id))"
+                :key="slot.id"
+                class="d-flex align-center justify-space-between mb-2"
+              >
+                <div class="d-flex align-center">
+                  <v-checkbox
+                    v-model="slot.enabled"
+                    hide-details
+                    density="compact"
+                    color="primary"
+                    class="mr-1"
+                  ></v-checkbox>
+                  <span class="text-body-2">{{ t('reminders.custom') }}</span>
+                </div>
+                <div class="d-flex align-center">
+                  <v-select
+                    v-model="slot.time"
+                    :items="timeOptions"
+                    density="compact"
+                    variant="outlined"
+                    hide-details
+                    :disabled="!slot.enabled"
+                    style="max-width: 130px;"
+                    class="mr-2"
+                  ></v-select>
+                  <v-btn
+                    icon="mdi-delete-outline"
+                    variant="text"
+                    color="error"
+                    size="small"
+                    :aria-label="t('reminders.removeCustom')"
+                    @click="removeCustomSlot(slot.id)"
+                  ></v-btn>
+                </div>
+              </div>
+
+              <v-btn
+                variant="outlined"
+                color="primary"
+                size="small"
+                prepend-icon="mdi-plus"
+                class="mt-2 mb-4"
+                @click="addCustomSlot"
+              >
+                {{ t('reminders.addCustom') }}
+              </v-btn>
+
+              <div class="d-flex mt-2">
+                <v-btn
+                  variant="tonal"
+                  color="primary"
+                  size="small"
+                  prepend-icon="mdi-bell-ring-outline"
+                  @click="triggerTestNotification"
+                >
+                  {{ t('reminders.sendTest') }}
+                </v-btn>
+              </div>
+            </div>
+          </div>
+
+          <v-divider v-if="isReminderSupported" class="mb-6"></v-divider>
+
           <!-- Reset Button -->
           <div class="d-flex justify-center">
             <v-btn
@@ -263,6 +479,10 @@ const close = () => {
 
     <v-snackbar v-model="biometricsClearedSnackbar" color="success" :timeout="3000">
       {{ t('biometrics.clearAllSuccess') }}
+    </v-snackbar>
+
+    <v-snackbar v-model="testNotificationSnackbar" color="success" :timeout="3000">
+      {{ t('reminders.testSent') }}
     </v-snackbar>
   </v-dialog>
 </template>

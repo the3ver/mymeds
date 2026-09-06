@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.6.0',
+    date: '2026-09-06',
+    title: {
+      de: 'Tägliche Einnahme-Erinnerungen für Android (TWA)',
+      en: 'Daily Intake Reminders for Android (TWA)'
+    },
+    highlights: {
+      de: [
+        'Tägliche Einnahme-Erinnerungen über Periodic Background Sync im Service Worker',
+        'Vorgaben für Morgens, Mittags, Abends und Zur Nacht sowie beliebig viele benutzerdefinierte Zeiten im 30-Minuten-Raster',
+        'Volle Zero-Knowledge-Sicherheit: Neutrale Benachrichtigungen ohne Klartextdaten bei gesperrtem Tresor',
+        'Bedingte Anzeige: Die Funktion wird nur angezeigt, wenn sie vom System (Android TWA / WebAPK) unterstützt wird'
+      ],
+      en: [
+        'Daily intake reminders via Periodic Background Sync in the Service Worker',
+        'Presets for morning, noon, evening, night, plus custom times in 30-minute intervals',
+        'Full zero-knowledge privacy: generic notifications without plaintext data while vault is locked',
+        'Conditional visibility: feature is only shown when supported by the system (Android TWA / WebAPK)'
+      ]
+    }
+  },
+  {
     version: '1.5.3',
     date: '2026-09-05',
     title: {

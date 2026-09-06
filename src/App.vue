@@ -6,6 +6,7 @@ import { state as appState, lock } from './app-state';
 import * as dataService from './modules/common/utils/dataService';
 import { onServiceWorkerUpdate, applyUpdateAndReload } from './modules/common/utils/updateService';
 import packageJson from '../package.json';
+import * as reminderService from './modules/common/utils/reminderService';
 import NavDrawer from './modules/common/components/NavDrawer.vue';
 import DatabaseListPage from './modules/common/components/DatabaseListPage.vue';
 import WelcomeDialog from './modules/common/components/WelcomeDialog.vue';
@@ -65,6 +66,26 @@ onMounted(async () => {
     pendingRegistration.value = reg;
     updateAvailableSnackbar.value = true;
   });
+
+  // Reminders check & periodic sync registration
+  if (reminderService.isReminderSupported()) {
+    dataService.getReminderSettings().then(async (reminders) => {
+      if (reminders?.enabled) {
+        await reminderService.registerPeriodicSync();
+        const { hasChanges, updatedLastNotified } = reminderService.evaluateDueReminders(reminders);
+        if (hasChanges) {
+          await dataService.saveReminderSettings({
+            ...reminders,
+            lastNotified: updatedLastNotified
+          });
+          await reminderService.sendTestNotification(
+            t('reminders.notificationTitle'),
+            t('reminders.notificationBody')
+          );
+        }
+      }
+    }).catch(err => console.warn('[App] Reminders init error:', err));
+  }
 });
 
 function reloadApp() {

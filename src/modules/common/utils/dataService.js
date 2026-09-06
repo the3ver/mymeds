@@ -95,6 +95,8 @@ export const saveShowOverview = dbAdapter.saveShowOverview;
 export const saveDisclaimerAccepted = dbAdapter.saveDisclaimerAccepted;
 export const saveDisclaimerVersion = dbAdapter.saveDisclaimerVersion;
 export const saveLastSeenChangelogVersion = dbAdapter.saveLastSeenChangelogVersion;
+export const getReminderSettings = dbAdapter.getReminderSettings;
+export const saveReminderSettings = dbAdapter.saveReminderSettings;
 export const deleteAllData = dbAdapter.deleteAllData;
 
 

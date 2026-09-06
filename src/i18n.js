@@ -333,6 +333,28 @@ export const messages = {
       activeOnThisDevice: 'Biometric unlock is active on this device',
       error: 'Biometric authentication failed: {message}',
       cancelled: 'Biometric authentication cancelled.'
+    },
+    reminders: {
+      title: 'Daily Reminders',
+      enable: 'Enable daily reminders',
+      description: 'Receive generic notifications for medication intake on this device.',
+      permissionTitle: 'Notification Permission',
+      permissionPrompt: 'Notifications are required to send intake reminders.',
+      permissionDenied: 'Notifications are blocked in your browser/system settings. Please enable them in Android App Settings to receive reminders.',
+      requestPermission: 'Allow Notifications',
+      standardTimes: 'Standard Times',
+      customTimes: 'Custom Times',
+      morning: 'Morning',
+      noon: 'Noon',
+      evening: 'Evening',
+      night: 'Night',
+      custom: 'Custom Time',
+      addCustom: 'Add custom time',
+      removeCustom: 'Remove time',
+      sendTest: 'Send test notification',
+      testSent: 'Test notification sent!',
+      notificationTitle: 'MyMeds',
+      notificationBody: 'Reminder: Time for your medication.'
     }
   },
   de: {
@@ -666,6 +688,28 @@ export const messages = {
       activeOnThisDevice: 'Biometrisches Entsperren auf diesem Gerät aktiv',
       error: 'Biometrische Authentifizierung fehlgeschlagen: {message}',
       cancelled: 'Biometrische Authentifizierung abgebrochen.'
+    },
+    reminders: {
+      title: 'Tägliche Erinnerungen',
+      enable: 'Tägliche Erinnerungen aktivieren',
+      description: 'Erhalte neutrale Einnahme-Erinnerungen zu festen Uhrzeiten auf diesem Gerät.',
+      permissionTitle: 'Benachrichtigungs-Berechtigung',
+      permissionPrompt: 'Benachrichtigungen sind erforderlich, um Einnahme-Erinnerungen zu senden.',
+      permissionDenied: 'Benachrichtigungen sind im Browser oder System blockiert. Bitte erlaube Benachrichtigungen in den Android-App-Einstellungen.',
+      requestPermission: 'Benachrichtigungen erlauben',
+      standardTimes: 'Standard-Zeiten',
+      customTimes: 'Benutzerdefinierte Zeiten',
+      morning: 'Morgens',
+      noon: 'Mittags',
+      evening: 'Abends',
+      night: 'Zur Nacht',
+      custom: 'Eigene Uhrzeit',
+      addCustom: 'Weitere Uhrzeit hinzufügen',
+      removeCustom: 'Uhrzeit entfernen',
+      sendTest: 'Test-Benachrichtigung senden',
+      testSent: 'Test-Benachrichtigung wurde gesendet!',
+      notificationTitle: 'MyMeds',
+      notificationBody: 'Erinnerung: Zeit für deine Medikamente.'
     }
   }
 }
