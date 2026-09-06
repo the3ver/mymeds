@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.6.2',
+    date: '2026-09-06',
+    title: {
+      de: 'Optimierte Lesbarkeit & Layout der Tresor-Karten',
+      en: 'Enhanced Readability & Layout for Vault Cards'
+    },
+    highlights: {
+      de: [
+        'Deutlich größere, gestochen scharfe Typografie mit voller Deckkraft (100 %) für alle Tresor-Informationen',
+        'Moderne horizontale Anordnung von Medikamenten- und Terminbeständen als gut lesbare Kacheln',
+        'Optimale Ausnutzung der Bildschirmbreite für Erstellungs- und Änderungsdaten',
+        'Größere Icons und Touch-Bereiche für komfortablere Bedienung auf Smartphones'
+      ],
+      en: [
+        'Larger, high-contrast typography with 100% opacity for all vault information',
+        'Modern horizontal stat tiles for medication and calendar entry counts',
+        'Optimized horizontal layout utilizing screen width for creation and modification dates',
+        'Larger icons and touch targets for easier interaction on mobile devices'
+      ]
+    }
+  },
+  {
     version: '1.6.0',
     date: '2026-09-06',
     title: {
