@@ -126,48 +126,69 @@ function onDatabaseUnlocked(result, password) {
         md="4"
       >
         <v-card
-          class="d-flex flex-column fill-height"
+          class="d-flex flex-column fill-height db-card"
           :color="getRandomColor(db.id)"
           variant="tonal"
         >
-          <v-card-title class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between" @click="handleDbClick(db)">
-            <span class="text-truncate">{{ db.name }}</span>
+          <v-card-title class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1" @click="handleDbClick(db)">
+            <span class="text-truncate mr-2">{{ db.name }}</span>
             <v-chip
               v-if="activeBiometricVaults.has(db.id)"
-              size="x-small"
+              size="small"
               color="primary"
               variant="flat"
               prepend-icon="mdi-fingerprint"
-              class="ml-2 flex-shrink-0"
+              class="flex-shrink-0 font-weight-medium"
               :title="t('biometrics.activeOnThisDevice')"
             >
               {{ t('biometrics.title') }}
             </v-chip>
           </v-card-title>
 
-          <v-card-text class="flex-grow-1 cursor-pointer" @click="handleDbClick(db)">
-            <div class="d-flex align-center mb-2">
-              <v-icon start>mdi-calendar-plus</v-icon>
-              <span>{{ t('app.db.created') }}: {{ formatDate(db.createdAt) }}</span>
+          <v-card-text class="flex-grow-1 cursor-pointer pt-2 pb-2 db-card-text" @click="handleDbClick(db)">
+            <!-- Prominent horizontal stats row for medication & calendar counts -->
+            <div class="db-stats-row d-flex flex-wrap align-center ga-3 mb-3">
+              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-lg">
+                <v-icon size="28" color="primary" class="mr-3 flex-shrink-0">mdi-pill</v-icon>
+                <div class="d-flex flex-column">
+                  <span class="text-h6 font-weight-bold line-height-1">{{ db.medsCount }}</span>
+                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{ t('app.db.meds') }}</span>
+                </div>
+              </div>
+
+              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-lg">
+                <v-icon size="28" color="secondary" class="mr-3 flex-shrink-0">mdi-calendar-check</v-icon>
+                <div class="d-flex flex-column">
+                  <span class="text-h6 font-weight-bold line-height-1">{{ db.calendarCount }}</span>
+                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{ t('app.db.entries') }}</span>
+                </div>
+              </div>
             </div>
-            <div class="d-flex align-center mb-2">
-              <v-icon start>mdi-calendar-edit</v-icon>
-              <span>{{ t('app.db.modified') }}: {{ formatDate(db.modifiedAt) }}</span>
-            </div>
-            <div class="d-flex align-center mb-2">
-              <v-icon start>mdi-pill</v-icon>
-              <span>{{ db.medsCount }} {{ t('app.db.meds') }}</span>
-            </div>
-            <div class="d-flex align-center">
-              <v-icon start>mdi-calendar-check</v-icon>
-              <span>{{ db.calendarCount }} {{ t('app.db.entries') }}</span>
+
+            <!-- Horizontal dates row utilizing the available horizontal space -->
+            <div class="db-dates-row d-flex flex-wrap justify-space-between align-center ga-2 pt-2 border-t text-body-1">
+              <div class="d-flex align-center py-1">
+                <v-icon size="22" class="mr-2 opacity-80 flex-shrink-0">mdi-calendar-plus</v-icon>
+                <span class="db-date-label">
+                  <span class="opacity-80 mr-1">{{ t('app.db.created') }}:</span>
+                  <strong class="font-weight-bold">{{ formatDate(db.createdAt) }}</strong>
+                </span>
+              </div>
+              <div class="d-flex align-center py-1">
+                <v-icon size="22" class="mr-2 opacity-80 flex-shrink-0">mdi-calendar-edit</v-icon>
+                <span class="db-date-label">
+                  <span class="opacity-80 mr-1">{{ t('app.db.modified') }}:</span>
+                  <strong class="font-weight-bold">{{ formatDate(db.modifiedAt) }}</strong>
+                </span>
+              </div>
             </div>
           </v-card-text>
 
-          <v-card-actions>
+          <v-card-actions class="px-3 pb-2 pt-0">
             <v-btn
               icon="mdi-swap-vertical"
               variant="text"
+              size="default"
               :title="t('sync.transferToDevice')"
               @click.stop="handleSyncClick(db)"
             ></v-btn>
@@ -175,6 +196,7 @@ function onDatabaseUnlocked(result, password) {
               v-if="activeBiometricVaults.has(db.id)"
               icon="mdi-fingerprint-off"
               variant="text"
+              size="default"
               color="warning"
               :title="t('biometrics.disabled')"
               @click.stop="handleRevokeBiometrics(db)"
@@ -183,11 +205,13 @@ function onDatabaseUnlocked(result, password) {
             <v-btn
               icon="mdi-pencil"
               variant="text"
+              size="default"
               @click.stop="handleRenameClick(db)"
             ></v-btn>
             <v-btn
               icon="mdi-delete-outline"
               variant="text"
+              size="default"
               @click.stop="handleDeleteClick(db)"
             ></v-btn>
           </v-card-actions>
@@ -242,9 +266,9 @@ function onDatabaseUnlocked(result, password) {
     v-model="confirmDeleteDialog"
     :title="t('app.deleteDatabaseTitle')"
     :message="t('app.deleteDatabaseConfirm', { name: selectedDb?.name })"
-    :confirm-text="t('dialog.delete')"
-    :confirm-input-value="t('dialog.delete')"
-    :confirm-input-label="t('dialog.deleteConfirmLabel')"
+    :confirm-text="t('app.deleteConfirmValue')"
+    :confirm-input-value="t('app.deleteConfirmValue')"
+    :confirm-input-label="t('app.deleteConfirmLabel')"
     @confirm="confirmDelete"
   />
 </template>
@@ -256,5 +280,32 @@ html, body {
 }
 .cursor-pointer {
   cursor: pointer;
+}
+
+.db-card-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(var(--v-theme-on-surface), 1) !important;
+  opacity: 1 !important;
+}
+
+.db-stat-pill {
+  background: rgba(var(--v-theme-surface), 0.78);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--v-border-color), 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-width: 125px;
+}
+
+.line-height-1 {
+  line-height: 1.15;
+}
+
+.db-date-label {
+  font-size: 1rem;
+}
+
+.border-t {
+  border-top: 1px solid rgba(var(--v-border-color), 0.2);
 }
 </style>
