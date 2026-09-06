@@ -135,8 +135,8 @@ async function handlePeriodicReminder() {
 
       await self.registration.showNotification(title, {
         body,
-        icon: './pwa-192x192.svg',
-        badge: './favicon.ico',
+        icon: './pwa-192x192.png',
+        badge: './pwa-192x192.png',
         tag: 'med-reminder',
       });
     }

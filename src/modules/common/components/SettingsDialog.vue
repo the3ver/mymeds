@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../utils/dataService'
 import * as biometricService from '../utils/biometricSessionService'
@@ -31,6 +31,9 @@ const reminderSlots = ref([])
 const notificationPermission = ref('default')
 const timeOptions = reminderService.generateHalfHourOptions()
 const testNotificationSnackbar = ref(false)
+const permissionDeniedSnackbar = ref(false)
+
+let isLoadingSettings = false
 
 async function clearAllBiometrics() {
   await biometricService.clearAllBiometrics()
@@ -47,39 +50,51 @@ watch(() => props.modelValue, (val) => {
 })
 
 async function loadSettings() {
-  const settings = await dataService.getSettings()
-  language.value = settings.locale
-  displayMode.value = settings.displayMode
-  sortMode.value = settings.sortMode
-  uiScale.value = settings.uiScale
-  yellowLimit.value = settings.yellowLimit
-  redLimit.value = settings.redLimit
+  isLoadingSettings = true
+  try {
+    const settings = await dataService.getSettings()
+    language.value = settings.locale
+    displayMode.value = settings.displayMode
+    sortMode.value = settings.sortMode
+    uiScale.value = settings.uiScale
+    yellowLimit.value = settings.yellowLimit
+    redLimit.value = settings.redLimit
 
-  // Check reminders support
-  isReminderSupported.value = reminderService.isReminderSupported()
-  if (typeof window !== 'undefined' && 'Notification' in window) {
-    notificationPermission.value = Notification.permission
+    // Check reminders support
+    isReminderSupported.value = reminderService.isReminderSupported()
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      notificationPermission.value = Notification.permission
+    }
+    const reminders = await dataService.getReminderSettings()
+    reminderEnabled.value = !!reminders.enabled
+    reminderSlots.value = Array.isArray(reminders.slots) ? JSON.parse(JSON.stringify(reminders.slots)) : []
+    await nextTick()
+  } finally {
+    isLoadingSettings = false
   }
-  const reminders = await dataService.getReminderSettings()
-  reminderEnabled.value = !!reminders.enabled
-  reminderSlots.value = Array.isArray(reminders.slots) ? JSON.parse(JSON.stringify(reminders.slots)) : []
 }
 
 async function saveReminderConfig() {
+  if (isLoadingSettings) return
   const current = await dataService.getReminderSettings()
   await dataService.saveReminderSettings({
     ...current,
     enabled: reminderEnabled.value,
-    slots: reminderSlots.value
+    slots: Array.isArray(reminderSlots.value) ? JSON.parse(JSON.stringify(reminderSlots.value)) : []
   })
 }
 
 async function toggleReminders(val) {
+  if (isLoadingSettings) return
   if (val) {
-    const perm = await reminderService.requestNotificationPermission()
-    notificationPermission.value = perm
+    let perm = notificationPermission.value
+    if (perm !== 'granted') {
+      perm = await reminderService.requestNotificationPermission()
+      notificationPermission.value = perm
+    }
     if (perm !== 'granted') {
       reminderEnabled.value = false
+      permissionDeniedSnackbar.value = true
       await saveReminderConfig()
       return
     }
@@ -114,6 +129,8 @@ async function triggerTestNotification() {
   )
   if (success) {
     testNotificationSnackbar.value = true
+  } else {
+    permissionDeniedSnackbar.value = true
   }
 }
 
@@ -148,6 +165,7 @@ watch([yellowLimit, redLimit], () => {
 })
 
 watch(reminderSlots, () => {
+  if (isLoadingSettings) return
   saveReminderConfig()
 }, { deep: true })
 
@@ -320,9 +338,9 @@ const close = () => {
               {{ t('reminders.description') }}
             </p>
 
-            <!-- Permission Warning if blocked -->
+            <!-- Permission Warning if not granted -->
             <v-alert
-              v-if="notificationPermission === 'denied'"
+              v-if="notificationPermission !== 'granted'"
               type="warning"
               variant="tonal"
               density="compact"
@@ -483,6 +501,10 @@ const close = () => {
 
     <v-snackbar v-model="testNotificationSnackbar" color="success" :timeout="3000">
       {{ t('reminders.testSent') }}
+    </v-snackbar>
+
+    <v-snackbar v-model="permissionDeniedSnackbar" color="warning" :timeout="5000">
+      {{ t('reminders.permissionRequiredToast') }}
     </v-snackbar>
   </v-dialog>
 </template>

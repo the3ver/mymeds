@@ -174,7 +174,21 @@ export async function requestNotificationPermission() {
   if (typeof window === 'undefined' || !('Notification' in window)) {
     return 'denied';
   }
-  return Notification.requestPermission();
+  try {
+    const res = Notification.requestPermission();
+    if (res && typeof res.then === 'function') {
+      return await res;
+    }
+    return res;
+  } catch (e) {
+    return new Promise((resolve) => {
+      try {
+        Notification.requestPermission((perm) => resolve(perm || 'denied'));
+      } catch (err) {
+        resolve('denied');
+      }
+    });
+  }
 }
 
 /**
@@ -247,15 +261,15 @@ export async function sendTestNotification(title = 'MyMeds', body = 'Erinnerung:
       if (registration && 'showNotification' in registration) {
         await registration.showNotification(title, {
           body,
-          icon: '/mymeds/pwa-192x192.svg',
-          badge: '/mymeds/favicon.ico',
+          icon: '/mymeds/pwa-192x192.png',
+          badge: '/mymeds/pwa-192x192.png',
           tag: 'med-reminder-test',
         });
         return true;
       }
     }
     // Fallback if no SW ready
-    new Notification(title, { body, icon: '/mymeds/pwa-192x192.svg' });
+    new Notification(title, { body, icon: '/mymeds/pwa-192x192.png' });
     return true;
   } catch (err) {
     console.error('[reminderService] Failed to send test notification:', err);

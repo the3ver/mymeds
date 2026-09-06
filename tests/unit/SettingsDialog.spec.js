@@ -132,4 +132,71 @@ describe('SettingsDialog.vue', () => {
 
     wrapper.unmount();
   });
+
+  it('saves reminder settings when toggling the switch and persists on reopen', async () => {
+    reminderService.isReminderSupported.mockReturnValue(true);
+    dataService.getReminderSettings.mockResolvedValue({
+      enabled: false,
+      slots: [
+        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
+      ],
+      lastNotified: {},
+    });
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    const switchInput = document.body.querySelector('.v-switch input');
+    expect(switchInput).not.toBeNull();
+    switchInput.click();
+    await flushPromises();
+
+    // Verify saveReminderSettings was called with enabled: true
+    const calls = dataService.saveReminderSettings.mock.calls;
+    const lastCallArg = calls[calls.length - 1][0];
+    expect(lastCallArg.enabled).toBe(true);
+
+    // Update mock to return what was saved
+    dataService.getReminderSettings.mockResolvedValue(lastCallArg);
+
+    // Close dialog
+    await wrapper.setProps({ modelValue: false });
+    await flushPromises();
+
+    // Reopen dialog
+    await wrapper.setProps({ modelValue: true });
+    await flushPromises();
+
+    const switchAfterReopen = document.body.querySelector('.v-switch input');
+    expect(switchAfterReopen.checked).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('keeps switch disabled if notification permission is denied', async () => {
+    reminderService.isReminderSupported.mockReturnValue(true);
+    reminderService.requestNotificationPermission.mockResolvedValue('denied');
+    dataService.getReminderSettings.mockResolvedValue({
+      enabled: false,
+      slots: [
+        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
+      ],
+      lastNotified: {},
+    });
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    const switchInput = document.body.querySelector('.v-switch input');
+    expect(switchInput).not.toBeNull();
+    switchInput.click();
+    await flushPromises();
+
+    // Last save call should have enabled: false
+    const calls = dataService.saveReminderSettings.mock.calls;
+    const lastCallArg = calls[calls.length - 1][0];
+    expect(lastCallArg.enabled).toBe(false);
+
+    wrapper.unmount();
+  });
 });

@@ -94,6 +94,63 @@ jobs:
           # Sync manifest-checksum.txt with production twa-manifest.json to avoid interactive prompts during build
           node -e "const crypto=require('crypto'), fs=require('fs'); fs.writeFileSync('manifest-checksum.txt', crypto.createHash('sha1').update(fs.readFileSync('twa-manifest.json')).digest('hex'));"
 
+      - name: Configure Android 13+ Notification Permission & Runtime Prompt
+        run: |
+          node -e "
+          const fs = require('fs');
+          const p = 'app/src/main/AndroidManifest.xml';
+          if (fs.existsSync(p)) {
+            let content = fs.readFileSync(p, 'utf8');
+            if (!content.includes('POST_NOTIFICATIONS')) {
+              content = content.replace(/(<manifest[^>]*>)/, '\$1\n    <uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>');
+              fs.writeFileSync(p, content, 'utf8');
+              console.log('Inserted POST_NOTIFICATIONS into ' + p);
+            }
+          }
+          "
+          node -e "
+          const fs = require('fs');
+          const p = 'app/src/main/java/org/mymeds/app/LauncherActivity.java';
+          if (fs.existsSync(p)) {
+            const code = \`package org.mymeds.app;
+
+          import android.content.pm.ActivityInfo;
+          import android.content.pm.PackageManager;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.Bundle;
+
+          public class LauncherActivity
+                  extends com.google.androidbrowserhelper.trusted.LauncherActivity {
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+                      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+                  } else {
+                      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                  }
+
+                  // Request notification permission at runtime on Android 13+ (API 33+)
+                  if (Build.VERSION.SDK_INT >= 33) {
+                      if (checkSelfPermission(\"android.permission.POST_NOTIFICATIONS\") != PackageManager.PERMISSION_GRANTED) {
+                          requestPermissions(new String[]{\"android.permission.POST_NOTIFICATIONS\"}, 1001);
+                      }
+                  }
+              }
+
+              @Override
+              protected Uri getLaunchingUrl() {
+                  return super.getLaunchingUrl();
+              }
+          }
+          \`;
+            fs.writeFileSync(p, code, 'utf8');
+            console.log('Updated LauncherActivity.java with runtime notification permission request');
+          }
+          "
+
       - name: Build TWA Android App Bundle (.aab) & APK
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'mymeds-playstore-key' }}

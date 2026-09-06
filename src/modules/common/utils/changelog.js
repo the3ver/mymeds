@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.6.3',
+    date: '2026-09-06',
+    title: {
+      de: 'Android 13+ Benachrichtigungen & Einstellungs-Fix',
+      en: 'Android 13+ Notifications & Settings Fix'
+    },
+    highlights: {
+      de: [
+        'Native Benachrichtigungs-Berechtigung (POST_NOTIFICATIONS) für Android 13+ in der APK integriert',
+        'Nativer Berechtigungsdialog wird direkt beim ersten App-Start auf Android 13+ angefordert',
+        'Fehlerbehebung für Test- und Einnahme-Benachrichtigungen durch Umstellung auf kompatible PNG-Symbole',
+        'Zuverlässige Speicherung der Erinnerungs-Einstellungen beim Verlassen und erneuten Öffnen des Dialogs'
+      ],
+      en: [
+        'Integrated native POST_NOTIFICATIONS permission for Android 13+ in the APK',
+        'Native permission prompt requested directly on app launch on Android 13+',
+        'Fixed test and intake notifications by switching to compatible PNG status icons',
+        'Reliable reminder settings persistence when closing and reopening settings'
+      ]
+    }
+  },
+  {
     version: '1.6.2',
     date: '2026-09-06',
     title: {
