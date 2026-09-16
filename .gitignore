@@ -126,3 +126,4 @@ pat.txt
 *.keystore
 *.jks
 android-build/
+.agents/github_sync_state.json

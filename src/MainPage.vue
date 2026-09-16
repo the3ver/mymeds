@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import MedList from './modules/meds/components/MedList.vue'
+import BmpScanDialog from './modules/meds/components/BmpScanDialog.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
 import DataDialog from './modules/common/components/DataDialog.vue'
 
@@ -14,6 +15,7 @@ const emit = defineEmits(['update:dataDialogOpen', 'update:activeTab']);
 
 const { t } = useI18n()
 const medDialog = ref(false)
+const bmpScanDialog = ref(false)
 const editDialog = ref(false)
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
@@ -86,17 +88,29 @@ defineExpose({
             data-testid="med-list"
           />
           <v-card
-            class="mb-4 border-dashed"
+            class="mb-3 border-dashed"
             variant="outlined"
             color="grey"
             @click="openMedDialog"
             style="border-style: dashed !important; border-width: 2px;"
           >
-            <v-card-text class="d-flex align-center justify-center py-4">
+            <v-card-text class="d-flex align-center justify-center py-3">
               <v-icon start size="large">mdi-plus</v-icon>
-              <span class="text-h6">{{ t('app.addMed') }}</span>
+              <span class="text-subtitle-1 font-weight-medium">{{ t('app.addMed') }}</span>
             </v-card-text>
           </v-card>
+
+          <v-btn
+            block
+            color="primary"
+            variant="tonal"
+            size="large"
+            prepend-icon="mdi-qrcode-scan"
+            class="mb-4"
+            @click="bmpScanDialog = true"
+          >
+            {{ t('app.scanBmp') }}
+          </v-btn>
         </v-container>
       </v-window-item>
       <v-window-item value="calendar">
@@ -145,6 +159,8 @@ defineExpose({
       :confirm-text="t('dialog.save')"
       @confirm="saveEdit"
     />
+
+    <BmpScanDialog v-model="bmpScanDialog" />
 
     <DataDialog :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
   </div>

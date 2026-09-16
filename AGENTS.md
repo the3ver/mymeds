@@ -9,9 +9,7 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 - **i18n:** `vue-i18n` (Standard: Deutsch, Fallback: Englisch in `src/i18n.js`)
 - **Build / Test:** Vite 7 + `vite-plugin-pwa`, Vitest 4 (Unit-Tests mit `fake-indexeddb` und `jsdom`)
 
-## Commands & Shell Guidelines
-- **Shell-Hinweis (Windows):** Die IDE startet Befehle standardmäßig in PowerShell. Reine Linux/Bash-Befehle (`grep`, `head`, `ls`, Bash-Pipes) **nicht** nackt in PowerShell ausführen, sondern immer über Git Bash:
-  - Git Bash Aufruf: `& "C:\Program Files\Git\bin\bash.exe" -c "<befehl>"` (oder `bash -c "<befehl>"`)
+## Commands
 - Dev Server: `npm run dev`
 - Tests ausführen: `& "C:\Program Files\Git\bin\bash.exe" -c "npm test -- --run"` (oder `npx vitest run`)
 - Build PWA: `npm run build`
@@ -50,7 +48,6 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 - **Kein Backend annehmen:** Die App ist rein statisch und Offline-First. Keine externen API-Routen oder Server-Kommunikation einbauen.
 - **i18n First:** Keine hartcodierten UI-Texte; neue Strings müssen in `src/i18n.js` (Deutsch & Englisch) eingetragen und via `t('...')` referenziert werden.
 - **Auto-Save beachten:** Änderungen an `appState.decryptedData` triggern automatisch das Speichern. Kein manuelles Überschreiben des Speicherflusses ohne Rücksprache.
-- **Shell & Tooling (Windows):** Niemals ungeschützt Bash-Syntax (`grep`, `head`, `awk`, Bash-Pipes) direkt in PowerShell ausführen. Stets Git Bash (`& "C:\Program Files\Git\bin\bash.exe" -c "..."` bzw. `bash -c "..."`) oder native PowerShell-Cmdlets (`Select-String`, `Get-Content`) verwenden.
 
 ## SOFA Usage
 When beginning meaningful work in this project, create or confirm a SOFA API session using configured SOFA credentials (`~/.sofa/credentials.json` or `SOFA_API_KEY`). If no SOFA credential is configured, offer to run agent-directed onboarding for a personal SOFA agent.

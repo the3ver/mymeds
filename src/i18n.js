@@ -70,7 +70,31 @@ export const messages = {
       importConfirmLabel: 'Type "Import" to confirm',
       importConfirmValue: 'Import',
       importSuccess: 'Data imported successfully.',
-      importError: 'Error importing data. Invalid file format.'
+      importError: 'Error importing data. Invalid file format.',
+      scanBmp: 'Scan Doctor’s Plan (BMP)'
+    },
+    bmp: {
+      scanTitle: 'Scan Medication Plan (BMP)',
+      scanSubtitle: 'Hold the 2D barcode (DataMatrix) of the doctor’s plan into the frame or upload a photo.',
+      cameraError: 'Could not access camera. Please check permissions or upload a photo.',
+      uploadImage: 'Take Photo / Upload Image',
+      manualInput: 'Enter / Paste Code Manually',
+      pastePlaceholder: 'Paste raw XML or Base64 code here...',
+      parseCode: 'Parse Code',
+      previewTitle: 'Medication Plan Recognized',
+      patient: 'Patient',
+      doctor: 'Doctor / Practice',
+      detectedMeds: 'Recognized Medications ({count})',
+      selectAll: 'Select All',
+      deselectAll: 'Deselect All',
+      importMode: 'Import Mode',
+      modeAppend: 'Add to existing medications',
+      modeReplace: 'Replace existing medications',
+      importSelected: 'Import {count} selected',
+      rescan: 'Scan Again',
+      noMedsSelected: 'Please select at least one medication to import.',
+      importSuccess: '{count} medications successfully imported!',
+      invalidPlan: 'Could not recognize a valid medication plan. Please ensure good lighting and focus.'
     },
     med: {
       name: 'Name',
@@ -85,7 +109,9 @@ export const messages = {
       emptyDate: 'Estimated empty date',
       na: 'N/A',
       unitPills: 'pcs',
-      unitDays: 'd'
+      unitDays: 'd',
+      reason: 'Reason',
+      instructions: 'Instructions'
     },
     dialog: {
       addTitle: 'Add New Med',
@@ -426,7 +452,31 @@ export const messages = {
       importConfirmLabel: 'Tippe "Import" zum Bestätigen',
       importConfirmValue: 'Import',
       importSuccess: 'Daten erfolgreich importiert.',
-      importError: 'Fehler beim Importieren der Daten. Ungültiges Dateiformat.'
+      importError: 'Fehler beim Importieren der Daten. Ungültiges Dateiformat.',
+      scanBmp: 'Arztplan einscannen (BMP)'
+    },
+    bmp: {
+      scanTitle: 'Medikationsplan (BMP) einscannen',
+      scanSubtitle: 'Halte den 2D-Barcode (DataMatrix) des Arztplans in das Sucherfeld oder lade ein Foto hoch.',
+      cameraError: 'Kamerazugriff fehlgeschlagen. Bitte prüfe die Kameraberechtigung oder wähle ein Bild aus.',
+      uploadImage: 'Foto aufnehmen / Bild wählen',
+      manualInput: 'Code manuell eingeben',
+      pastePlaceholder: 'XML oder Base64-Code hier einfügen...',
+      parseCode: 'Code analysieren',
+      previewTitle: 'Medikationsplan erkannt',
+      patient: 'Patient',
+      doctor: 'Arzt / Praxis',
+      detectedMeds: 'Erkannte Medikamente ({count})',
+      selectAll: 'Alle auswählen',
+      deselectAll: 'Keine auswählen',
+      importMode: 'Import-Modus',
+      modeAppend: 'Zu bestehenden Medikamenten hinzufügen',
+      modeReplace: 'Bestehende Medikamente ersetzen',
+      importSelected: '{count} ausgewählte importieren',
+      rescan: 'Neu scannen',
+      noMedsSelected: 'Bitte wähle mindestens ein Medikament aus.',
+      importSuccess: '{count} Medikamente erfolgreich importiert!',
+      invalidPlan: 'Es konnte kein gültiger Medikationsplan erkannt werden. Achte auf gute Beleuchtung und einen scharfen 2D-Code.'
     },
     med: {
       name: 'Name',
@@ -441,7 +491,9 @@ export const messages = {
       emptyDate: 'Voraussichtlich leer am',
       na: 'n.v.',
       unitPills: 'Stk.',
-      unitDays: 't'
+      unitDays: 't',
+      reason: 'Grund',
+      instructions: 'Hinweise'
     },
     dialog: {
       addTitle: 'Neues Medikament',

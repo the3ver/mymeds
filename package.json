@@ -1,7 +1,7 @@
 {
   "name": "mymeds",
   "private": true,
-  "version": "1.6.3",
+  "version": "1.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@zxing/library": "^0.23.0",
+    "fflate": "^0.8.3",
     "idb": "^8.0.3",
     "mqtt": "^5.15.2",
     "peerjs": "^1.5.5",

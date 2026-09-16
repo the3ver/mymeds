@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.7.0',
+    date: '2026-09-16',
+    title: {
+      de: 'Bundesmedikationsplan (BMP) Scan & Import',
+      en: 'Medication Plan (BMP) Scan & Import'
+    },
+    highlights: {
+      de: [
+        'Einscannen von gedruckten 2D-DataMatrix-Codes des Bundesmedikationsplans (BMP) via Kamera',
+        'Foto- & Bild-Upload zur Erkennung abfotografierter Medikationspläne',
+        'Automatische Dekomprimierung (ZLIB/Deflate) und Erkennung von Dosierungen, Wirkstoffen & PZN',
+        'Strukturierte Import-Vorschau mit Bestandsmengen-Schnellauswahl und Hinzufügen/Ersetzen-Optionen'
+      ],
+      en: [
+        'Scan printed 2D DataMatrix barcodes from official Medication Plans (BMP) via camera',
+        'Photo & image upload to recognize photographed medication schedules',
+        'Automatic decompression (ZLIB/Deflate) and parsing of doses, active ingredients & PZN',
+        'Structured import preview with pill count presets and append/replace modes'
+      ]
+    }
+  },
+  {
     version: '1.6.3',
     date: '2026-09-06',
     title: {
