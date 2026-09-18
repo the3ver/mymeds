@@ -71,7 +71,8 @@ export const messages = {
       importConfirmValue: 'Import',
       importSuccess: 'Data imported successfully.',
       importError: 'Error importing data. Invalid file format.',
-      scanBmp: 'Scan Doctor’s Plan (BMP)'
+      scanBmp: 'Scan Doctor’s Plan (BMP)',
+      showBmp: 'Show Plan as BMP (DataMatrix)'
     },
     bmp: {
       scanTitle: 'Scan Medication Plan (BMP)',
@@ -94,7 +95,23 @@ export const messages = {
       rescan: 'Scan Again',
       noMedsSelected: 'Please select at least one medication to import.',
       importSuccess: '{count} medications successfully imported!',
-      invalidPlan: 'Could not recognize a valid medication plan. Please ensure good lighting and focus.'
+      invalidPlan: 'Could not recognize a valid medication plan. Please ensure good lighting and focus.',
+      exportTitle: 'Medication Plan (BMP)',
+      exportSubtitle: 'Official 2D DataMatrix code for doctor practices and pharmacies.',
+      formatStandard: 'Standard (Compressed)',
+      formatXml: 'Uncompressed (XML)',
+      downloadPng: 'Save as PNG Image',
+      share: 'Share / Print',
+      patientOptional: 'Patient Information (Optional for doctor matching)',
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      birthDate: 'Birth Date',
+      emptyMeds: 'No medications selected to display.',
+      copyXml: 'Copy XML',
+      xmlCopied: 'BMP XML copied to clipboard!',
+      selectMedsToInclude: 'Select medications to include:',
+      medsCountBadge: '{selected} of {total} medications',
+      fullscreen: 'Fullscreen'
     },
     med: {
       name: 'Name',
@@ -453,7 +470,8 @@ export const messages = {
       importConfirmValue: 'Import',
       importSuccess: 'Daten erfolgreich importiert.',
       importError: 'Fehler beim Importieren der Daten. Ungültiges Dateiformat.',
-      scanBmp: 'Arztplan einscannen (BMP)'
+      scanBmp: 'Arztplan einscannen (BMP)',
+      showBmp: 'Plan als BMP anzeigen (DataMatrix)'
     },
     bmp: {
       scanTitle: 'Medikationsplan (BMP) einscannen',
@@ -476,7 +494,23 @@ export const messages = {
       rescan: 'Neu scannen',
       noMedsSelected: 'Bitte wähle mindestens ein Medikament aus.',
       importSuccess: '{count} Medikamente erfolgreich importiert!',
-      invalidPlan: 'Es konnte kein gültiger Medikationsplan erkannt werden. Achte auf gute Beleuchtung und einen scharfen 2D-Code.'
+      invalidPlan: 'Es konnte kein gültiger Medikationsplan erkannt werden. Achte auf gute Beleuchtung und einen scharfen 2D-Code.',
+      exportTitle: 'Bundesmedikationsplan (BMP)',
+      exportSubtitle: 'Offizieller 2D-DataMatrix-Code für Arztpraxen und Apotheken.',
+      formatStandard: 'Standard (Komprimiert)',
+      formatXml: 'Unkomprimiert (XML)',
+      downloadPng: 'Als PNG-Bild speichern',
+      share: 'Teilen / Drucken',
+      patientOptional: 'Patienten-Daten (optional für Arzt-Zuordnung)',
+      firstName: 'Vorname',
+      lastName: 'Nachname',
+      birthDate: 'Geburtsdatum',
+      emptyMeds: 'Keine Medikamente zur Anzeige ausgewählt.',
+      copyXml: 'XML kopieren',
+      xmlCopied: 'BMP-XML in die Zwischenablage kopiert!',
+      selectMedsToInclude: 'Auszustellende Medikamente auswählen:',
+      medsCountBadge: '{selected} von {total} Medikamenten',
+      fullscreen: 'Vollbild'
     },
     med: {
       name: 'Name',

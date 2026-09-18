@@ -7,6 +7,7 @@ import ConfirmDialog from './ConfirmDialog.vue'
 import ExportDialog from './ExportDialog.vue'
 import ImportDialog from './ImportDialog.vue'
 import BmpScanDialog from '../../meds/components/BmpScanDialog.vue'
+import BmpExportDialog from '../../meds/components/BmpExportDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean
@@ -19,6 +20,7 @@ const confirmClearDialog = ref(false)
 const exportDialog = ref(false)
 const importDialog = ref(false)
 const bmpScanDialog = ref(false)
+const bmpExportDialog = ref(false)
 const importStats = ref(null)
 const fileInput = ref(null)
 const exportDataContent = ref('')
@@ -113,6 +115,14 @@ const close = () => {
             >
               {{ t('app.scanBmp') }}
             </v-btn>
+            <v-btn
+              color="secondary"
+              variant="tonal"
+              prepend-icon="mdi-barcode-scan"
+              @click="bmpExportDialog = true"
+            >
+              {{ t('app.showBmp') }}
+            </v-btn>
             <input
               type="file"
               ref="fileInput"
@@ -154,6 +164,10 @@ const close = () => {
 
     <BmpScanDialog
       v-model="bmpScanDialog"
+    />
+
+    <BmpExportDialog
+      v-model="bmpExportDialog"
     />
 
     <ConfirmDialog

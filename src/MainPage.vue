@@ -5,6 +5,7 @@ import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import MedList from './modules/meds/components/MedList.vue'
 import BmpScanDialog from './modules/meds/components/BmpScanDialog.vue'
+import BmpExportDialog from './modules/meds/components/BmpExportDialog.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
 import DataDialog from './modules/common/components/DataDialog.vue'
 
@@ -16,6 +17,7 @@ const emit = defineEmits(['update:dataDialogOpen', 'update:activeTab']);
 const { t } = useI18n()
 const medDialog = ref(false)
 const bmpScanDialog = ref(false)
+const bmpExportDialog = ref(false)
 const editDialog = ref(false)
 const editingIndex = ref(-1)
 const currentEditMed = ref({})
@@ -106,10 +108,22 @@ defineExpose({
             variant="tonal"
             size="large"
             prepend-icon="mdi-qrcode-scan"
-            class="mb-4"
+            class="mb-3"
             @click="bmpScanDialog = true"
           >
             {{ t('app.scanBmp') }}
+          </v-btn>
+
+          <v-btn
+            block
+            color="secondary"
+            variant="outlined"
+            size="large"
+            prepend-icon="mdi-barcode-scan"
+            class="mb-4"
+            @click="bmpExportDialog = true"
+          >
+            {{ t('app.showBmp') }}
           </v-btn>
         </v-container>
       </v-window-item>
@@ -161,6 +175,8 @@ defineExpose({
     />
 
     <BmpScanDialog v-model="bmpScanDialog" />
+
+    <BmpExportDialog v-model="bmpExportDialog" />
 
     <DataDialog :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
   </div>

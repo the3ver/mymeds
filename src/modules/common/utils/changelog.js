@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.8.0',
+    date: '2026-09-18',
+    title: {
+      de: 'Bundesmedikationsplan (BMP) 2D-DataMatrix Anzeige & Export',
+      en: 'Medication Plan (BMP) 2D DataMatrix Display & Export'
+    },
+    highlights: {
+      de: [
+        'Anzeige der Medikationsliste als offizieller 2D-DataMatrix-Code (Bundesmedikationsplan / BMP)',
+        'KBV-konforme XML-Generierung im Ultrakurzformat (UKF 026) mit ZLIB/Deflate-Komprimierung',
+        'Auswahl einzelner Medikamente und optionaler Patientendaten für den Export',
+        'PNG-Bild-Download, Web-Share und Kopieren des XML-Codes direkt in die Zwischenablage'
+      ],
+      en: [
+        'Display medication list as official 2D DataMatrix code (Bundesmedikationsplan / BMP)',
+        'KBV-compliant Ultrakurzformat (UKF 026) XML generation with ZLIB/Deflate compression',
+        'Selective inclusion of medications and optional patient data for doctor matching',
+        'PNG image download, Web Share, and copying raw XML code directly to clipboard'
+      ]
+    }
+  },
+  {
     version: '1.7.0',
     date: '2026-09-16',
     title: {
