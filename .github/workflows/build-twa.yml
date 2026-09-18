@@ -36,16 +36,18 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools build-tools;35.0.0 platforms;android-34'
 
-      - name: Accept Android SDK Licenses & Install Build Tools
+      - name: Configure Android SDK Tools Compatibility for Bubblewrap
         run: |
+          mkdir -p "$ANDROID_HOME/bin"
+          mkdir -p "$ANDROID_HOME/tools/bin"
+          SDK_BIN=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          if [ -n "$SDK_BIN" ]; then
+            ln -sf "$SDK_BIN" "$ANDROID_HOME/bin/sdkmanager"
+            ln -sf "$SDK_BIN" "$ANDROID_HOME/tools/bin/sdkmanager"
+            echo "Linked sdkmanager: $SDK_BIN -> $ANDROID_HOME/bin/sdkmanager"
+          fi
           yes | sdkmanager --licenses || true
-          yes | sdkmanager "build-tools;35.0.0" "platforms;android-34" || true
-          mkdir -p "$ANDROID_HOME/build-tools"
-          ls -la "$ANDROID_HOME"
-          ls -la "$ANDROID_HOME/build-tools"
 
       - name: Restore Keystore
         run: |
