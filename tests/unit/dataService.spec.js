@@ -234,6 +234,12 @@ describe('dataService.saveDisclaimerAccepted', () => {
     await dataService.saveDisclaimerVersion(1);
     expect(dbAdapter.saveDisclaimerVersion).toHaveBeenCalledWith(1);
   });
+
+  it('should delegate saveVaultDisplayMode to dbAdapter.saveVaultDisplayMode', async () => {
+    dbAdapter.saveVaultDisplayMode.mockResolvedValue(true);
+    await dataService.saveVaultDisplayMode('simple');
+    expect(dbAdapter.saveVaultDisplayMode).toHaveBeenCalledWith('simple');
+  });
 });
 
 

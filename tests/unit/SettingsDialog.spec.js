@@ -16,6 +16,7 @@ vi.mock('../../src/modules/common/utils/dataService', () => ({
   saveUiScale: vi.fn(),
   saveSortMode: vi.fn(),
   saveDisplayMode: vi.fn(),
+  saveVaultDisplayMode: vi.fn(),
   saveYellowLimit: vi.fn(),
   saveRedLimit: vi.fn(),
   saveShowOverview: vi.fn(),
@@ -52,6 +53,7 @@ describe('SettingsDialog.vue', () => {
       uiScale: 'normal',
       sortMode: 'added',
       displayMode: 'pills',
+      vaultDisplayMode: 'simple',
       yellowLimit: 21,
       redLimit: 7,
     });
@@ -197,6 +199,25 @@ describe('SettingsDialog.vue', () => {
     const lastCallArg = calls[calls.length - 1][0];
     expect(lastCallArg.enabled).toBe(false);
 
+    wrapper.unmount();
+  });
+
+  it('renders vaultDisplayMode section and calls saveVaultDisplayMode on change', async () => {
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(document.body.textContent).toContain('Tresor-Ansicht');
+    expect(document.body.textContent).toContain('Einfach (Kompakt & ruhig)');
+    expect(document.body.textContent).toContain('Detailliert (Mit Zählern & Datumsangaben)');
+
+    const radioInputs = Array.from(document.body.querySelectorAll('input[type="radio"]'));
+    const comfortableRadio = radioInputs.find(input => input.value === 'comfortable');
+    expect(comfortableRadio).toBeDefined();
+
+    comfortableRadio.click();
+    await flushPromises();
+
+    expect(dataService.saveVaultDisplayMode).toHaveBeenCalledWith('comfortable');
     wrapper.unmount();
   });
 });

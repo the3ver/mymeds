@@ -36,8 +36,51 @@ describe('DatabaseListPage.vue', () => {
     },
   ];
 
-  it('renders vault cards with prominent counts and horizontal layout', async () => {
+  it('renders vault cards in simple mode by default (calm, minimal layout with menu and summary)', async () => {
     vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set([1]));
+
+    const wrapper = mount(DatabaseListPage, {
+      global: {
+        plugins: [vuetify, i18n],
+        stubs: {
+          VFab: true,
+          CreateDatabaseDialog: true,
+          DatabaseUnlockDialog: true,
+          RenameDatabaseDialog: true,
+          SyncDialog: true,
+          ConfirmDialog: true,
+        },
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 20));
+
+    const text = wrapper.text();
+    expect(text).toContain('Haupt-Tresor');
+    expect(text).toContain('4 Medikamente');
+    expect(text).toContain('2 Einträge');
+    expect(text).not.toContain('Erstellt:');
+    expect(text).not.toContain('Geändert:');
+
+    // Verify stat pills do NOT exist in simple mode
+    const pills = wrapper.findAll('.db-stat-pill');
+    expect(pills.length).toBe(0);
+
+    // Verify 3-dots menu buttons exist (one per vault)
+    const menuBtns = wrapper.findAll('button .mdi-dots-vertical, .v-btn--icon .mdi-dots-vertical');
+    expect(menuBtns.length).toBeGreaterThanOrEqual(1);
+
+    // Verify biometric icon exists for vault 1
+    const bioIcon = wrapper.find('.mdi-fingerprint');
+    expect(bioIcon.exists()).toBe(true);
+  });
+
+  it('renders vault cards in comfortable mode when configured', async () => {
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'comfortable' });
     vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set([1]));
 
     const wrapper = mount(DatabaseListPage, {
@@ -66,12 +109,39 @@ describe('DatabaseListPage.vue', () => {
     expect(text).toContain('Erstellt:');
     expect(text).toContain('Geändert:');
 
-    // Verify stat pills exist
+    // Verify stat pills exist in comfortable mode
     const pills = wrapper.findAll('.db-stat-pill');
     expect(pills.length).toBe(4);
+  });
 
-    // Verify biometric badge on vault 1
-    expect(text).toContain('Biometrisches Entsperren');
+  it('allows toggling display mode between simple and comfortable', async () => {
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    const saveSpy = vi.spyOn(dataService, 'saveVaultDisplayMode').mockResolvedValue();
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const wrapper = mount(DatabaseListPage, {
+      global: {
+        plugins: [vuetify, i18n],
+        stubs: {
+          VFab: true,
+          CreateDatabaseDialog: true,
+          DatabaseUnlockDialog: true,
+          RenameDatabaseDialog: true,
+          SyncDialog: true,
+          ConfirmDialog: true,
+        },
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 20));
+
+    const toggleBtn = wrapper.find('[data-testid="toggle-vault-display-btn"]');
+    expect(toggleBtn.exists()).toBe(true);
+
+    await toggleBtn.trigger('click');
+    expect(saveSpy).toHaveBeenCalledWith('comfortable');
   });
 
   it('renders empty state when no vaults exist', async () => {

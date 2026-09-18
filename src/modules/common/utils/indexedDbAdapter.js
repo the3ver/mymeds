@@ -97,6 +97,7 @@ export async function getSettings() {
     yellowLimit: await getSetting('yellowLimit', 21),
     redLimit: await getSetting('redLimit', 7),
     showOverview: await getSetting('showOverview', true),
+    vaultDisplayMode: await getSetting('vaultDisplayMode', 'simple'),
     disclaimerVersion,
     disclaimerAccepted: disclaimerVersion >= CURRENT_DISCLAIMER_VERSION,
     lastSeenChangelogVersion: await getSetting('lastSeenChangelogVersion', ''),
@@ -133,6 +134,7 @@ export const saveTheme = (theme) => setSetting('theme', theme);
 export const saveUiScale = (scale) => setSetting('uiScale', scale);
 export const saveSortMode = (mode) => setSetting('sortMode', mode);
 export const saveDisplayMode = (mode) => setSetting('displayMode', mode);
+export const saveVaultDisplayMode = (mode) => setSetting('vaultDisplayMode', mode);
 export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);

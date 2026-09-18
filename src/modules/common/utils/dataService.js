@@ -89,6 +89,7 @@ export const saveTheme = dbAdapter.saveTheme;
 export const saveUiScale = dbAdapter.saveUiScale;
 export const saveSortMode = dbAdapter.saveSortMode;
 export const saveDisplayMode = dbAdapter.saveDisplayMode;
+export const saveVaultDisplayMode = dbAdapter.saveVaultDisplayMode;
 export const saveYellowLimit = dbAdapter.saveYellowLimit;
 export const saveRedLimit = dbAdapter.saveRedLimit;
 export const saveShowOverview = dbAdapter.saveShowOverview;

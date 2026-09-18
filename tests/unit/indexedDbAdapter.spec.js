@@ -99,6 +99,7 @@ describe('indexedDbAdapter', () => {
       expect(settings.showOverview).toBe(true);
       expect(settings.disclaimerVersion).toBe(0);
       expect(settings.disclaimerAccepted).toBe(false);
+      expect(settings.vaultDisplayMode).toBe('simple');
     });
 
     it('should save and retrieve disclaimerVersion setting', async () => {
@@ -121,6 +122,7 @@ describe('indexedDbAdapter', () => {
       await dbAdapter.saveYellowLimit(30);
       await dbAdapter.saveRedLimit(10);
       await dbAdapter.saveShowOverview(false);
+      await dbAdapter.saveVaultDisplayMode('comfortable');
 
       const settings = await dbAdapter.getSettings();
       expect(settings.locale).toBe('en');
@@ -131,6 +133,7 @@ describe('indexedDbAdapter', () => {
       expect(settings.yellowLimit).toBe(30);
       expect(settings.redLimit).toBe(10);
       expect(settings.showOverview).toBe(false);
+      expect(settings.vaultDisplayMode).toBe('comfortable');
     });
   });
 

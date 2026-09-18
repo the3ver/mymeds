@@ -5,6 +5,26 @@
 
 export const changelog = [
   {
+    version: '1.9.0',
+    date: '2026-09-18',
+    title: {
+      de: 'Übersichtliche Tresor-Ansicht & Umschaltfunktion',
+      en: 'Calm Vault View & Display Toggle'
+    },
+    highlights: {
+      de: [
+        'Einführung einer ruhigen, aufgeräumten Tresor-Darstellung mit kompakter Zusammenfassung',
+        'Auslagerung sekundärer Tresor-Aktionen (Umbenennen, Sync, Biometrie, Löschen) in ein 3-Punkte-Kontextmenü',
+        'Umschaltbarkeit zwischen einfacher und detaillierter Ansicht über Einstellungen und Schnellschalter'
+      ],
+      en: [
+        'Introduced a calm, clean vault layout with a compact summary of meds and entries',
+        'Moved secondary vault actions (rename, sync, biometrics, delete) into a 3-dots context menu',
+        'Toggle between simple and detailed views via app preferences and quick switch button'
+      ]
+    }
+  },
+  {
     version: '1.8.3',
     date: '2026-09-18',
     title: {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
 import * as biometricService from '../utils/biometricSessionService';
@@ -13,6 +13,7 @@ import SyncDialog from './SyncDialog.vue';
 const { t, locale } = useI18n();
 const databases = ref([]);
 const activeBiometricVaults = ref(new Set());
+const vaultDisplayMode = ref('simple');
 const createDialog = ref(false);
 const unlockDialog = ref(false);
 const confirmDeleteDialog = ref(false);
@@ -41,7 +42,25 @@ const formatDate = (dateString) => {
 onMounted(async () => {
   await loadDatabases();
   await loadBiometrics();
+  await loadVaultDisplayMode();
+  window.addEventListener('storage-vault-display-mode-changed', loadVaultDisplayMode);
 });
+
+onUnmounted(() => {
+  window.removeEventListener('storage-vault-display-mode-changed', loadVaultDisplayMode);
+});
+
+async function loadVaultDisplayMode() {
+  const settings = await dataService.getSettings();
+  vaultDisplayMode.value = settings.vaultDisplayMode || 'simple';
+}
+
+async function toggleVaultDisplayMode() {
+  const nextMode = vaultDisplayMode.value === 'simple' ? 'comfortable' : 'simple';
+  vaultDisplayMode.value = nextMode;
+  await dataService.saveVaultDisplayMode(nextMode);
+  window.dispatchEvent(new Event('storage-vault-display-mode-changed'));
+}
 
 async function loadDatabases() {
   databases.value = await dataService.getDatabaseList();
@@ -117,6 +136,21 @@ function onDatabaseUnlocked(result, password) {
 
 <template>
   <v-container>
+    <div v-if="databases.length > 0" class="d-flex align-center justify-space-between mb-3 px-1">
+      <div class="text-subtitle-1 font-weight-medium opacity-80">
+        {{ t('app.databases') }}
+      </div>
+      <v-btn
+        :icon="vaultDisplayMode === 'simple' ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline'"
+        variant="text"
+        density="comfortable"
+        size="small"
+        :title="t('app.toggleVaultDisplayMode')"
+        @click="toggleVaultDisplayMode"
+        data-testid="toggle-vault-display-btn"
+      ></v-btn>
+    </div>
+
     <v-row>
       <v-col
         v-for="db in databases"
@@ -125,7 +159,85 @@ function onDatabaseUnlocked(result, password) {
         sm="6"
         md="4"
       >
+        <!-- Simple / Ruhige Ansicht -->
         <v-card
+          v-if="vaultDisplayMode === 'simple'"
+          class="d-flex flex-column fill-height db-card db-card-simple cursor-pointer"
+          :color="getRandomColor(db.id)"
+          variant="tonal"
+          @click="handleDbClick(db)"
+        >
+          <v-card-title class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4">
+            <div class="d-flex align-center min-width-0 mr-2">
+              <v-icon size="22" class="mr-2 flex-shrink-0 opacity-80">mdi-shield-lock-outline</v-icon>
+              <span class="text-truncate">{{ db.name }}</span>
+            </div>
+            <div class="d-flex align-center flex-shrink-0 ga-1">
+              <v-icon
+                v-if="activeBiometricVaults.has(db.id)"
+                size="20"
+                color="primary"
+                class="mr-1"
+                :title="t('biometrics.activeOnThisDevice')"
+              >
+                mdi-fingerprint
+              </v-icon>
+              <v-menu location="bottom end">
+                <template v-slot:activator="{ props: menuProps }">
+                  <v-btn
+                    v-bind="menuProps"
+                    icon="mdi-dots-vertical"
+                    variant="text"
+                    density="comfortable"
+                    size="small"
+                    @click.stop
+                    :title="t('app.vaultActions')"
+                  ></v-btn>
+                </template>
+                <v-list density="compact" min-width="180">
+                  <v-list-item
+                    prepend-icon="mdi-pencil"
+                    :title="t('app.vaultRename')"
+                    @click.stop="handleRenameClick(db)"
+                  ></v-list-item>
+                  <v-list-item
+                    prepend-icon="mdi-swap-vertical"
+                    :title="t('sync.transferToDevice')"
+                    @click.stop="handleSyncClick(db)"
+                  ></v-list-item>
+                  <v-list-item
+                    v-if="activeBiometricVaults.has(db.id)"
+                    prepend-icon="mdi-fingerprint-off"
+                    :title="t('biometrics.disabled')"
+                    color="warning"
+                    @click.stop="handleRevokeBiometrics(db)"
+                  ></v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item
+                    prepend-icon="mdi-delete-outline"
+                    :title="t('app.vaultDelete')"
+                    color="error"
+                    @click.stop="handleDeleteClick(db)"
+                  ></v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+          </v-card-title>
+
+          <v-card-text class="pt-0 pb-3 px-4 cursor-pointer">
+            <div class="d-flex align-center text-body-2 opacity-80">
+              <v-icon size="18" color="primary" class="mr-1">mdi-pill</v-icon>
+              <span class="font-weight-medium mr-3">{{ db.medsCount }} {{ t('app.db.meds') }}</span>
+              <span class="mr-3 opacity-40">•</span>
+              <v-icon size="18" color="secondary" class="mr-1">mdi-calendar-check</v-icon>
+              <span class="font-weight-medium">{{ db.calendarCount }} {{ t('app.db.entries') }}</span>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- Comfortable / Detaillierte Ansicht -->
+        <v-card
+          v-else
           class="d-flex flex-column fill-height db-card"
           :color="getRandomColor(db.id)"
           variant="tonal"
@@ -307,5 +419,19 @@ html, body {
 
 .border-t {
   border-top: 1px solid rgba(var(--v-border-color), 0.2);
+}
+
+.db-card-simple {
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border-radius: 12px;
+}
+
+.db-card-simple:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.min-width-0 {
+  min-width: 0;
 }
 </style>

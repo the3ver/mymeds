@@ -16,6 +16,7 @@ const { t, locale } = useI18n()
 // State
 const language = ref(locale.value)
 const displayMode = ref('pills')
+const vaultDisplayMode = ref('simple')
 const sortMode = ref('added')
 const uiScale = ref('normal')
 const yellowLimit = ref(21)
@@ -55,6 +56,7 @@ async function loadSettings() {
     const settings = await dataService.getSettings()
     language.value = settings.locale
     displayMode.value = settings.displayMode
+    vaultDisplayMode.value = settings.vaultDisplayMode || 'simple'
     sortMode.value = settings.sortMode
     uiScale.value = settings.uiScale
     yellowLimit.value = settings.yellowLimit
@@ -145,6 +147,11 @@ watch(displayMode, (val) => {
   window.dispatchEvent(new Event('storage-display-mode-changed'))
 })
 
+watch(vaultDisplayMode, (val) => {
+  dataService.saveVaultDisplayMode(val)
+  window.dispatchEvent(new Event('storage-vault-display-mode-changed'))
+})
+
 watch(sortMode, (val) => {
   dataService.saveSortMode(val)
   window.dispatchEvent(new Event('storage-sort-mode-changed'))
@@ -173,6 +180,7 @@ const resetSettings = async () => {
   // Reset values to defaults
   language.value = 'de'
   displayMode.value = 'pills'
+  vaultDisplayMode.value = 'simple'
   sortMode.value = 'added'
   uiScale.value = 'normal'
   yellowLimit.value = 21
@@ -190,6 +198,7 @@ const resetSettings = async () => {
   await Promise.all([
     dataService.saveLocale(language.value),
     dataService.saveDisplayMode(displayMode.value),
+    dataService.saveVaultDisplayMode(vaultDisplayMode.value),
     dataService.saveSortMode(sortMode.value),
     dataService.saveUiScale(uiScale.value),
     dataService.saveYellowLimit(yellowLimit.value),
@@ -205,6 +214,7 @@ const resetSettings = async () => {
 
   // Trigger updates
   window.dispatchEvent(new Event('storage-display-mode-changed'))
+  window.dispatchEvent(new Event('storage-vault-display-mode-changed'))
   window.dispatchEvent(new Event('storage-sort-mode-changed'))
   window.dispatchEvent(new Event('storage-limits-changed'))
   window.dispatchEvent(new Event('storage-overview-changed'))
@@ -260,6 +270,29 @@ const close = () => {
                   <div class="d-flex align-center">
                     <v-icon start class="mr-2">mdi-package-variant-closed</v-icon>
                     {{ t('app.showPackages') }}
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
+
+          <!-- Vault Display Mode -->
+          <div class="mb-6">
+            <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('app.vaultDisplayMode') }}</div>
+            <v-radio-group v-model="vaultDisplayMode" color="primary">
+              <v-radio value="simple">
+                <template v-slot:label>
+                  <div class="d-flex align-center">
+                    <v-icon start class="mr-2">mdi-view-compact-outline</v-icon>
+                    {{ t('app.vaultDisplaySimple') }}
+                  </div>
+                </template>
+              </v-radio>
+              <v-radio value="comfortable">
+                <template v-slot:label>
+                  <div class="d-flex align-center">
+                    <v-icon start class="mr-2">mdi-view-agenda-outline</v-icon>
+                    {{ t('app.vaultDisplayComfortable') }}
                   </div>
                 </template>
               </v-radio>
