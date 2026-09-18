@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.8.1',
+    date: '2026-09-18',
+    title: {
+      de: 'CI/CD Fix für Android TWA Build (setup-android v4)',
+      en: 'CI/CD Fix for Android TWA Build (setup-android v4)'
+    },
+    highlights: {
+      de: [
+        'Aktualisierung der Android SDK Action auf v4 zur Behebung des veralteten "tools"-Pakets',
+        'Synchronisierung der Android TWA Versionierung'
+      ],
+      en: [
+        'Updated Android SDK action to v4 resolving deprecated "tools" package failure',
+        'Synchronized Android TWA versioning'
+      ]
+    }
+  },
+  {
     version: '1.8.0',
     date: '2026-09-18',
     title: {
