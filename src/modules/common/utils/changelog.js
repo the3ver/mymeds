@@ -5,20 +5,20 @@
 
 export const changelog = [
   {
-    version: '1.8.1',
+    version: '1.8.2',
     date: '2026-09-18',
     title: {
-      de: 'CI/CD Fix für Android TWA Build (setup-android v4)',
-      en: 'CI/CD Fix for Android TWA Build (setup-android v4)'
+      de: 'CI/CD Fix für Android TWA Build Tools & Bubblewrap',
+      en: 'CI/CD Fix for Android TWA Build Tools & Bubblewrap'
     },
     highlights: {
       de: [
-        'Aktualisierung der Android SDK Action auf v4 zur Behebung des veralteten "tools"-Pakets',
-        'Synchronisierung der Android TWA Versionierung'
+        'Explizite Vorinstallation der Android Build-Tools für die Bubblewrap-Validierung',
+        'Synchronisierung der Android TWA Versionierung auf v1.8.2'
       ],
       en: [
-        'Updated Android SDK action to v4 resolving deprecated "tools" package failure',
-        'Synchronized Android TWA versioning'
+        'Explicit pre-installation of Android build-tools for Bubblewrap verification',
+        'Synchronized Android TWA versioning to v1.8.2'
       ]
     }
   },
