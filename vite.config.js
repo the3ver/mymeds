@@ -54,6 +54,29 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/svg+xml'
           }
+        ],
+        shortcuts: [
+          {
+            name: 'Medikamente',
+            short_name: 'Meds',
+            description: 'Medikamentenübersicht öffnen',
+            url: './?tab=meds',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Kalender',
+            short_name: 'Kalender',
+            description: 'Gesundheitstermine und Einnahmeplan öffnen',
+            url: './?tab=calendar',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Barcode scannen',
+            short_name: 'Scan',
+            description: 'Barcode oder Medikationsplan scannen',
+            url: './?action=scan',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          }
         ]
       }
     })

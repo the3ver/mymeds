@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.9.1',
+    date: '2026-09-20',
+    title: {
+      de: 'Moderne PWA-Funktionen (Speicherschutz, Shortcuts, Badging & Haptik)',
+      en: 'Modern PWA Features (Storage Protection, Shortcuts, Badging & Haptics)'
+    },
+    highlights: {
+      de: [
+        'Automatischer Schutz der verschlüsselten IndexedDB-Tresore vor Browser-Löschung (Storage Eviction) und Speicheranzeige in den Einstellungen',
+        'Schnellzugriff über App-Shortcuts direkt vom Homescreen (Medikamente, Kalender, Barcode/BMP scannen)',
+        'App Badging API zur Kennzeichnung kritischer Bestände am App-Icon mit automatischem Reset beim Sperren des Tresors',
+        'Haptisches Feedback (Vibration API) bei erfolgreichem Barcode-/BMP-Scan und Fehleingaben (in den Einstellungen deaktivierbar)'
+      ],
+      en: [
+        'Automatic protection of encrypted IndexedDB vaults against browser deletion (Storage Eviction) and storage display in settings',
+        'Quick access via App Shortcuts directly from the homescreen (Medications, Calendar, Scan Barcode/BMP)',
+        'App Badging API indicating critical medication stock on the app icon with zero-knowledge reset on vault lock',
+        'Haptic feedback (Vibration API) on barcode/BMP scans and input warnings (configurable in app settings)'
+      ]
+    }
+  },
+  {
     version: '1.9.0',
     date: '2026-09-18',
     title: {

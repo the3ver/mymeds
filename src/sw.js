@@ -20,6 +20,9 @@ self.addEventListener('periodicsync', (event) => {
 // Notification Click: bring app to foreground
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  if (self.navigator && 'clearAppBadge' in self.navigator) {
+    self.navigator.clearAppBadge().catch(() => {});
+  }
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
@@ -132,6 +135,10 @@ async function handlePeriodicReminder() {
       const body = locale === 'de'
         ? 'Erinnerung: Zeit für deine Medikamente.'
         : 'Reminder: Time for your medication.';
+
+      if (self.navigator && 'setAppBadge' in self.navigator) {
+        self.navigator.setAppBadge(dueCount).catch(() => {});
+      }
 
       await self.registration.showNotification(title, {
         body,

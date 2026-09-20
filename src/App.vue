@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { state as appState, lock } from './app-state';
 import * as dataService from './modules/common/utils/dataService';
 import { onServiceWorkerUpdate, applyUpdateAndReload } from './modules/common/utils/updateService';
+import { autoRequestPersistence } from './modules/common/utils/storagePersistenceService';
 import packageJson from '../package.json';
 import * as reminderService from './modules/common/utils/reminderService';
 import NavDrawer from './modules/common/components/NavDrawer.vue';
@@ -86,6 +87,9 @@ onMounted(async () => {
       }
     }).catch(err => console.warn('[App] Reminders init error:', err));
   }
+
+  // Auto-request storage persistence in the background
+  autoRequestPersistence().catch(err => console.warn('[App] Storage persistence error:', err));
 });
 
 function reloadApp() {

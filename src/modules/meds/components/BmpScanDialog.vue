@@ -276,6 +276,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { parseBmpData } from '../utils/bmpParser';
 import * as bmpScannerService from '../utils/bmpScannerService';
+import * as hapticService from '../../common/utils/hapticService';
 import { state as appState } from '../../../app-state';
 
 const props = defineProps({
@@ -401,10 +402,12 @@ async function processRawBmpData(rawData) {
   const result = parseBmpData(rawData);
 
   if (!result.success || !result.meds || result.meds.length === 0) {
+    hapticService.vibrateWarning();
     errorMessage.value = t('bmp.invalidPlan');
     return;
   }
 
+  hapticService.vibrateSuccess();
   stopCamera();
   metadata.value = result.metadata || {};
   detectedMeds.value = result.meds.map((m) => ({

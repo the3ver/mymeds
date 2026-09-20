@@ -40,6 +40,26 @@ vi.mock('../../src/modules/common/utils/reminderService', async (importOriginal)
   };
 });
 
+vi.mock('../../src/modules/common/utils/storagePersistenceService', () => ({
+  isPersistenceSupported: vi.fn().mockReturnValue(true),
+  isStoragePersisted: vi.fn().mockResolvedValue(false),
+  requestPersistence: vi.fn().mockResolvedValue(true),
+  getStorageEstimate: vi.fn().mockResolvedValue({
+    supported: true,
+    usage: 1048576,
+    quota: 104857600,
+    usageFormatted: '1 MB',
+    quotaFormatted: '100 MB',
+    percentUsed: 1,
+  }),
+}));
+
+vi.mock('../../src/modules/common/utils/hapticService', () => ({
+  isHapticsSupported: vi.fn().mockReturnValue(true),
+  isHapticsEnabled: vi.fn().mockReturnValue(true),
+  setHapticsEnabled: vi.fn(),
+}));
+
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
 
@@ -218,6 +238,59 @@ describe('SettingsDialog.vue', () => {
     await flushPromises();
 
     expect(dataService.saveVaultDisplayMode).toHaveBeenCalledWith('comfortable');
+    wrapper.unmount();
+  });
+
+  it('renders storage persistence section, displays quota and allows requesting persistence', async () => {
+    const storageService = await import('../../src/modules/common/utils/storagePersistenceService');
+    storageService.isPersistenceSupported.mockReturnValue(true);
+    storageService.isStoragePersisted.mockResolvedValue(false);
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    // Section title
+    expect(document.body.textContent).toContain('Speicher & Persistenz');
+    // Status unpersisted
+    expect(document.body.textContent).toContain('Standard (Vom Browser verwaltet)');
+    // Quota display
+    expect(document.body.textContent).toContain('1 MB / 100 MB');
+
+    // Request persistence button click
+    const requestBtn = Array.from(document.body.querySelectorAll('button')).find(
+      btn => btn.textContent.includes('Dauerhaften Schutz anfordern')
+    );
+    expect(requestBtn).toBeDefined();
+
+    storageService.requestPersistence.mockResolvedValue(true);
+    storageService.isStoragePersisted.mockResolvedValue(true);
+    requestBtn.click();
+    await flushPromises();
+
+    expect(storageService.requestPersistence).toHaveBeenCalledTimes(1);
+    expect(document.body.textContent).toContain('Dauerhaft geschützt (Persistent)');
+
+    wrapper.unmount();
+  });
+
+  it('renders haptic feedback switch when supported and toggles setting', async () => {
+    const hapticService = await import('../../src/modules/common/utils/hapticService');
+    hapticService.isHapticsSupported.mockReturnValue(true);
+    hapticService.isHapticsEnabled.mockReturnValue(true);
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(document.body.textContent).toContain('Haptisches Feedback');
+    expect(document.body.textContent).toContain('Dezente Vibration bei Barcode-Scans und Bestätigungen');
+
+    const switchInput = document.body.querySelector('.haptic-switch input');
+    expect(switchInput).not.toBeNull();
+    switchInput.click();
+    await flushPromises();
+
+    expect(hapticService.setHapticsEnabled).toHaveBeenCalledWith(false);
+
     wrapper.unmount();
   });
 });

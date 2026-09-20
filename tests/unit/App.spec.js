@@ -8,6 +8,9 @@ import * as components from 'vuetify/components';
 import { state as appState } from '../../src/app-state';
 import * as dataService from '../../src/modules/common/utils/dataService';
 
+vi.mock('../../src/modules/common/utils/storagePersistenceService', () => ({
+  autoRequestPersistence: vi.fn().mockResolvedValue(true),
+}));
 
 // Minimal DOM mocks
 if (typeof global.window === 'undefined') global.window = {};
@@ -99,5 +102,12 @@ describe('App.vue', () => {
     expect(welcomeComponent.exists()).toBe(true);
     expect(welcomeComponent.props('modelValue')).toBe(true);
     expect(welcomeComponent.props('isExistingUser')).toBe(true);
+  });
+
+  it('triggers autoRequestPersistence in background on mount', async () => {
+    const storageService = await import('../../src/modules/common/utils/storagePersistenceService');
+    const wrapper = mountApp();
+    await flushPromises();
+    expect(storageService.autoRequestPersistence).toHaveBeenCalled();
   });
 });

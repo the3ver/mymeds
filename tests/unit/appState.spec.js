@@ -6,6 +6,10 @@ vi.mock('../../src/modules/common/utils/dataService', () => ({
   saveAndLockDatabase: vi.fn().mockResolvedValue(true),
 }));
 
+vi.mock('../../src/modules/common/utils/badgingService', () => ({
+  clearBadge: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe('app-state', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -67,6 +71,12 @@ describe('app-state', () => {
       expect(state.decryptedData.calendar).toEqual([]);
       expect(state.decryptedData.lastDoseUpdate).toBeNull();
       expect(state.deductions).toEqual({});
+    });
+
+    it('should clear app badge on lock', async () => {
+      const badgingService = await import('../../src/modules/common/utils/badgingService');
+      await lock();
+      expect(badgingService.clearBadge).toHaveBeenCalled();
     });
   });
 

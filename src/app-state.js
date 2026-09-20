@@ -1,5 +1,6 @@
 import { reactive, watch } from 'vue';
 import * as dataService from './modules/common/utils/dataService';
+import { clearBadge } from './modules/common/utils/badgingService';
 
 export const state = reactive({
   isLocked: true,
@@ -74,4 +75,7 @@ export async function lock() {
   state.decryptedData.lastDoseUpdate = null;
   state.deductions = {}; // Clear deductions on lock
   state.isLocked = true;
+
+  // Clear badge on lock for privacy
+  clearBadge().catch(err => console.warn('[app-state] Error clearing badge on lock:', err));
 }

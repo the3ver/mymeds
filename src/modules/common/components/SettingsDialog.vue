@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 import * as dataService from '../utils/dataService'
 import * as biometricService from '../utils/biometricSessionService'
 import * as reminderService from '../utils/reminderService'
+import * as storageService from '../utils/storagePersistenceService'
+import * as hapticService from '../utils/hapticService'
 import ConfirmDialog from './ConfirmDialog.vue'
 
 const props = defineProps({
@@ -25,6 +27,21 @@ const confirmResetDialog = ref(false)
 const confirmClearBiometricsDialog = ref(false)
 const biometricsClearedSnackbar = ref(false)
 
+// Storage State
+const isStorageSupported = ref(false)
+const isPersisted = ref(false)
+const storageEstimate = ref({
+  supported: false,
+  usage: 0,
+  quota: 0,
+  usageFormatted: '0 B',
+  quotaFormatted: '0 B',
+  percentUsed: 0,
+})
+const isRequestingPersist = ref(false)
+const persistSuccessSnackbar = ref(false)
+const persistFailedSnackbar = ref(false)
+
 // Reminders State
 const isReminderSupported = ref(false)
 const reminderEnabled = ref(false)
@@ -34,11 +51,42 @@ const timeOptions = reminderService.generateHalfHourOptions()
 const testNotificationSnackbar = ref(false)
 const permissionDeniedSnackbar = ref(false)
 
+// Haptics State
+const isHapticsSupported = ref(false)
+const hapticsEnabled = ref(true)
+
 let isLoadingSettings = false
 
 async function clearAllBiometrics() {
   await biometricService.clearAllBiometrics()
   biometricsClearedSnackbar.value = true
+}
+
+async function loadStorageInfo() {
+  isStorageSupported.value = storageService.isPersistenceSupported()
+  if (isStorageSupported.value) {
+    isPersisted.value = await storageService.isStoragePersisted()
+  }
+  storageEstimate.value = await storageService.getStorageEstimate()
+}
+
+async function handleRequestPersistence() {
+  isRequestingPersist.value = true
+  try {
+    const success = await storageService.requestPersistence()
+    isPersisted.value = await storageService.isStoragePersisted()
+    storageEstimate.value = await storageService.getStorageEstimate()
+    if (success || isPersisted.value) {
+      persistSuccessSnackbar.value = true
+    } else {
+      persistFailedSnackbar.value = true
+    }
+  } catch (err) {
+    console.warn('[SettingsDialog] Request persistence error:', err)
+    persistFailedSnackbar.value = true
+  } finally {
+    isRequestingPersist.value = false
+  }
 }
 
 // Load settings when dialog opens or component mounts
@@ -70,6 +118,14 @@ async function loadSettings() {
     const reminders = await dataService.getReminderSettings()
     reminderEnabled.value = !!reminders.enabled
     reminderSlots.value = Array.isArray(reminders.slots) ? JSON.parse(JSON.stringify(reminders.slots)) : []
+
+    // Check storage persistence & quota
+    await loadStorageInfo()
+
+    // Check haptics support & state
+    isHapticsSupported.value = hapticService.isHapticsSupported()
+    hapticsEnabled.value = hapticService.isHapticsEnabled()
+
     await nextTick()
   } finally {
     isLoadingSettings = false
@@ -176,6 +232,11 @@ watch(reminderSlots, () => {
   saveReminderConfig()
 }, { deep: true })
 
+watch(hapticsEnabled, (val) => {
+  if (isLoadingSettings) return
+  hapticService.setHapticsEnabled(val)
+})
+
 const resetSettings = async () => {
   // Reset values to defaults
   language.value = 'de'
@@ -185,6 +246,8 @@ const resetSettings = async () => {
   uiScale.value = 'normal'
   yellowLimit.value = 21
   redLimit.value = 7
+  hapticsEnabled.value = true
+  hapticService.setHapticsEnabled(true)
 
   reminderEnabled.value = false
   reminderSlots.value = [
@@ -492,6 +555,75 @@ const close = () => {
 
           <v-divider v-if="isReminderSupported" class="mb-6"></v-divider>
 
+          <!-- Storage & Persistence -->
+          <div v-if="isStorageSupported || storageEstimate.supported" class="mb-6">
+            <div class="text-subtitle-1 font-weight-bold mb-2">{{ t('storage.title') }}</div>
+            <div class="d-flex flex-column">
+              <div class="d-flex align-center flex-wrap mb-2">
+                <v-chip
+                  :color="isPersisted ? 'success' : 'warning'"
+                  size="small"
+                  variant="flat"
+                  :prepend-icon="isPersisted ? 'mdi-shield-check' : 'mdi-shield-alert-outline'"
+                  class="font-weight-medium"
+                >
+                  {{ isPersisted ? t('storage.persisted') : t('storage.notPersisted') }}
+                </v-chip>
+              </div>
+
+              <p class="text-caption text-medium-emphasis mb-3">
+                {{ isPersisted ? t('storage.persistedDesc') : t('storage.notPersistedDesc') }}
+              </p>
+
+              <div v-if="!isPersisted" class="mb-3">
+                <v-btn
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  prepend-icon="mdi-shield-plus-outline"
+                  :loading="isRequestingPersist"
+                  @click="handleRequestPersistence"
+                >
+                  {{ t('storage.requestPersist') }}
+                </v-btn>
+              </div>
+
+              <div v-if="storageEstimate.supported" class="text-caption text-medium-emphasis">
+                <div class="d-flex align-center">
+                  <v-icon start size="small" class="mr-1">mdi-database-outline</v-icon>
+                  <span>{{ t('storage.usage') }}: {{ storageEstimate.usageFormatted }} / {{ storageEstimate.quotaFormatted }} ({{ storageEstimate.percentUsed }}%)</span>
+                </div>
+                <v-progress-linear
+                  v-if="storageEstimate.quota > 0"
+                  :model-value="storageEstimate.percentUsed"
+                  color="primary"
+                  height="4"
+                  rounded
+                  class="mt-2"
+                ></v-progress-linear>
+              </div>
+            </div>
+          </div>
+
+          <v-divider v-if="isStorageSupported || storageEstimate.supported" class="mb-6"></v-divider>
+
+          <!-- Haptic Feedback (Vibration API) -->
+          <div v-if="isHapticsSupported" class="mb-6">
+            <div class="text-subtitle-1 font-weight-bold mb-1">{{ t('app.haptics') }}</div>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              {{ t('app.hapticsDesc') }}
+            </p>
+            <v-switch
+              v-model="hapticsEnabled"
+              color="primary"
+              :label="t('app.haptics')"
+              hide-details
+              class="haptic-switch"
+            ></v-switch>
+          </div>
+
+          <v-divider v-if="isHapticsSupported" class="mb-6"></v-divider>
+
           <!-- Reset Button -->
           <div class="d-flex justify-center">
             <v-btn
@@ -538,6 +670,14 @@ const close = () => {
 
     <v-snackbar v-model="permissionDeniedSnackbar" color="warning" :timeout="5000">
       {{ t('reminders.permissionRequiredToast') }}
+    </v-snackbar>
+
+    <v-snackbar v-model="persistSuccessSnackbar" color="success" :timeout="3000">
+      {{ t('storage.persistSuccess') }}
+    </v-snackbar>
+
+    <v-snackbar v-model="persistFailedSnackbar" color="warning" :timeout="5000">
+      {{ t('storage.persistFailed') }}
     </v-snackbar>
   </v-dialog>
 </template>

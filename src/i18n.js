@@ -47,6 +47,8 @@ export const messages = {
       showOverview: 'Show Overview Card',
       overviewText: 'Meds last until {date}',
       overviewTextCritical: 'Meds last only {days} days until {date}',
+      haptics: 'Haptic Feedback',
+      hapticsDesc: 'Subtle vibration for barcode scans and confirmations',
       reset: 'Reset Settings',
       resetConfirm: 'Are you sure you want to reset all settings to default?',
       addMed: 'Add Medication',
@@ -407,6 +409,17 @@ export const messages = {
       testSent: 'Test notification sent!',
       notificationTitle: 'MyMeds',
       notificationBody: 'Reminder: Time for your medication.'
+    },
+    storage: {
+      title: 'Storage & Persistence',
+      persisted: 'Persistent (Protected)',
+      notPersisted: 'Standard (Browser-managed)',
+      persistedDesc: 'Your encrypted vaults are protected from automatic deletion by the OS.',
+      notPersistedDesc: 'The browser may clear data under storage pressure. Request persistent storage to protect your data.',
+      requestPersist: 'Request Persistent Storage',
+      usage: 'Storage Used',
+      persistSuccess: 'Persistent storage successfully granted.',
+      persistFailed: 'Persistent storage could not be granted. Install MyMeds to home screen to allow this.'
     }
   },
   de: {
@@ -454,6 +467,8 @@ export const messages = {
       showOverview: 'Übersichtskarte anzeigen',
       overviewText: 'Meds reichen bis {date}',
       overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}',
+      haptics: 'Haptisches Feedback',
+      hapticsDesc: 'Dezente Vibration bei Barcode-Scans und Bestätigungen',
       reset: 'Einstellungen zurücksetzen',
       resetConfirm: 'Möchtest du wirklich alle Einstellungen auf Standard zurücksetzen?',
       addMed: 'Medikament hinzufügen',
@@ -814,6 +829,17 @@ export const messages = {
       testSent: 'Test-Benachrichtigung wurde gesendet!',
       notificationTitle: 'MyMeds',
       notificationBody: 'Erinnerung: Zeit für deine Medikamente.'
+    },
+    storage: {
+      title: 'Speicher & Persistenz',
+      persisted: 'Dauerhaft geschützt (Persistent)',
+      notPersisted: 'Standard (Vom Browser verwaltet)',
+      persistedDesc: 'Deine verschlüsselten Tresore sind vor automatischer Löschung durch das Betriebssystem geschützt.',
+      notPersistedDesc: 'Bei knappem Gerätespeicher könnte der Browser Daten bereinigen. Fordere dauerhaften Schutz an.',
+      requestPersist: 'Dauerhaften Schutz anfordern',
+      usage: 'Belegter Speicher',
+      persistSuccess: 'Dauerhafter Speicherplatz wurde erfolgreich aktiviert.',
+      persistFailed: 'Dauerhafter Speicher konnte nicht aktiviert werden. Installiere MyMeds auf dem Homescreen, um dies zu ermöglichen.'
     }
   }
 }

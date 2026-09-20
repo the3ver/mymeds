@@ -36,6 +36,27 @@ describe('i18n disclaimer translations', () => {
         expect(sync.modeOverwrite).toBeTruthy();
         expect(sync.modeCopy).toBeTruthy();
       });
+
+      it('should contain complete storage persistence translations', () => {
+        const storage = messages[locale]?.storage;
+        expect(storage).toBeDefined();
+        expect(storage.title).toBeTruthy();
+        expect(storage.persisted).toBeTruthy();
+        expect(storage.notPersisted).toBeTruthy();
+        expect(storage.persistedDesc).toBeTruthy();
+        expect(storage.notPersistedDesc).toBeTruthy();
+        expect(storage.requestPersist).toBeTruthy();
+        expect(storage.usage).toBeTruthy();
+        expect(storage.persistSuccess).toBeTruthy();
+        expect(storage.persistFailed).toBeTruthy();
+      });
+
+      it('should contain complete haptic feedback translations', () => {
+        const app = messages[locale]?.app;
+        expect(app).toBeDefined();
+        expect(app.haptics).toBeTruthy();
+        expect(app.hapticsDesc).toBeTruthy();
+      });
     });
   });
 });

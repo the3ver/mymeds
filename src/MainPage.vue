@@ -8,6 +8,9 @@ import BmpScanDialog from './modules/meds/components/BmpScanDialog.vue'
 import BmpExportDialog from './modules/meds/components/BmpExportDialog.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
 import DataDialog from './modules/common/components/DataDialog.vue'
+import { consumeShortcutIntent } from './modules/common/utils/shortcutService'
+import { updateCriticalMedsBadge } from './modules/common/utils/badgingService'
+import { getSettings } from './modules/common/utils/dataService'
 
 defineProps({
   dataDialogOpen: Boolean,
@@ -28,9 +31,40 @@ watch(activeTab, (newTab) => {
   emit('update:activeTab', newTab);
 });
 
-onMounted(() => {
+// Keep app badge updated when medications change
+watch(
+  () => appState.decryptedData?.meds,
+  async (meds) => {
+    try {
+      const settings = await getSettings();
+      await updateCriticalMedsBadge(meds, settings?.redLimit || 7);
+    } catch (err) {
+      console.warn('[MainPage] Error updating badge on meds change:', err);
+    }
+  },
+  { deep: true }
+);
+
+onMounted(async () => {
   if (appState.pendingIntent === 'import') {
     emit('update:dataDialogOpen', true);
+  }
+
+  // Handle shortcut intents (e.g. from homescreen app shortcuts)
+  const intent = consumeShortcutIntent();
+  if (intent.tab) {
+    activeTab.value = intent.tab;
+  }
+  if (intent.action === 'scan') {
+    bmpScanDialog.value = true;
+  }
+
+  // Initial badge update for critical meds
+  try {
+    const settings = await getSettings();
+    await updateCriticalMedsBadge(appState.decryptedData?.meds, settings?.redLimit || 7);
+  } catch (err) {
+    console.warn('[MainPage] Error updating badge on mount:', err);
   }
 });
 
