@@ -216,9 +216,31 @@ const saveEntry = (entry) => {
   }
 }
 
+const confirmDeleteDialog = ref(false)
+const entryIndexToDelete = ref(-1)
+const entryToDelete = computed(() => {
+  if (entryIndexToDelete.value > -1 && entries.value[entryIndexToDelete.value]) {
+    return entries.value[entryIndexToDelete.value]
+  }
+  return null
+})
+
+const requestDeleteEntry = (index) => {
+  entryIndexToDelete.value = index
+  confirmDeleteDialog.value = true
+}
+
+const confirmDelete = () => {
+  if (entryIndexToDelete.value > -1) {
+    entries.value.splice(entryIndexToDelete.value, 1)
+    entryIndexToDelete.value = -1
+    expandedIndex.value = -1
+  }
+  confirmDeleteDialog.value = false
+}
+
 const deleteEntry = (index) => {
-  entries.value.splice(index, 1)
-  expandedIndex.value = -1
+  requestDeleteEntry(index)
 }
 
 const toggleExpand = (index) => {
@@ -287,7 +309,11 @@ const openFilterDialog = () => {
 
 defineExpose({
   openFilterDialog,
-  openTypeDialog
+  openTypeDialog,
+  requestDeleteEntry,
+  confirmDelete,
+  confirmDeleteDialog,
+  entries
 })
 </script>
 
@@ -351,7 +377,7 @@ defineExpose({
                 <div class="d-flex justify-end gap-2 mt-4">
                   <v-btn icon="mdi-calendar-export" variant="text" color="primary" :aria-label="t('calendar.export')" @click.stop="exportToCalendar(item.data)"></v-btn>
                   <v-btn icon="mdi-pencil" variant="text" color="primary" :aria-label="t('dialog.edit')" @click.stop="openEditDialog(item.data)"></v-btn>
-                  <v-btn icon="mdi-delete" variant="text" color="error" :aria-label="t('dialog.delete')" @click.stop="deleteEntry(item.data.originalIndex)"></v-btn>
+                  <v-btn icon="mdi-delete" variant="text" color="error" :aria-label="t('dialog.delete')" @click.stop="requestDeleteEntry(item.data.originalIndex)"></v-btn>
                 </div>
               </v-card-text>
             </div>
@@ -366,6 +392,7 @@ defineExpose({
     <EntryTypeDialog v-model="typeDialog" @select="onTypeSelected" />
     <CalendarEntryDialog v-model="entryDialog" :entry="currentEntry" :suggestions="existingTreatments" :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')" :confirm-text="t('dialog.save')" @confirm="saveEntry" />
     <ConfirmDialog v-model="exportDialog" :title="t('calendar.export')" :message="t('calendar.exportConfirm')" :confirm-text="t('dialog.yes')" :cancel-text="t('dialog.no')" @confirm="confirmExport" />
+    <ConfirmDialog v-model="confirmDeleteDialog" :title="t('calendar.deleteEntryTitle')" :message="entryToDelete ? t('calendar.deleteEntryConfirmNamed', { name: entryToDelete.title }) : t('calendar.deleteEntryConfirm')" :confirm-text="t('dialog.delete')" :cancel-text="t('dialog.cancel')" @confirm="confirmDelete" />
     <FilterDialog v-model="filterDialog" v-model:selected-filters="filterTypes" />
   </v-container>
 </template>

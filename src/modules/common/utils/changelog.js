@@ -5,6 +5,22 @@
 
 export const changelog = [
   {
+    version: '1.9.2',
+    date: '2026-09-23',
+    title: {
+      de: 'Sicherheitsabfrage beim Löschen von Kalendereinträgen',
+      en: 'Confirmation Dialog for Calendar Entry Deletion'
+    },
+    highlights: {
+      de: [
+        'Bestätigungsdialog vor dem endgültigen Löschen eines Kalendereintrags hinzugefügt (#32)'
+      ],
+      en: [
+        'Added confirmation dialog before deleting calendar entries (#32)'
+      ]
+    }
+  },
+  {
     version: '1.9.1',
     date: '2026-09-20',
     title: {

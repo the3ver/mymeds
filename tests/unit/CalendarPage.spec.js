@@ -70,4 +70,25 @@ describe('CalendarPage.vue', () => {
     wrapper.vm.openTypeDialog();
     expect(wrapper.vm.typeDialog).toBe(true);
   });
+
+  it('should show confirmation dialog before deleting an entry and only delete upon confirmation', async () => {
+    const wrapper = mountComponent();
+    expect(wrapper.vm.entries.length).toBe(3);
+
+    // Call delete request for index 0
+    wrapper.vm.requestDeleteEntry(0);
+    await wrapper.vm.$nextTick();
+
+    // Dialog should be open, entry should NOT be deleted yet
+    expect(wrapper.vm.confirmDeleteDialog).toBe(true);
+    expect(wrapper.vm.entries.length).toBe(3);
+
+    // Confirm deletion
+    wrapper.vm.confirmDelete();
+    await wrapper.vm.$nextTick();
+
+    // Dialog closed and entry deleted
+    expect(wrapper.vm.confirmDeleteDialog).toBe(false);
+    expect(wrapper.vm.entries.length).toBe(2);
+  });
 });
