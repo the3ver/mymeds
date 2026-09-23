@@ -41,9 +41,21 @@ describe('NavDrawer.vue', () => {
         global: {
           plugins: [vuetify, i18n],
           stubs: {
-            SettingsDialog: true,
-            SyncDialog: true,
-            HelpDialog: true
+            SettingsDialog: {
+              name: 'SettingsDialog',
+              props: ['modelValue'],
+              template: '<div class="settings-dialog-stub"></div>'
+            },
+            SyncDialog: {
+              name: 'SyncDialog',
+              props: ['modelValue', 'databases'],
+              template: '<div class="sync-dialog-stub"></div>'
+            },
+            HelpDialog: {
+              name: 'HelpDialog',
+              props: ['modelValue'],
+              template: '<div class="help-dialog-stub"></div>'
+            }
           }
         }
       }
@@ -111,5 +123,50 @@ describe('NavDrawer.vue', () => {
 
     await reloadBtn.trigger('click');
     expect(applySpy).toHaveBeenCalledWith(mockRegistration);
+  });
+
+  it('opens SettingsDialog when Settings list item is clicked', async () => {
+    const { wrapper, navDrawer } = mountComponent();
+    await flushPromises();
+
+    const settingsBtn = wrapper.find('[data-testid="nav-settings-btn"]');
+    expect(settingsBtn.exists()).toBe(true);
+
+    await settingsBtn.trigger('click');
+    await flushPromises();
+
+    const settingsDialog = navDrawer.findComponent({ name: 'SettingsDialog' });
+    expect(settingsDialog.exists()).toBe(true);
+    expect(settingsDialog.props('modelValue')).toBe(true);
+  });
+
+  it('opens SyncDialog when Sync list item is clicked', async () => {
+    const { wrapper, navDrawer } = mountComponent();
+    await flushPromises();
+
+    const syncBtn = wrapper.find('[data-testid="nav-sync-btn"]');
+    expect(syncBtn.exists()).toBe(true);
+
+    await syncBtn.trigger('click');
+    await flushPromises();
+
+    const syncDialog = navDrawer.findComponent({ name: 'SyncDialog' });
+    expect(syncDialog.exists()).toBe(true);
+    expect(syncDialog.props('modelValue')).toBe(true);
+  });
+
+  it('opens HelpDialog when Help list item is clicked', async () => {
+    const { wrapper, navDrawer } = mountComponent();
+    await flushPromises();
+
+    const helpBtn = wrapper.find('[data-testid="nav-help-btn"]');
+    expect(helpBtn.exists()).toBe(true);
+
+    await helpBtn.trigger('click');
+    await flushPromises();
+
+    const helpDialog = navDrawer.findComponent({ name: 'HelpDialog' });
+    expect(helpDialog.exists()).toBe(true);
+    expect(helpDialog.props('modelValue')).toBe(true);
   });
 });

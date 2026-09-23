@@ -1,7 +1,21 @@
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { cleanupOutdatedCaches, precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { clientsClaim } from 'workbox-core';
+
+// Immediately claim any existing clients as soon as the service worker activates
+clientsClaim();
 
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
+
+// SPA Navigation fallback: ensure navigation requests (including routes/query params) serve index.html
+try {
+  const handler = createHandlerBoundToURL('index.html');
+  const navigationRoute = new NavigationRoute(handler);
+  registerRoute(navigationRoute);
+} catch (e) {
+  console.warn('[SW] NavigationRoute registration warning:', e);
+}
 
 // Handle manual update triggers from updateService.js
 self.addEventListener('message', (event) => {

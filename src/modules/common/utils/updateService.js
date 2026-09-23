@@ -53,15 +53,55 @@ export async function checkForAppUpdates() {
 }
 
 /**
- * Tells the waiting Service Worker to skip waiting and reloads the active client.
+ * Tells the waiting Service Worker to skip waiting and safely reloads the active client
+ * once the new Service Worker has taken control (controllerchange).
  * @param {ServiceWorkerRegistration} [registration]
  */
 export function applyUpdateAndReload(registration) {
-  if (registration?.waiting) {
-    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-  }
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') return;
+
+  const hasSW = typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
+  if (!hasSW) {
     window.location.reload();
+    return;
+  }
+
+  let reloaded = false;
+  const reloadOnce = () => {
+    if (!reloaded) {
+      reloaded = true;
+      window.location.reload();
+    }
+  };
+
+  // Wait for the newly activated Service Worker to claim the client before reloading.
+  navigator.serviceWorker.addEventListener('controllerchange', reloadOnce, { once: true });
+
+  // Fallback safety timeout: reload anyway if controllerchange does not fire within 2.5s.
+  setTimeout(reloadOnce, 2500);
+
+  const waitingWorker = registration?.waiting;
+  const installingWorker = registration?.installing;
+
+  if (waitingWorker) {
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+  } else if (installingWorker) {
+    installingWorker.addEventListener('statechange', () => {
+      if (installingWorker.state === 'installed') {
+        installingWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+  } else {
+    // If no worker waiting or installing, check current registration or trigger reload
+    Promise.resolve(navigator.serviceWorker.getRegistration?.()).then((reg) => {
+      if (reg?.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } else if (!reg?.installing) {
+        reloadOnce();
+      }
+    }).catch(() => {
+      reloadOnce();
+    });
   }
 }
 
@@ -75,6 +115,8 @@ export function onServiceWorkerUpdate(callback) {
     return () => {};
   }
 
+  let cleanupUpdateFound = () => {};
+
   const handleControllerChange = async () => {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
@@ -84,7 +126,37 @@ export function onServiceWorkerUpdate(callback) {
 
   navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
+  // Check if an update is already waiting or installing in background
+  Promise.resolve(navigator.serviceWorker.getRegistration?.()).then((registration) => {
+    if (!registration) return;
+
+    if (registration.waiting) {
+      callback(registration);
+      return;
+    }
+
+    const handleUpdateFound = () => {
+      const installing = registration.installing;
+      if (!installing) return;
+      installing.addEventListener('statechange', () => {
+        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+          callback(registration);
+        }
+      });
+    };
+
+    if (registration.addEventListener) {
+      registration.addEventListener('updatefound', handleUpdateFound);
+      cleanupUpdateFound = () => {
+        if (registration.removeEventListener) {
+          registration.removeEventListener('updatefound', handleUpdateFound);
+        }
+      };
+    }
+  }).catch(() => {});
+
   return () => {
     navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+    cleanupUpdateFound();
   };
 }

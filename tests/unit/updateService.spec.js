@@ -132,7 +132,7 @@ describe('updateService', () => {
   });
 
   describe('applyUpdateAndReload', () => {
-    it('sends SKIP_WAITING to waiting worker and reloads window', () => {
+    it('sends SKIP_WAITING to waiting worker and reloads on controllerchange', () => {
       const postMessage = vi.fn();
       const mockReg = {
         waiting: { postMessage }
@@ -140,10 +140,139 @@ describe('updateService', () => {
       const reload = vi.fn();
       global.window = { location: { reload } };
 
+      let controllerChangeHandler = null;
+      global.navigator = {
+        serviceWorker: {
+          addEventListener: vi.fn((event, handler) => {
+            if (event === 'controllerchange') {
+              controllerChangeHandler = handler;
+            }
+          }),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
       applyUpdateAndReload(mockReg);
 
       expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
-      expect(reload).toHaveBeenCalled();
+      // Should NOT reload immediately before controllerchange
+      expect(reload).not.toHaveBeenCalled();
+
+      // Trigger controllerchange
+      expect(controllerChangeHandler).toBeDefined();
+      controllerChangeHandler();
+
+      expect(reload).toHaveBeenCalledTimes(1);
+
+      // Should not reload a second time if controllerchange fires again
+      controllerChangeHandler();
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to reload if controllerchange does not fire within timeout', () => {
+      vi.useFakeTimers();
+      const postMessage = vi.fn();
+      const mockReg = {
+        waiting: { postMessage }
+      };
+      const reload = vi.fn();
+      global.window = { location: { reload } };
+
+      global.navigator = {
+        serviceWorker: {
+          addEventListener: vi.fn(),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
+      applyUpdateAndReload(mockReg);
+
+      expect(reload).not.toHaveBeenCalled();
+
+      // Advance time by 2500ms
+      vi.advanceTimersByTime(2500);
+
+      expect(reload).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it('waits for installing worker to become installed before sending SKIP_WAITING', () => {
+      const postMessage = vi.fn();
+      let stateChangeHandler = null;
+      const mockInstalling = {
+        state: 'installing',
+        postMessage,
+        addEventListener: vi.fn((event, handler) => {
+          if (event === 'statechange') {
+            stateChangeHandler = handler;
+          }
+        })
+      };
+      const mockReg = {
+        waiting: null,
+        installing: mockInstalling
+      };
+      const reload = vi.fn();
+      global.window = { location: { reload } };
+
+      let controllerChangeHandler = null;
+      global.navigator = {
+        serviceWorker: {
+          addEventListener: vi.fn((event, handler) => {
+            if (event === 'controllerchange') {
+              controllerChangeHandler = handler;
+            }
+          }),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
+      applyUpdateAndReload(mockReg);
+
+      expect(postMessage).not.toHaveBeenCalled();
+      expect(mockInstalling.addEventListener).toHaveBeenCalledWith('statechange', expect.any(Function));
+
+      // Transition installing worker to installed
+      mockInstalling.state = 'installed';
+      stateChangeHandler();
+
+      expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+      expect(reload).not.toHaveBeenCalled();
+
+      // Trigger controllerchange
+      controllerChangeHandler();
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('queries navigator.serviceWorker.getRegistration if registration argument is omitted', async () => {
+      const postMessage = vi.fn();
+      const mockReg = {
+        waiting: { postMessage }
+      };
+      const reload = vi.fn();
+      global.window = { location: { reload } };
+
+      let controllerChangeHandler = null;
+      global.navigator = {
+        serviceWorker: {
+          addEventListener: vi.fn((event, handler) => {
+            if (event === 'controllerchange') {
+              controllerChangeHandler = handler;
+            }
+          }),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
+      applyUpdateAndReload();
+
+      await Promise.resolve(); // let getRegistration promise resolve
+
+      expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+      expect(reload).not.toHaveBeenCalled();
+
+      controllerChangeHandler();
+      expect(reload).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -164,6 +293,73 @@ describe('updateService', () => {
 
       cleanup();
       expect(removeEventListener).toHaveBeenCalledWith('controllerchange', expect.any(Function));
+    });
+
+    it('notifies callback immediately if worker is already waiting', async () => {
+      const callback = vi.fn();
+      const mockReg = {
+        waiting: { postMessage: vi.fn() },
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+      };
+      global.navigator = {
+        serviceWorker: {
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
+      onServiceWorkerUpdate(callback);
+
+      await Promise.resolve(); // let getRegistration resolve
+
+      expect(callback).toHaveBeenCalledWith(mockReg);
+    });
+
+    it('listens for updatefound and notifies callback when installing worker is installed', async () => {
+      const callback = vi.fn();
+      let updateFoundHandler = null;
+      let stateChangeHandler = null;
+      const mockInstalling = {
+        state: 'installing',
+        addEventListener: vi.fn((event, handler) => {
+          if (event === 'statechange') stateChangeHandler = handler;
+        })
+      };
+      const mockReg = {
+        waiting: null,
+        installing: mockInstalling,
+        addEventListener: vi.fn((event, handler) => {
+          if (event === 'updatefound') updateFoundHandler = handler;
+        }),
+        removeEventListener: vi.fn()
+      };
+      global.navigator = {
+        serviceWorker: {
+          controller: {},
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          getRegistration: vi.fn().mockResolvedValue(mockReg)
+        }
+      };
+
+      onServiceWorkerUpdate(callback);
+
+      await Promise.resolve(); // let getRegistration resolve
+
+      expect(mockReg.addEventListener).toHaveBeenCalledWith('updatefound', expect.any(Function));
+      expect(callback).not.toHaveBeenCalled();
+
+      // Trigger updatefound
+      updateFoundHandler();
+      expect(mockInstalling.addEventListener).toHaveBeenCalledWith('statechange', expect.any(Function));
+
+      // Worker transitions to installed
+      mockInstalling.state = 'installed';
+      stateChangeHandler();
+
+      expect(callback).toHaveBeenCalledWith(mockReg);
     });
   });
 });

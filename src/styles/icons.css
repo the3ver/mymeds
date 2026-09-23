@@ -114,6 +114,9 @@
 .mdi-eye-off::before {
   content: "\F0209";
 }
+.mdi-menu::before {
+  content: "\F035C";
+}
 .mdi-menu-down::before {
   content: "\F035D";
 }

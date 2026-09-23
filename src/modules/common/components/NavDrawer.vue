@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
 import { checkForAppUpdates, applyUpdateAndReload } from '../utils/updateService'
 import packageJson from '../../../../package.json'
+
+const HelpDialog = defineAsyncComponent(() => import('./HelpDialog.vue'))
+const SettingsDialog = defineAsyncComponent(() => import('./SettingsDialog.vue'))
+const SyncDialog = defineAsyncComponent(() => import('./SyncDialog.vue'))
 
 const props = defineProps({
   modelValue: Boolean
@@ -110,14 +114,14 @@ const toggleTheme = () => {
         </v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="settingsDialog = true">
+      <v-list-item @click="settingsDialog = true" data-testid="nav-settings-btn">
         <template v-slot:prepend>
           <v-icon>mdi-cog</v-icon>
         </template>
         <v-list-item-title>{{ t('app.settings') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="handleOpenSync">
+      <v-list-item @click="handleOpenSync" data-testid="nav-sync-btn">
         <template v-slot:prepend>
           <v-icon>mdi-sync</v-icon>
         </template>
@@ -133,7 +137,7 @@ const toggleTheme = () => {
 
       <v-divider></v-divider>
 
-      <v-list-item @click="helpDialog = true">
+      <v-list-item @click="helpDialog = true" data-testid="nav-help-btn">
         <template v-slot:prepend>
           <v-icon>mdi-help-circle-outline</v-icon>
         </template>

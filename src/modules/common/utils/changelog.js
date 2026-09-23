@@ -5,6 +5,30 @@
 
 export const changelog = [
   {
+    version: '1.10.3',
+    date: '2026-09-23',
+    title: {
+      de: 'Fehlerbehebung beim PWA-Update & nahtloser Reload',
+      en: 'Fix PWA Update Reload & Seamless Activation'
+    },
+    highlights: {
+      de: [
+        'Behebt einen kritischen Fehler (Weißer Bildschirm / 404), wenn nach einer Update-Meldung "Für Update neu laden" geklickt wurde',
+        'Neuer Service Worker übernimmt sofort die Kontrolle (clientsClaim), bevor der Reload auf controllerchange sicher ausgeführt wird',
+        'SPA-Navigation-Fallback für Anfragen mit Query-Parametern im Service Worker integriert',
+        'Burger-Menü-Icon links oben in der App-Bar wiederhergestellt',
+        'Fehlende Komponenten-Imports im Navigationsmenü behoben (Einstellungen-, Synchronisations- und Hilfe-Dialoge öffnen wieder zuverlässig)'
+      ],
+      en: [
+        'Fixes a critical bug (blank white screen / 404) when clicking "Reload for update" after an update is announced',
+        'New Service Worker immediately takes control (clientsClaim) before reload is safely executed on controller change',
+        'SPA navigation fallback in Service Worker for requests with query parameters',
+        'Restored missing hamburger menu icon in the top app bar',
+        'Fixed component imports in navigation drawer (Settings, Sync, and Help dialogs open properly again)'
+      ]
+    }
+  },
+  {
     version: '1.10.2',
     date: '2026-09-23',
     title: {
