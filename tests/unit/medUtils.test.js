@@ -115,6 +115,49 @@ describe('checkAndUpdateDailyDose', () => {
     expect(updatedItems.find(m => m.name === 'TestMed').count).toBe(4.5);
   });
 
+  it('should calculate deductions according to weekly schedule', () => {
+    // Monday 2023-10-23
+    const monday = new Date('2023-10-23T10:00:00.000Z');
+    // Tuesday 2023-10-24 (1 day later)
+    const tuesday = new Date('2023-10-24T10:00:00.000Z');
+    // Following Monday 2023-10-30 (7 days later)
+    const nextMonday = new Date('2023-10-30T10:00:00.000Z');
+
+    const weeklyMeds = [
+      { name: 'MondayInjection', count: 4, dose: '1', schedule: { type: 'weekly', days: ['mo'] } },
+      { name: 'TuesdayPill', count: 10, dose: '1', schedule: { type: 'weekly', days: ['di'] } }
+    ];
+
+    // From Monday to Tuesday: TuesdayPill should deduct 1, MondayInjection 0
+    const res1 = checkAndUpdateDailyDose(weeklyMeds, monday.toDateString(), tuesday);
+    expect(res1.deductions['MondayInjection']).toBeUndefined();
+    expect(res1.deductions['TuesdayPill']).toBe(1);
+    expect(res1.updatedItems.find(m => m.name === 'MondayInjection').count).toBe(4);
+    expect(res1.updatedItems.find(m => m.name === 'TuesdayPill').count).toBe(9);
+
+    // From Monday to next Monday (7 days later): both should deduct 1 each
+    const res2 = checkAndUpdateDailyDose(weeklyMeds, monday.toDateString(), nextMonday);
+    expect(res2.deductions['MondayInjection']).toBe(1);
+    expect(res2.deductions['TuesdayPill']).toBe(1);
+  });
+
+  it('should calculate deductions according to interval schedule', () => {
+    // 2 days difference with interval = 2 days -> deduct 1
+    const meds = [
+      { name: 'AltDayMed', count: 10, dose: '1', schedule: { type: 'interval', intervalDays: 2 } }
+    ];
+
+    // 1 day passed: 0 deducted
+    const res1 = checkAndUpdateDailyDose(meds, yesterday.toDateString(), today); // 1 day diff
+    expect(res1.deductions['AltDayMed']).toBeUndefined();
+    expect(res1.updatedItems[0].count).toBe(10);
+
+    // 2 days passed: 1 deducted
+    const res2 = checkAndUpdateDailyDose(meds, twoDaysAgo.toDateString(), today); // 2 days diff
+    expect(res2.deductions['AltDayMed']).toBe(1);
+    expect(res2.updatedItems[0].count).toBe(9);
+  });
+
   it('should handle missing lastUpdateDate by setting it to today and not deducting', () => {
     const { updated, updatedItems, newDate, deductions } = checkAndUpdateDailyDose(
       mockMeds,
@@ -184,6 +227,38 @@ describe('calculateDaysRemaining', () => {
 
   it('should return 0 when count is 0 with valid dose', () => {
     expect(calculateDaysRemaining({ count: 0, dose: '1' })).toBe(0);
+  });
+
+  it('should calculate days remaining for weekly schedule', () => {
+    // 1 injection per week, 4 remaining -> 28 days
+    expect(calculateDaysRemaining({
+      count: 4,
+      dose: '1',
+      schedule: { type: 'weekly', days: ['mo'] }
+    })).toBe(28);
+
+    // 1 tablet twice a week (Mo, Fr), 4 remaining -> 14 days
+    expect(calculateDaysRemaining({
+      count: 4,
+      dose: '1',
+      schedule: { type: 'weekly', days: ['mo', 'fr'] }
+    })).toBe(14);
+  });
+
+  it('should calculate days remaining for interval schedule', () => {
+    // 1 tablet every 2 days, 10 remaining -> 20 days
+    expect(calculateDaysRemaining({
+      count: 10,
+      dose: '1',
+      schedule: { type: 'interval', intervalDays: 2 }
+    })).toBe(20);
+
+    // 2 tablets every 3 days, 10 remaining -> floor(10 * 3 / 2) = 15 days
+    expect(calculateDaysRemaining({
+      count: 10,
+      dose: '2',
+      schedule: { type: 'interval', intervalDays: 3 }
+    })).toBe(15);
   });
 });
 

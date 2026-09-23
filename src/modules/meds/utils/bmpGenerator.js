@@ -141,10 +141,42 @@ export function cleanDateToBmp(dateStr) {
   return dateStr.replace(/[^0-9]/g, '').slice(0, 8);
 }
 
+const DAY_LABELS = {
+  1: 'Mo', mo: 'Mo', mon: 'Mo',
+  2: 'Di', di: 'Di', tue: 'Di',
+  3: 'Mi', mi: 'Mi', wed: 'Mi',
+  4: 'Do', do: 'Do', thu: 'Do',
+  5: 'Fr', fr: 'Fr', fri: 'Fr',
+  6: 'Sa', sa: 'Sa', sat: 'Sa',
+  0: 'So', 7: 'So', so: 'So', sun: 'So'
+};
+
+function formatDayLabel(day) {
+  const key = String(day).toLowerCase();
+  return DAY_LABELS[key] || String(day);
+}
+
 /**
  * Converts MyMeds dose string into BMP dosage attributes (m, d, v, h or t).
  */
-export function parseDoseToBmpAttributes(doseStr) {
+export function parseDoseToBmpAttributes(doseStr, schedule) {
+  if (schedule && schedule.type === 'weekly') {
+    const rawDays = Array.isArray(schedule.days) ? schedule.days : [];
+    const formattedDays = rawDays.map(formatDayLabel).join(', ');
+    const dosePart = (doseStr && typeof doseStr === 'string' && doseStr.trim()) || '1';
+
+    if (rawDays.length === 1) {
+      return { t: `${dosePart}x wöchentlich (${formattedDays})` };
+    }
+    return { t: `Wöchentlich (${formattedDays}): ${dosePart}` };
+  }
+
+  if (schedule && schedule.type === 'interval') {
+    const intervalDays = schedule.intervalDays || 1;
+    const dosePart = (doseStr && typeof doseStr === 'string' && doseStr.trim()) || '1';
+    return { t: `Alle ${intervalDays} Tage: ${dosePart}` };
+  }
+
   if (!doseStr || typeof doseStr !== 'string') {
     return { m: '1', d: '0', v: '0', h: '0' };
   }
@@ -255,7 +287,7 @@ export function generateBmpXml({
     }
 
     // Dosage attributes
-    const doseAttrs = parseDoseToBmpAttributes(med.dose);
+    const doseAttrs = parseDoseToBmpAttributes(med.dose, med.schedule);
     if (doseAttrs.t) {
       mAttrs.push(`t="${escapeXml(doseAttrs.t)}"`);
     } else {

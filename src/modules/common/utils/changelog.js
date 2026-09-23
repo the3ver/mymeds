@@ -5,6 +5,26 @@
 
 export const changelog = [
   {
+    version: '1.10.0',
+    date: '2026-09-23',
+    title: {
+      de: 'Wöchentliche Einnahmepläne & flexible Intervalle',
+      en: 'Weekly Intake Schedules & Flexible Intervals'
+    },
+    highlights: {
+      de: [
+        'Unterstützung für wöchentliche Einnahmen (feste Wochentage) und flexible Intervalle (alle X Tage) (#8)',
+        'Taggenauer automatischer Abzug und Reichweitenberechnung für Nicht-Tagesdosierungen (#8)',
+        'Bundesmedikationsplan (BMP / DataMatrix) Export: Automatische Übernahme flexibler Einnahmen in das offizielle Freitext-Attribut (#8)'
+      ],
+      en: [
+        'Support for weekly intakes (selected weekdays) and custom intervals (every X days) (#8)',
+        'Accurate daily deduction and supply calculation for non-daily schedules (#8)',
+        'Bundesmedikationsplan (BMP / DataMatrix) export: Automatic export of flexible schedules to official freetext attribute (#8)'
+      ]
+    }
+  },
+  {
     version: '1.9.3',
     date: '2026-09-23',
     title: {

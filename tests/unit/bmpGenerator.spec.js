@@ -65,6 +65,32 @@ describe('bmpGenerator', () => {
     expect(xml).toContain('<M a="Med 3" m="0.5" d="0" v="0" h="0"/>');
   });
 
+  it('should export schedule as freetext attribute t in BMP XML for weekly and interval meds', () => {
+    const meds = [
+      {
+        name: 'WeeklySpritze',
+        dose: '1',
+        schedule: { type: 'weekly', days: ['mo'] }
+      },
+      {
+        name: 'MultiWeeklyMed',
+        dose: '1',
+        schedule: { type: 'weekly', days: ['di', 'fr'] }
+      },
+      {
+        name: 'IntervalPill',
+        dose: '1',
+        schedule: { type: 'interval', intervalDays: 2 }
+      }
+    ];
+
+    const xml = generateBmpXml({ meds });
+
+    expect(xml).toContain('<M a="WeeklySpritze" t="1x wöchentlich (Mo)"/>');
+    expect(xml).toContain('<M a="MultiWeeklyMed" t="Wöchentlich (Di, Fr): 1"/>');
+    expect(xml).toContain('<M a="IntervalPill" t="Alle 2 Tage: 1"/>');
+  });
+
   it('should properly escape XML special characters in all fields', () => {
     const meds = [
       {

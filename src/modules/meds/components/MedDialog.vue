@@ -23,6 +23,29 @@ const emit = defineEmits(['update:modelValue', 'confirm'])
 const { t } = useI18n()
 
 const localMed = ref({ ...props.med })
+const scheduleType = ref(props.med?.schedule?.type || 'daily')
+const weeklyDays = ref(Array.isArray(props.med?.schedule?.days) && props.med.schedule.days.length > 0 ? [...props.med.schedule.days] : ['mo'])
+const intervalDays = ref(props.med?.schedule?.intervalDays || 2)
+
+const availableWeekdays = [
+  { id: 'mo', labelKey: 'med.dayMo' },
+  { id: 'di', labelKey: 'med.dayDi' },
+  { id: 'mi', labelKey: 'med.dayMi' },
+  { id: 'do', labelKey: 'med.dayDo' },
+  { id: 'fr', labelKey: 'med.dayFr' },
+  { id: 'sa', labelKey: 'med.daySa' },
+  { id: 'so', labelKey: 'med.daySo' },
+]
+
+function toggleDay(dayId) {
+  if (weeklyDays.value.includes(dayId)) {
+    if (weeklyDays.value.length > 1) {
+      weeklyDays.value = weeklyDays.value.filter(d => d !== dayId)
+    }
+  } else {
+    weeklyDays.value.push(dayId)
+  }
+}
 
 // A palette of 10 fitting colors
 const colors = [
@@ -34,12 +57,21 @@ const colors = [
 watch(() => props.modelValue, (val) => {
   if (val) {
     localMed.value = { ...props.med }
+    if (props.med?.schedule) {
+      scheduleType.value = props.med.schedule.type || 'daily'
+      weeklyDays.value = Array.isArray(props.med.schedule.days) && props.med.schedule.days.length > 0 ? [...props.med.schedule.days] : ['mo']
+      intervalDays.value = props.med.schedule.intervalDays || 2
+    } else {
+      scheduleType.value = 'daily'
+      weeklyDays.value = ['mo']
+      intervalDays.value = 2
+    }
     // Set default color if none exists
     if (!localMed.value.color) {
       localMed.value.color = colors[0]
     }
   }
-})
+}, { immediate: true })
 
 const close = () => {
   emit('update:modelValue', false)
@@ -47,6 +79,19 @@ const close = () => {
 
 const save = () => {
   if (localMed.value.name && localMed.value.count && localMed.value.dose) {
+    if (scheduleType.value === 'weekly') {
+      localMed.value.schedule = {
+        type: 'weekly',
+        days: weeklyDays.value
+      }
+    } else if (scheduleType.value === 'interval') {
+      localMed.value.schedule = {
+        type: 'interval',
+        intervalDays: Math.max(1, parseInt(intervalDays.value, 10) || 1)
+      }
+    } else {
+      delete localMed.value.schedule
+    }
     emit('confirm', localMed.value)
     close()
   }
@@ -60,6 +105,15 @@ const addPackageSize = (size) => {
   const currentCount = parseFloat(localMed.value.count) || 0
   localMed.value.count = currentCount + size
 }
+
+defineExpose({
+  scheduleType,
+  weeklyDays,
+  intervalDays,
+  save,
+  close,
+  localMed
+})
 </script>
 
 <template>
@@ -108,6 +162,53 @@ const addPackageSize = (size) => {
         </div>
 
         <DoseInput v-model="localMed.dose" :label="t('med.dose') + ' *'" />
+
+        <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.schedule') }}</div>
+        <v-btn-toggle
+          v-model="scheduleType"
+          mandatory
+          divided
+          density="compact"
+          color="primary"
+          variant="outlined"
+          class="mb-3 w-100 d-flex"
+        >
+          <v-btn value="daily" class="flex-grow-1">{{ t('med.scheduleDaily') }}</v-btn>
+          <v-btn value="weekly" class="flex-grow-1">{{ t('med.scheduleWeekly') }}</v-btn>
+          <v-btn value="interval" class="flex-grow-1">{{ t('med.scheduleInterval') }}</v-btn>
+        </v-btn-toggle>
+
+        <!-- Weekly days selector -->
+        <div v-if="scheduleType === 'weekly'" class="mb-3">
+          <div class="text-caption text-grey mb-1">{{ t('med.weeklyDays') }}</div>
+          <div class="d-flex flex-wrap gap-1">
+            <v-chip
+              v-for="day in availableWeekdays"
+              :key="day.id"
+              :color="weeklyDays.includes(day.id) ? 'primary' : 'default'"
+              :variant="weeklyDays.includes(day.id) ? 'flat' : 'outlined'"
+              size="small"
+              class="cursor-pointer"
+              @click="toggleDay(day.id)"
+            >
+              {{ t(day.labelKey) }}
+            </v-chip>
+          </div>
+        </div>
+
+        <!-- Interval days selector -->
+        <div v-if="scheduleType === 'interval'" class="mb-3">
+          <v-text-field
+            v-model.number="intervalDays"
+            :label="t('med.intervalDaysLabel')"
+            type="number"
+            min="1"
+            max="365"
+            variant="underlined"
+            density="compact"
+            hide-details
+          ></v-text-field>
+        </div>
 
         <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.color') }}</div>
         <div class="d-flex flex-wrap gap-2">

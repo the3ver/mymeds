@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../../common/utils/dataService'
-import { parseDose, getStatusColor } from '../utils/medUtils'
+import { parseDose, getStatusColor, calculateDaysRemaining } from '../utils/medUtils'
 
 const props = defineProps({
   item: {
@@ -74,9 +74,25 @@ const displayPlan = computed(() => {
 })
 
 const daysRemaining = computed(() => {
-  const dose = dailyDoseTotal.value
-  if (!dose || dose <= 0) return null
-  return Math.floor(props.item.count / dose)
+  return calculateDaysRemaining(props.item)
+})
+
+const scheduleChipText = computed(() => {
+  const schedule = props.item.schedule
+  if (!schedule || schedule.type === 'daily') return ''
+  if (schedule.type === 'weekly') {
+    const days = Array.isArray(schedule.days) ? schedule.days : []
+    const dayLabels = days.map(d => {
+      const code = String(d).toLowerCase().slice(0, 2)
+      const capitalized = code.charAt(0).toUpperCase() + code.slice(1)
+      return t(`med.day${capitalized}`)
+    }).join(', ')
+    return dayLabels || t('med.scheduleWeekly')
+  }
+  if (schedule.type === 'interval') {
+    return t('med.everyXDays', { n: schedule.intervalDays || 1 })
+  }
+  return ''
 })
 
 const emptyDate = computed(() => {
@@ -125,6 +141,7 @@ const statusColor = computed(() => {
         <div class="d-flex flex-wrap align-center gap-2 text-body-1 text-grey">
           <span v-if="item.ingredient">({{ item.ingredient }})</span>
           <span class="text-high-emphasis text-body-2 font-weight-bold ml-1">{{ displayPlan }}</span>
+          <v-chip v-if="scheduleChipText" size="x-small" color="primary" variant="tonal" class="ml-1">{{ scheduleChipText }}</v-chip>
         </div>
       </v-card-title>
 
@@ -199,6 +216,10 @@ const statusColor = computed(() => {
           <div class="d-flex justify-space-between mb-2">
             <span class="text-grey">{{ t('med.dose') }}:</span>
             <span class="font-weight-medium">{{ dailyDoseTotal }}</span>
+          </div>
+          <div v-if="scheduleChipText" class="d-flex justify-space-between mb-2">
+            <span class="text-grey">{{ t('med.schedule') }}:</span>
+            <span class="font-weight-medium">{{ scheduleChipText }}</span>
           </div>
           <div class="d-flex justify-space-between mb-2">
             <span class="text-grey">{{ t('med.daysRemaining') }}:</span>

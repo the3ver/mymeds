@@ -94,4 +94,22 @@ describe('MedCard.vue', () => {
     expect(wrapper.emitted('delete')).toBeDefined();
     expect(wrapper.emitted('delete').length).toBe(1);
   });
+
+  it('should display schedule chip for weekly and interval medications', () => {
+    const weeklyWrapper = mountComponent({
+      item: {
+        ...defaultItem,
+        schedule: { type: 'weekly', days: ['mo', 'fr'] }
+      }
+    });
+    expect(weeklyWrapper.text()).toContain('Mo, Fr');
+
+    const intervalWrapper = mountComponent({
+      item: {
+        ...defaultItem,
+        schedule: { type: 'interval', intervalDays: 3 }
+      }
+    });
+    expect(intervalWrapper.text()).toContain('Alle 3 Tage');
+  });
 });
