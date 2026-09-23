@@ -457,6 +457,22 @@ const close = () => {
 
             <!-- Slot Configuration (Visible when enabled) -->
             <div v-if="reminderEnabled" class="pl-2">
+              <!-- Android Battery Optimization Guidance -->
+              <v-alert
+                type="info"
+                variant="tonal"
+                density="compact"
+                class="mb-3"
+                icon="mdi-battery-sync"
+              >
+                <div class="text-subtitle-2 font-weight-bold mb-1">
+                  {{ t('reminders.batteryOptimizationTitle') }}
+                </div>
+                <div class="text-caption">
+                  {{ t('reminders.batteryOptimizationText') }}
+                </div>
+              </v-alert>
+
               <div class="text-caption text-medium-emphasis text-uppercase font-weight-bold mb-2">
                 {{ t('reminders.standardTimes') }}
               </div>

@@ -222,6 +222,25 @@ describe('SettingsDialog.vue', () => {
     wrapper.unmount();
   });
 
+  it('displays battery optimization guidance when reminders are enabled', async () => {
+    reminderService.isReminderSupported.mockReturnValue(true);
+    dataService.getReminderSettings.mockResolvedValue({
+      enabled: true,
+      slots: [
+        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
+      ],
+      lastNotified: {},
+    });
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(document.body.textContent).toContain('Wichtig für Android- / Pixel-Nutzer');
+    expect(document.body.textContent).toContain('Nicht eingeschränkt');
+
+    wrapper.unmount();
+  });
+
   it('renders vaultDisplayMode section and calls saveVaultDisplayMode on change', async () => {
     const wrapper = mountComponent();
     await flushPromises();

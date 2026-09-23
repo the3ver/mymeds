@@ -204,4 +204,21 @@ describe('reminderService', () => {
       expect(result.updatedLastNotified['2026-09-06_custom_1']).toBeDefined();
     });
   });
+
+  describe('supportsNotificationTriggers', () => {
+    it('returns false when window or Notification is missing or lacks showTrigger', () => {
+      expect(reminderService.supportsNotificationTriggers()).toBe(false);
+    });
+
+    it('returns true when showTrigger and TimestampTrigger are available', () => {
+      window.Notification = class {};
+      Notification.prototype.showTrigger = {};
+      window.TimestampTrigger = class {};
+
+      expect(reminderService.supportsNotificationTriggers()).toBe(true);
+
+      delete window.TimestampTrigger;
+      delete Notification.prototype.showTrigger;
+    });
+  });
 });

@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.9.3',
+    date: '2026-09-23',
+    title: {
+      de: 'Zuverlässigere Benachrichtigungen & Android-Akku-Leitfaden',
+      en: 'Reliable Notifications & Android Battery Guidance'
+    },
+    highlights: {
+      de: [
+        'Anleitung zur Android-Akku-Freigabe („Nicht eingeschränkt“) in den Einstellungen ergänzt (#38)',
+        'Dynamische Prüfung auf Notification-Triggers und optimierte Hintergrundprüfungen (#38)'
+      ],
+      en: [
+        'Added Android battery optimization guidance ("Unrestricted") in reminder settings (#38)',
+        'Dynamic check for Notification Triggers and optimized background checks (#38)'
+      ]
+    }
+  },
+  {
     version: '1.9.2',
     date: '2026-09-23',
     title: {

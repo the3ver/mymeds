@@ -276,3 +276,19 @@ export async function sendTestNotification(title = 'MyMeds', body = 'Erinnerung:
     return false;
   }
 }
+
+/**
+ * Checks whether Notification Triggers (TimestampTrigger) are supported.
+ * Note: Discontinued in standard Chromium, but checked dynamically.
+ * @returns {boolean}
+ */
+export function supportsNotificationTriggers() {
+  if (typeof window === 'undefined' || !('Notification' in window) || !window.Notification) {
+    return false;
+  }
+  return Boolean(
+    window.Notification.prototype &&
+    'showTrigger' in window.Notification.prototype &&
+    typeof window.TimestampTrigger !== 'undefined'
+  );
+}

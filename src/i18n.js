@@ -411,7 +411,9 @@ export const messages = {
       sendTest: 'Send test notification',
       testSent: 'Test notification sent!',
       notificationTitle: 'MyMeds',
-      notificationBody: 'Reminder: Time for your medication.'
+      notificationBody: 'Reminder: Time for your medication.',
+      batteryOptimizationTitle: 'Important for Android / Pixel users',
+      batteryOptimizationText: 'To ensure reminders arrive reliably on time in the background, set battery usage for MyMeds to "Unrestricted" in Android App Info (App info -> Battery usage -> Unrestricted).'
     },
     storage: {
       title: 'Storage & Persistence',
@@ -834,7 +836,9 @@ export const messages = {
       sendTest: 'Test-Benachrichtigung senden',
       testSent: 'Test-Benachrichtigung wurde gesendet!',
       notificationTitle: 'MyMeds',
-      notificationBody: 'Erinnerung: Zeit für deine Medikamente.'
+      notificationBody: 'Erinnerung: Zeit für deine Medikamente.',
+      batteryOptimizationTitle: 'Wichtig für Android- / Pixel-Nutzer',
+      batteryOptimizationText: 'Damit Erinnerungen im Hintergrund zuverlässig pünktlich ankommen, stelle in den Android-App-Einstellungen die Akkunutzung für MyMeds auf „Nicht eingeschränkt“ (App-Info -> Akkunutzung der App -> Nicht eingeschränkt).'
     },
     storage: {
       title: 'Speicher & Persistenz',
