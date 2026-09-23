@@ -1,14 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
 import * as biometricService from '../utils/biometricSessionService';
 import { unlock } from '../../../app-state';
-import CreateDatabaseDialog from './CreateDatabaseDialog.vue';
-import DatabaseUnlockDialog from './DatabaseUnlockDialog.vue';
-import ConfirmDialog from './ConfirmDialog.vue';
-import RenameDatabaseDialog from './RenameDatabaseDialog.vue';
-import SyncDialog from './SyncDialog.vue';
+
+const CreateDatabaseDialog = defineAsyncComponent(() => import('./CreateDatabaseDialog.vue'));
+const DatabaseUnlockDialog = defineAsyncComponent(() => import('./DatabaseUnlockDialog.vue'));
+const ConfirmDialog = defineAsyncComponent(() => import('./ConfirmDialog.vue'));
+const RenameDatabaseDialog = defineAsyncComponent(() => import('./RenameDatabaseDialog.vue'));
+const SyncDialog = defineAsyncComponent(() => import('./SyncDialog.vue'));
 
 const { t, locale } = useI18n();
 const databases = ref([]);

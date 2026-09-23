@@ -1,0 +1,341 @@
+/* Material Design Icons - Optimized subset for MyMeds (WOFF2 only) */
+@font-face {
+  font-family: "Material Design Icons";
+  src: url("@mdi/font/fonts/materialdesignicons-webfont.woff2?v=7.4.47") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.mdi:before,
+.mdi-set {
+  display: inline-block;
+  font: normal normal normal 24px/1 "Material Design Icons";
+  font-size: inherit;
+  text-rendering: auto;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mdi-checkbox-marked::before {
+  content: "\F0132";
+}
+.mdi-checkbox-blank-outline::before {
+  content: "\F0131";
+}
+.mdi-minus-box::before {
+  content: "\F0375";
+}
+.mdi-circle::before {
+  content: "\F0765";
+}
+.mdi-arrow-up::before {
+  content: "\F005D";
+}
+.mdi-arrow-down::before {
+  content: "\F0045";
+}
+.mdi-chevron-down::before {
+  content: "\F0140";
+}
+.mdi-chevron-up::before {
+  content: "\F0143";
+}
+.mdi-check::before {
+  content: "\F012C";
+}
+.mdi-close-circle::before {
+  content: "\F0159";
+}
+.mdi-close::before {
+  content: "\F0156";
+}
+.mdi-check-circle::before {
+  content: "\F05E0";
+}
+.mdi-information::before {
+  content: "\F02FC";
+}
+.mdi-alert-circle::before {
+  content: "\F0028";
+}
+.mdi-chevron-left::before {
+  content: "\F0141";
+}
+.mdi-chevron-right::before {
+  content: "\F0142";
+}
+.mdi-radiobox-marked::before {
+  content: "\F043E";
+}
+.mdi-radiobox-blank::before {
+  content: "\F043D";
+}
+.mdi-pencil::before {
+  content: "\F03EB";
+}
+.mdi-star-outline::before {
+  content: "\F04D2";
+}
+.mdi-star::before {
+  content: "\F04CE";
+}
+.mdi-star-half-full::before {
+  content: "\F04D0";
+}
+.mdi-cached::before {
+  content: "\F00E8";
+}
+.mdi-page-first::before {
+  content: "\F0600";
+}
+.mdi-page-last::before {
+  content: "\F0601";
+}
+.mdi-unfold-more-horizontal::before {
+  content: "\F054F";
+}
+.mdi-paperclip::before {
+  content: "\F03E2";
+}
+.mdi-plus::before {
+  content: "\F0415";
+}
+.mdi-minus::before {
+  content: "\F0374";
+}
+.mdi-calendar::before {
+  content: "\F00ED";
+}
+.mdi-eye::before {
+  content: "\F0208";
+}
+.mdi-eye-off::before {
+  content: "\F0209";
+}
+.mdi-menu-down::before {
+  content: "\F035D";
+}
+.mdi-menu-up::before {
+  content: "\F0360";
+}
+.mdi-filter-variant::before {
+  content: "\F0236";
+}
+.mdi-lock::before {
+  content: "\F033E";
+}
+.mdi-qrcode-scan::before {
+  content: "\F0433";
+}
+.mdi-barcode-scan::before {
+  content: "\F0072";
+}
+.mdi-format-list-bulleted::before {
+  content: "\F0279";
+}
+.mdi-calendar-clock::before {
+  content: "\F00F0";
+}
+.mdi-link-plus::before {
+  content: "\F0C94";
+}
+.mdi-doctor::before {
+  content: "\F0A42";
+}
+.mdi-needle::before {
+  content: "\F0391";
+}
+.mdi-emoticon-sick::before {
+  content: "\F157C";
+}
+.mdi-note-text::before {
+  content: "\F039E";
+}
+.mdi-calendar-range::before {
+  content: "\F0679";
+}
+.mdi-delete::before {
+  content: "\F01B4";
+}
+.mdi-calendar-export::before {
+  content: "\F0B24";
+}
+.mdi-key-alert::before {
+  content: "\F1983";
+}
+.mdi-view-agenda-outline::before {
+  content: "\F11D8";
+}
+.mdi-view-compact-outline::before {
+  content: "\F0E6C";
+}
+.mdi-shield-lock-outline::before {
+  content: "\F0CCC";
+}
+.mdi-fingerprint::before {
+  content: "\F0237";
+}
+.mdi-dots-vertical::before {
+  content: "\F01D9";
+}
+.mdi-swap-vertical::before {
+  content: "\F04E2";
+}
+.mdi-fingerprint-off::before {
+  content: "\F0EB1";
+}
+.mdi-delete-outline::before {
+  content: "\F09E7";
+}
+.mdi-pill::before {
+  content: "\F0402";
+}
+.mdi-calendar-check::before {
+  content: "\F00EF";
+}
+.mdi-calendar-plus::before {
+  content: "\F00F3";
+}
+.mdi-calendar-edit::before {
+  content: "\F08A7";
+}
+.mdi-export::before {
+  content: "\F0207";
+}
+.mdi-import::before {
+  content: "\F02FA";
+}
+.mdi-delete-sweep::before {
+  content: "\F05E9";
+}
+.mdi-download::before {
+  content: "\F01DA";
+}
+.mdi-share-variant::before {
+  content: "\F0497";
+}
+.mdi-alert::before {
+  content: "\F0026";
+}
+.mdi-weather-sunny::before {
+  content: "\F0599";
+}
+.mdi-weather-night::before {
+  content: "\F0594";
+}
+.mdi-cog::before {
+  content: "\F0493";
+}
+.mdi-sync::before {
+  content: "\F04E6";
+}
+.mdi-database::before {
+  content: "\F01BC";
+}
+.mdi-help-circle-outline::before {
+  content: "\F0625";
+}
+.mdi-sparkles::before {
+  content: "\F0674";
+}
+.mdi-creation::before {
+  content: "\F0674";
+}
+.mdi-update::before {
+  content: "\F06B0";
+}
+.mdi-tag-text-outline::before {
+  content: "\F04FD";
+}
+.mdi-open-in-new::before {
+  content: "\F03CC";
+}
+.mdi-github::before {
+  content: "\F02A4";
+}
+.mdi-license::before {
+  content: "\F0FC3";
+}
+.mdi-package-variant-closed::before {
+  content: "\F03D7";
+}
+.mdi-battery-sync::before {
+  content: "\F1834";
+}
+.mdi-bell-ring-outline::before {
+  content: "\F009F";
+}
+.mdi-shield-check::before {
+  content: "\F0565";
+}
+.mdi-shield-alert-outline::before {
+  content: "\F0ECD";
+}
+.mdi-shield-plus-outline::before {
+  content: "\F0ADB";
+}
+.mdi-database-outline::before {
+  content: "\F1632";
+}
+.mdi-restore::before {
+  content: "\F099B";
+}
+.mdi-upload::before {
+  content: "\F0552";
+}
+.mdi-safe::before {
+  content: "\F0A6A";
+}
+.mdi-content-copy::before {
+  content: "\F018F";
+}
+.mdi-key::before {
+  content: "\F0306";
+}
+.mdi-package-down::before {
+  content: "\F03D4";
+}
+.mdi-content-save::before {
+  content: "\F0193";
+}
+.mdi-check-circle-outline::before {
+  content: "\F05E1";
+}
+.mdi-zip-box::before {
+  content: "\F05C4";
+}
+.mdi-code-tags::before {
+  content: "\F0174";
+}
+.mdi-account-outline::before {
+  content: "\F0013";
+}
+.mdi-refresh::before {
+  content: "\F0450";
+}
+.mdi-camera-flip::before {
+  content: "\F15D9";
+}
+.mdi-flashlight-off::before {
+  content: "\F0245";
+}
+.mdi-flashlight::before {
+  content: "\F0244";
+}
+.mdi-camera::before {
+  content: "\F0100";
+}
+.mdi-code-json::before {
+  content: "\F0626";
+}
+.mdi-account::before {
+  content: "\F0004";
+}
+.mdi-hospital-building::before {
+  content: "\F02E1";
+}
+.mdi-package-variant::before {
+  content: "\F03D6";
+}

@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.10.1',
+    date: '2026-09-23',
+    title: {
+      de: 'Bundle- & Ladezeit-Optimierung',
+      en: 'Bundle & Load Time Optimization'
+    },
+    highlights: {
+      de: [
+        'Massive Reduzierung der initialen Bundle-Größe (Initiales JS von 1,75 MB auf 155 kB / CSS von 848 kB auf 405 kB reduziert) (#21)',
+        'Automatisches Tree-Shaking für Vuetify über vite-plugin-vuetify (#21)',
+        'Code-Splitting via dynamic imports für schwere Dialoge (Barcode-Scanner, Export, Cloud-Sync) (#21)',
+        'Optimierter WOFF2-Icon-Subset eliminiert 3,2 MB nicht benötigter Font-Dateien (#21)'
+      ],
+      en: [
+        'Massive reduction of initial bundle size (Initial JS reduced from 1.75 MB to 155 kB / CSS from 848 kB to 405 kB) (#21)',
+        'Automatic Vuetify tree-shaking via vite-plugin-vuetify (#21)',
+        'Code-splitting via dynamic imports for heavy dialogs (barcode scanner, export, cloud sync) (#21)',
+        'Optimized WOFF2 icon subset eliminating 3.2 MB of unused font files (#21)'
+      ]
+    }
+  },
+  {
     version: '1.10.0',
     date: '2026-09-23',
     title: {

@@ -1,16 +1,17 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state as appState } from './app-state'
 import MedDialog from './modules/meds/components/MedDialog.vue'
 import MedList from './modules/meds/components/MedList.vue'
-import BmpScanDialog from './modules/meds/components/BmpScanDialog.vue'
-import BmpExportDialog from './modules/meds/components/BmpExportDialog.vue'
 import CalendarPage from './modules/calendar/components/CalendarPage.vue'
-import DataDialog from './modules/common/components/DataDialog.vue'
 import { consumeShortcutIntent } from './modules/common/utils/shortcutService'
 import { updateCriticalMedsBadge } from './modules/common/utils/badgingService'
 import { getSettings } from './modules/common/utils/dataService'
+
+const BmpScanDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpScanDialog.vue'))
+const BmpExportDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpExportDialog.vue'))
+const DataDialog = defineAsyncComponent(() => import('./modules/common/components/DataDialog.vue'))
 
 defineProps({
   dataDialogOpen: Boolean,
@@ -208,11 +209,11 @@ defineExpose({
       @confirm="saveEdit"
     />
 
-    <BmpScanDialog v-model="bmpScanDialog" />
+    <BmpScanDialog v-if="bmpScanDialog" v-model="bmpScanDialog" />
 
-    <BmpExportDialog v-model="bmpExportDialog" />
+    <BmpExportDialog v-if="bmpExportDialog" v-model="bmpExportDialog" />
 
-    <DataDialog :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
+    <DataDialog v-if="dataDialogOpen" :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
   </div>
 </template>
 

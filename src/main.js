@@ -8,9 +8,7 @@ import * as dataService from './modules/common/utils/dataService'
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import '@mdi/font/css/materialdesignicons.css'
+import './styles/icons.css'
 
 async function initializeApp() {
   // Fetch settings asynchronously
@@ -26,8 +24,6 @@ async function initializeApp() {
 
   // Create Vuetify instance and set the theme
   const vuetify = createVuetify({
-    components,
-    directives,
     theme: {
       defaultTheme: settings.theme,
     },

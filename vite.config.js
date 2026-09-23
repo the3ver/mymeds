@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
@@ -10,6 +11,7 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    vuetify({ autoImport: true }),
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
@@ -85,6 +87,32 @@ export default defineConfig({
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..']
+    }
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('@zxing')) {
+              return 'vendor-zxing'
+            }
+            if (id.includes('mqtt') || id.includes('peerjs')) {
+              return 'vendor-sync'
+            }
+            if (id.includes('qrcode')) {
+              return 'vendor-qrcode'
+            }
+            if (id.includes('vuetify')) {
+              return 'vendor-vuetify'
+            }
+            if (id.includes('vue') || id.includes('vue-i18n')) {
+              return 'vendor-vue'
+            }
+          }
+        }
+      }
     }
   }
 })

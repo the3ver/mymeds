@@ -6,9 +6,6 @@ import { state as appState } from '../../../app-state'
 import * as dataService from '../utils/dataService'
 import { checkForAppUpdates, applyUpdateAndReload } from '../utils/updateService'
 import packageJson from '../../../../package.json'
-import HelpDialog from './HelpDialog.vue'
-import SettingsDialog from './SettingsDialog.vue'
-import SyncDialog from './SyncDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean
