@@ -112,4 +112,34 @@ describe('MedCard.vue', () => {
     });
     expect(intervalWrapper.text()).toContain('Alle 3 Tage');
   });
+
+  it('should render PillAvatar with shape and pillSize when shape is specified', () => {
+    const wrapper = mountComponent({
+      item: {
+        ...defaultItem,
+        shape: 'round-score',
+        pillSize: 'small',
+        color: 'deep-orange',
+      }
+    });
+
+    const pillAvatar = wrapper.findComponent({ name: 'PillAvatar' });
+    expect(pillAvatar.exists()).toBe(true);
+    expect(pillAvatar.props('shape')).toBe('round-score');
+    expect(pillAvatar.props('pillSize')).toBe('small');
+    expect(pillAvatar.props('color')).toBe('deep-orange');
+  });
+
+  it('should render letter in PillAvatar when shape is letter or undefined', () => {
+    const wrapper = mountComponent({
+      item: {
+        ...defaultItem,
+        shape: 'letter',
+      }
+    });
+
+    const pillAvatar = wrapper.findComponent({ name: 'PillAvatar' });
+    expect(pillAvatar.exists()).toBe(true);
+    expect(pillAvatar.text()).toBe('I');
+  });
 });

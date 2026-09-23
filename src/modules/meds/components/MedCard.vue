@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../../common/utils/dataService'
 import { parseDose, getStatusColor, calculateDaysRemaining } from '../utils/medUtils'
+import PillAvatar from './PillAvatar.vue'
 
 const props = defineProps({
   item: {
@@ -131,9 +132,15 @@ const statusColor = computed(() => {
   >
     <v-card-item>
       <template v-slot:prepend>
-        <v-avatar :color="item.color" class="mr-2">
-          <span class="text-h6 text-white">{{ item.name.charAt(0).toUpperCase() }}</span>
-        </v-avatar>
+        <div class="mr-3 d-flex align-center justify-center">
+          <PillAvatar
+            :shape="item.shape || 'letter'"
+            :pill-size="item.pillSize || 'medium'"
+            :color="item.color || 'blue'"
+            :name="item.name"
+            :size="42"
+          />
+        </div>
       </template>
 
       <v-card-title class="text-wrap" style="line-height: 1.2;">

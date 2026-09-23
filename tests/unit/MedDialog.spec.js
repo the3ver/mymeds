@@ -82,4 +82,31 @@ describe('MedDialog.vue', () => {
       intervalDays: 3
     });
   });
+
+  it('includes white, amber, and deep-orange in available colors', () => {
+    const wrapper = mountComponent({
+      med: { name: 'Aspirin', count: 10, dose: '1' }
+    });
+
+    expect(wrapper.vm.colors).toContain('white');
+    expect(wrapper.vm.colors).toContain('amber');
+    expect(wrapper.vm.colors).toContain('deep-orange');
+  });
+
+  it('emits selected shape and pillSize on save', async () => {
+    const wrapper = mountComponent({
+      med: { name: 'CardioASS', count: 30, dose: '1' }
+    });
+
+    wrapper.vm.localMed.shape = 'heart';
+    wrapper.vm.localMed.pillSize = 'small';
+    wrapper.vm.localMed.color = 'deep-orange';
+    wrapper.vm.save();
+
+    expect(wrapper.emitted('confirm')).toBeDefined();
+    const confirmedMed = wrapper.emitted('confirm')[0][0];
+    expect(confirmedMed.shape).toBe('heart');
+    expect(confirmedMed.pillSize).toBe('small');
+    expect(confirmedMed.color).toBe('deep-orange');
+  });
 });

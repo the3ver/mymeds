@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.10.2',
+    date: '2026-09-23',
+    title: {
+      de: 'Stilisierte Pillenformen, Größen & erweiterte Farbpalette',
+      en: 'Stylized Pill Shapes, Sizes & Expanded Color Palette'
+    },
+    highlights: {
+      de: [
+        'Auswahl aus 18 stilisierten Vektor-Pillenformen und Darreichungsformen (Rund, Bruchkerben, Kapsel, Oblong, Herz, Diamant, Tropfen, Spray etc.)',
+        'Pillengrößen-Auswahl (Klein S, Mittel M, Groß L) zur einfachen visuellen Unterscheidung ähnlich aussehender Tabletten',
+        'Smart-Default für zweifarbige Kapseln (Kappe farbig, Körper weiß) und optimierte plastische 3D-Darstellung weißer Tabletten',
+        'Erweiterte Farbpalette um Weiß, Deep-Orange und Amber (Gelb) mit interaktiver Live-Vorschau im Dialog'
+      ],
+      en: [
+        'Choice of 18 stylized vector pill shapes and administration forms (round, scored, capsule, oblong, heart, diamond, drops, spray, etc.)',
+        'Pill size selector (Small S, Medium M, Large L) for easy visual distinction between similar medications',
+        'Smart default for dual-color capsules (colored cap, white body) and optimized 3D embossed look for white pills',
+        'Expanded color palette with white, deep-orange, and amber (yellow) with interactive live preview in dialog'
+      ]
+    }
+  },
+  {
     version: '1.10.1',
     date: '2026-09-23',
     title: {

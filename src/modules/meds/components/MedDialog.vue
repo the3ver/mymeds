@@ -2,12 +2,13 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DoseInput from './DoseInput.vue'
+import PillAvatar from './PillAvatar.vue'
 
 const props = defineProps({
   modelValue: Boolean,
   med: {
     type: Object,
-    default: () => ({ name: '', ingredient: '', count: '', packageSize: '', dose: '', color: '' })
+    default: () => ({ name: '', ingredient: '', count: '', packageSize: '', dose: '', color: '', shape: 'letter', pillSize: 'medium' })
   },
   title: {
     type: String,
@@ -47,10 +48,31 @@ function toggleDay(dayId) {
   }
 }
 
-// A palette of 10 fitting colors
+// Expanded palette with white, deep-orange, amber
 const colors = [
-  'red', 'pink', 'purple', 'indigo', 'blue',
-  'cyan', 'teal', 'green', 'orange', 'blue-grey'
+  'white', 'deep-orange', 'orange', 'amber', 'red', 'pink',
+  'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'blue-grey'
+]
+
+const availableShapes = [
+  { id: 'letter', labelKey: 'med.shapes.letter' },
+  { id: 'round', labelKey: 'med.shapes.round' },
+  { id: 'round-score', labelKey: 'med.shapes.roundScore' },
+  { id: 'round-cross', labelKey: 'med.shapes.roundCross' },
+  { id: 'capsule', labelKey: 'med.shapes.capsule' },
+  { id: 'oblong', labelKey: 'med.shapes.oblong' },
+  { id: 'oblong-score', labelKey: 'med.shapes.oblongScore' },
+  { id: 'oval', labelKey: 'med.shapes.oval' },
+  { id: 'heart', labelKey: 'med.shapes.heart' },
+  { id: 'diamond', labelKey: 'med.shapes.diamond' },
+  { id: 'triangle', labelKey: 'med.shapes.triangle' },
+  { id: 'hexagon', labelKey: 'med.shapes.hexagon' },
+  { id: 'square', labelKey: 'med.shapes.square' },
+  { id: 'drop', labelKey: 'med.shapes.drop' },
+  { id: 'syringe', labelKey: 'med.shapes.syringe' },
+  { id: 'inhaler', labelKey: 'med.shapes.inhaler' },
+  { id: 'tube', labelKey: 'med.shapes.tube' },
+  { id: 'patch', labelKey: 'med.shapes.patch' },
 ]
 
 // Watch for dialog opening to reset/set values
@@ -69,6 +91,12 @@ watch(() => props.modelValue, (val) => {
     // Set default color if none exists
     if (!localMed.value.color) {
       localMed.value.color = colors[0]
+    }
+    if (!localMed.value.shape) {
+      localMed.value.shape = 'letter'
+    }
+    if (!localMed.value.pillSize) {
+      localMed.value.pillSize = 'medium'
     }
   }
 }, { immediate: true })
@@ -112,14 +140,25 @@ defineExpose({
   intervalDays,
   save,
   close,
-  localMed
+  localMed,
+  colors,
+  availableShapes
 })
 </script>
 
 <template>
   <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px">
     <v-card>
-      <v-card-title>{{ title }}</v-card-title>
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>{{ title }}</span>
+        <PillAvatar
+          :shape="localMed.shape || 'letter'"
+          :pill-size="localMed.pillSize || 'medium'"
+          :color="localMed.color || 'blue'"
+          :name="localMed.name || 'M'"
+          :size="36"
+        />
+      </v-card-title>
       <v-card-text class="text-body-1">
         <v-text-field
           v-model="localMed.name"
@@ -211,20 +250,61 @@ defineExpose({
         </div>
 
         <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.color') }}</div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-1 mb-2">
           <v-btn
             v-for="color in colors"
             :key="color"
             :color="color"
-            icon="mdi-check"
             size="x-small"
             variant="flat"
-            class="ma-1"
+            class="ma-1 color-btn"
+            :class="{ 'color-btn--white': color === 'white' }"
             @click="localMed.color = color"
           >
-            <v-icon v-if="localMed.color === color" color="white">mdi-check</v-icon>
+            <v-icon v-if="localMed.color === color" :color="color === 'white' ? 'grey-darken-4' : 'white'" size="16">mdi-check</v-icon>
             <span v-else></span>
           </v-btn>
+        </div>
+
+        <!-- Pill shape selector -->
+        <div class="text-subtitle-2 mb-2 mt-4">{{ t('med.pillShape') }}</div>
+        <div class="d-flex flex-wrap gap-1 mb-3">
+          <v-btn
+            v-for="s in availableShapes"
+            :key="s.id"
+            :variant="localMed.shape === s.id ? 'tonal' : 'outlined'"
+            :color="localMed.shape === s.id ? 'primary' : undefined"
+            size="small"
+            class="shape-btn"
+            :title="t(s.labelKey)"
+            @click="localMed.shape = s.id"
+          >
+            <PillAvatar
+              :shape="s.id"
+              :pill-size="'medium'"
+              :color="localMed.color || 'blue'"
+              :name="localMed.name || 'M'"
+              :size="26"
+            />
+          </v-btn>
+        </div>
+
+        <!-- Pill size selector (for non-letter shapes) -->
+        <div v-if="localMed.shape && localMed.shape !== 'letter'" class="mb-3">
+          <div class="text-caption text-grey mb-1">{{ t('med.pillSize') }}</div>
+          <v-btn-toggle
+            v-model="localMed.pillSize"
+            mandatory
+            divided
+            density="compact"
+            color="primary"
+            variant="outlined"
+            class="w-100 d-flex"
+          >
+            <v-btn value="small" class="flex-grow-1">{{ t('med.sizeSmall') }}</v-btn>
+            <v-btn value="medium" class="flex-grow-1">{{ t('med.sizeMedium') }}</v-btn>
+            <v-btn value="large" class="flex-grow-1">{{ t('med.sizeLarge') }}</v-btn>
+          </v-btn-toggle>
         </div>
       </v-card-text>
       <v-card-actions>
@@ -237,7 +317,24 @@ defineExpose({
 </template>
 
 <style scoped>
+.gap-1 {
+  gap: 4px;
+}
 .gap-2 {
   gap: 8px;
+}
+.color-btn {
+  min-width: 28px !important;
+  width: 28px;
+  height: 28px !important;
+}
+.color-btn--white {
+  border: 1.5px solid #cbd5e1 !important;
+}
+.shape-btn {
+  min-width: 36px !important;
+  width: 36px;
+  height: 36px !important;
+  padding: 0 !important;
 }
 </style>
