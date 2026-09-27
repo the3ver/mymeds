@@ -305,8 +305,7 @@ export const messages = {
           submitted: 'Submitted'
         },
         banner: {
-          singular: '1 upcoming doctor appointment requires a referral to be obtained.',
-          plural: '{count} upcoming doctor appointments require referrals to be obtained.'
+          message: '1 upcoming doctor appointment requires a referral to be obtained. | {count} upcoming doctor appointments require referrals to be obtained.'
         },
         filter: 'Open referrals'
       },
@@ -784,8 +783,7 @@ export const messages = {
           submitted: 'Abgegeben'
         },
         banner: {
-          singular: 'Für 1 anstehenden Arzttermin muss noch eine Überweisung besorgt werden.',
-          plural: 'Für {count} anstehende Arzttermine müssen noch Überweisungen besorgt werden.'
+          message: 'Für 1 anstehenden Arzttermin muss noch eine Überweisung besorgt werden. | Für {count} anstehende Arzttermine müssen noch Überweisungen besorgt werden.'
         },
         filter: 'Offene Überweisungen'
       },

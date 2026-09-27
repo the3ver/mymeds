@@ -53,18 +53,28 @@ const sortedEntries = computed(() => {
     const today = getLocalDateString()
 
     filtered = filtered.filter(entry => {
-      const matchesOpen = isPendingReferral(entry, entries.value, today)
-      if (hasOpenReferrals && !matchesOpen) {
-        return false
+      const matchesOpen = hasOpenReferrals && isPendingReferral(entry, entries.value, today)
+      const matchesType = regularTypes.length > 0 && regularTypes.includes(entry.type)
+
+      if (hasOpenReferrals && regularTypes.length > 0) {
+        return matchesOpen || matchesType
       }
-      if (regularTypes.length > 0) {
-        return regularTypes.includes(entry.type)
+      if (hasOpenReferrals) {
+        return matchesOpen
       }
-      return true
+      return matchesType
     })
   }
 
-  return filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+  const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  // Pre-compute effective referral status once per entry (avoids O(N^2) in template)
+  return sorted.map(entry => {
+    if (entry.type === 'doctor' && entry.needsReferral) {
+      return { ...entry, effectiveReferralStatus: resolveEffectiveReferralStatus(entry, entries.value) || 'needed' }
+    }
+    return entry
+  })
 })
 
 const groupedEntries = computed(() => {
@@ -178,10 +188,6 @@ const getEntrySubtitle = (entry) => {
     return `${dateStr} - ${formatDate(entry.endDate, true)} (${diffDays} ${t('app.showDays')})`
   }
   return dateStr
-}
-
-const getEffectiveReferralStatus = (entry) => {
-  return resolveEffectiveReferralStatus(entry, entries.value) || 'needed'
 }
 
 const REFERRAL_STATUS_CONFIG = {
@@ -370,7 +376,7 @@ defineExpose({
       icon="mdi-alert-circle-outline"
       class="mb-4 referral-alert-banner"
     >
-      {{ pendingReferralsCount === 1 ? t('calendar.referral.banner.singular') : t('calendar.referral.banner.plural', { count: pendingReferralsCount }) }}
+      {{ t('calendar.referral.banner.message', pendingReferralsCount, { count: pendingReferralsCount }) }}
     </v-alert>
 
     <v-card v-if="filterTypes.length > 0" class="mb-4 bg-primary-lighten-5" variant="tonal" density="compact">
@@ -416,14 +422,14 @@ defineExpose({
               <div class="text-h6">{{ item.data.title }}</div>
               <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
               <v-chip
-                v-if="item.data.type === 'doctor' && item.data.needsReferral"
+                v-if="item.data.effectiveReferralStatus"
                 size="small"
-                :color="getReferralChipColor(getEffectiveReferralStatus(item.data))"
+                :color="getReferralChipColor(item.data.effectiveReferralStatus)"
                 variant="tonal"
                 class="ml-auto"
               >
-                <v-icon start size="16">{{ getReferralChipIcon(getEffectiveReferralStatus(item.data)) }}</v-icon>
-                {{ t(`calendar.referral.status.${getEffectiveReferralStatus(item.data)}`) }}
+                <v-icon start size="16">{{ getReferralChipIcon(item.data.effectiveReferralStatus) }}</v-icon>
+                {{ t(`calendar.referral.status.${item.data.effectiveReferralStatus}`) }}
               </v-chip>
             </v-card-title>
           </v-card-item>
@@ -432,16 +438,16 @@ defineExpose({
               <v-divider></v-divider>
               <v-card-text class="text-body-1">
                 <template v-if="item.data.type === 'doctor'">
-                  <div v-if="item.data.needsReferral" class="mb-2">
+                  <div v-if="item.data.effectiveReferralStatus" class="mb-2">
                     <span class="text-grey">{{ t('calendar.referral.statusLabel') }}:</span>
                     <div class="mt-1">
                       <v-chip
                         size="small"
-                        :color="getReferralChipColor(getEffectiveReferralStatus(item.data))"
+                        :color="getReferralChipColor(item.data.effectiveReferralStatus)"
                         variant="tonal"
                       >
-                        <v-icon start size="16">{{ getReferralChipIcon(getEffectiveReferralStatus(item.data)) }}</v-icon>
-                        {{ t(`calendar.referral.status.${getEffectiveReferralStatus(item.data)}`) }}
+                        <v-icon start size="16">{{ getReferralChipIcon(item.data.effectiveReferralStatus) }}</v-icon>
+                        {{ t(`calendar.referral.status.${item.data.effectiveReferralStatus}`) }}
                       </v-chip>
                     </div>
                   </div>

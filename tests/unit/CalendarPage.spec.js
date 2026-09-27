@@ -301,7 +301,7 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.text()).not.toContain('Praxisbesuch 2');
   });
 
-  it('should not neutralize open_referrals filter when doctor filter is also selected', async () => {
+  it('should union doctor type filter with open_referrals, and narrow correctly with open_referrals alone', async () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 5);
     const futureDateStr = futureDate.toISOString().split('T')[0];
@@ -335,7 +335,17 @@ describe('CalendarPage.vue', () => {
     ];
 
     const wrapper = mountComponent({ initialEntries: entries });
+
+    // Union: doctor OR open_referrals -> all 3 match doctor type
     wrapper.vm.filterTypes = ['doctor', 'open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
+    expect(wrapper.text()).toContain('Arzttermin mit vorhandener Überweisung');
+    expect(wrapper.text()).toContain('Vergangener Arzttermin');
+
+    // open_referrals alone -> only future entries with needed referral
+    wrapper.vm.filterTypes = ['open_referrals'];
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
@@ -427,7 +437,7 @@ describe('CalendarPage.vue', () => {
     ]);
   });
 
-  it('should strictly isolate open referrals and exclude non-doctor types when open_referrals is active alongside other filters', async () => {
+  it('should combine open_referrals with type filters as union: show entries matching either condition', async () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 5);
     const futureDateStr = futureDate.toISOString().split('T')[0];
@@ -451,8 +461,8 @@ describe('CalendarPage.vue', () => {
     wrapper.vm.filterTypes = ['vaccination', 'open_referrals'];
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.sortedEntries.length).toBe(0);
-    expect(wrapper.text()).not.toContain('Impfung Zukunft');
-    expect(wrapper.text()).not.toContain('Arzttermin mit fehlender Überweisung');
+    expect(wrapper.vm.sortedEntries.length).toBe(2);
+    expect(wrapper.text()).toContain('Impfung Zukunft');
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
   });
 });

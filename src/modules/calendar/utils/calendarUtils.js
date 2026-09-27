@@ -161,25 +161,27 @@ export function getQuarterKey(dateString) {
   return `${year}-Q${quarter}`
 }
 
+function normalizeLocation(location) {
+  return location ? location.trim().toLowerCase() : ''
+}
+
 export function resolveEffectiveReferralStatus(entry, allEntries = []) {
   if (!entry || entry.type !== 'doctor' || !entry.needsReferral) {
     return null
   }
 
-  const rawLocation = entry.location ? entry.location.trim() : ''
-  if (!rawLocation) {
+  const normalizedLocation = normalizeLocation(entry.location)
+  if (!normalizedLocation) {
     return entry.referralStatus || 'needed'
   }
 
-  const normalizedLocation = rawLocation.toLowerCase()
   const quarterKey = getQuarterKey(entry.date)
 
   const entriesPool = allEntries.includes(entry) ? allEntries : [entry, ...allEntries]
 
   const sameQuarterAppointments = entriesPool.filter((e) => {
     if (!e || e.type !== 'doctor' || !e.needsReferral) return false
-    const loc = e.location ? e.location.trim().toLowerCase() : ''
-    return loc === normalizedLocation && getQuarterKey(e.date) === quarterKey
+    return normalizeLocation(e.location) === normalizedLocation && getQuarterKey(e.date) === quarterKey
   })
 
   if (sameQuarterAppointments.some((e) => e.referralStatus === 'submitted')) {
