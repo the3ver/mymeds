@@ -205,4 +205,99 @@ describe('CalendarPage.vue', () => {
     const banner = wrapper.find('.referral-alert-banner');
     expect(banner.exists()).toBe(false);
   });
+
+  it('should filter entries to only upcoming appointments requiring a referral when open_referrals filter is active', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 10);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 10);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Anstehend ohne Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Anstehend mit Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Vergangen ohne Überweisung',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Anstehende Impfung',
+        date: futureDateStr,
+        type: 'vaccination',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    expect(wrapper.text()).toContain('Anstehend ohne Überweisung');
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+    expect(wrapper.text()).toContain('Vergangen ohne Überweisung');
+    expect(wrapper.text()).toContain('Anstehende Impfung');
+
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Anstehend ohne Überweisung');
+    expect(wrapper.text()).not.toContain('Anstehend mit Überweisung');
+    expect(wrapper.text()).not.toContain('Vergangen ohne Überweisung');
+    expect(wrapper.text()).not.toContain('Anstehende Impfung');
+
+    expect(wrapper.text()).toContain('Offene Überweisungen');
+
+    wrapper.vm.clearFilter();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+  });
+
+  it('should not show appointment under open_referrals if covered by another submitted referral in same quarter and location', async () => {
+    const futureDate1 = new Date();
+    futureDate1.setDate(futureDate1.getDate() + 5);
+    const futureDateStr1 = futureDate1.toISOString().split('T')[0];
+
+    const futureDate2 = new Date();
+    futureDate2.setDate(futureDate2.getDate() + 15);
+    const futureDateStr2 = futureDate2.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Praxisbesuch 1',
+        date: futureDateStr1,
+        type: 'doctor',
+        location: 'Gemeinschaftspraxis',
+        needsReferral: true,
+        referralStatus: 'submitted',
+      },
+      {
+        title: 'Praxisbesuch 2',
+        date: futureDateStr2,
+        type: 'doctor',
+        location: 'Gemeinschaftspraxis',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).not.toContain('Praxisbesuch 1');
+    expect(wrapper.text()).not.toContain('Praxisbesuch 2');
+  });
 });

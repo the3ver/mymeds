@@ -48,7 +48,27 @@ const sortedEntries = computed(() => {
   let filtered = [...entries.value]
 
   if (filterTypes.value.length > 0) {
-    filtered = filtered.filter(entry => filterTypes.value.includes(entry.type))
+    const hasOpenReferrals = filterTypes.value.includes('open_referrals')
+    const regularTypes = filterTypes.value.filter(t => t !== 'open_referrals')
+
+    filtered = filtered.filter(entry => {
+      const today = new Date().toISOString().split('T')[0]
+      const matchesOpenReferrals = hasOpenReferrals &&
+        entry.type === 'doctor' &&
+        Boolean(entry.needsReferral) &&
+        entry.date >= today &&
+        resolveEffectiveReferralStatus(entry, entries.value) === 'needed'
+
+      const matchesRegular = regularTypes.length > 0 && regularTypes.includes(entry.type)
+
+      if (hasOpenReferrals && regularTypes.length > 0) {
+        return matchesOpenReferrals || matchesRegular
+      } else if (hasOpenReferrals) {
+        return matchesOpenReferrals
+      } else {
+        return matchesRegular
+      }
+    })
   }
 
   return filtered.map((item, index) => ({ ...item, originalIndex: index }))
@@ -288,7 +308,12 @@ const clearFilter = () => {
 
 const filterText = computed(() => {
   if (filterTypes.value.length === 0) return ''
-  const typeNames = filterTypes.value.map(type => t(`calendar.types.${type}`)).join(', ')
+  const typeNames = filterTypes.value.map(type => {
+    if (type === 'open_referrals') {
+      return t('calendar.referral.filter')
+    }
+    return t(`calendar.types.${type}`)
+  }).join(', ')
   return t('calendar.filterBy', { types: typeNames })
 })
 
@@ -348,7 +373,10 @@ defineExpose({
   confirmDelete,
   confirmDeleteDialog,
   entries,
-  pendingReferralsCount
+  pendingReferralsCount,
+  filterTypes,
+  clearFilter,
+  filterText
 })
 </script>
 

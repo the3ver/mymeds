@@ -15,6 +15,7 @@ const { t } = useI18n()
 
 const availableTypes = computed(() => [
   { title: t('calendar.types.doctor'), value: 'doctor', icon: 'mdi-doctor', color: 'primary' },
+  { title: t('calendar.referral.filter'), value: 'open_referrals', icon: 'mdi-file-alert-outline', color: 'amber-darken-3' },
   { title: t('calendar.types.vaccination'), value: 'vaccination', icon: 'mdi-needle', color: 'teal' },
   { title: t('calendar.types.illness'), value: 'illness', icon: 'mdi-emoticon-sick', color: 'orange' },
   { title: t('calendar.types.note'), value: 'note', icon: 'mdi-note-text', color: 'blue-grey' }
