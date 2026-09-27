@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   createCalendarEvent,
-  createDetailedCalendarEvent
+  createDetailedCalendarEvent,
+  getQuarterKey,
+  resolveEffectiveReferralStatus,
+  isPendingReferral,
+  getLocalDateString
 } from '../../src/modules/calendar/utils/calendarUtils';
 import { downloadIcsEvent } from '../../src/modules/calendar/utils/calendar';
 
@@ -231,6 +235,169 @@ describe('calendarUtils & calendar', () => {
 
       expect(clickedElements.length).toBe(1);
       expect(clickedElements[0].download).toBe('termin.ics');
+    });
+  });
+
+  describe('getQuarterKey', () => {
+    it('should compute the correct quarter key for various dates', () => {
+      expect(getQuarterKey('2026-01-15')).toBe('2026-Q1');
+      expect(getQuarterKey('2026-03-31')).toBe('2026-Q1');
+      expect(getQuarterKey('2026-04-01')).toBe('2026-Q2');
+      expect(getQuarterKey('2026-07-15')).toBe('2026-Q3');
+      expect(getQuarterKey('2026-10-01')).toBe('2026-Q4');
+      expect(getQuarterKey('2026-12-31')).toBe('2026-Q4');
+    });
+
+    it('should parse YYYY-MM-DD string directly to avoid timezone shift at midnight', () => {
+      const getMonthSpy = vi.spyOn(Date.prototype, 'getMonth').mockReturnValue(2); // Simulated March in UTC-
+      try {
+        expect(getQuarterKey('2026-04-01')).toBe('2026-Q2');
+      } finally {
+        getMonthSpy.mockRestore();
+      }
+    });
+  });
+
+  describe('resolveEffectiveReferralStatus', () => {
+    it('should aggregate submitted status across appointments at same location and quarter', () => {
+      const entries = [
+        {
+          date: '2026-10-05',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'submitted'
+        },
+        {
+          date: '2026-11-20',
+          type: 'doctor',
+          location: '  nierenambulanz ffm  ',
+          needsReferral: true,
+          referralStatus: 'needed'
+        },
+        {
+          date: '2027-01-15',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'needed'
+        }
+      ];
+
+      expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('submitted');
+      expect(resolveEffectiveReferralStatus(entries[2], entries)).toBe('needed');
+    });
+
+    it('should evaluate isolated when location is empty', () => {
+      const entries = [
+        {
+          date: '2026-10-05',
+          type: 'doctor',
+          location: '',
+          needsReferral: true,
+          referralStatus: 'submitted'
+        },
+        {
+          date: '2026-10-20',
+          type: 'doctor',
+          location: '',
+          needsReferral: true,
+          referralStatus: 'needed'
+        }
+      ];
+
+      expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('needed');
+    });
+
+    it('should resolve entry own status self-contained even if allEntries is empty', () => {
+      const entry = {
+        date: '2026-10-05',
+        type: 'doctor',
+        location: 'Nierenambulanz FFM',
+        needsReferral: true,
+        referralStatus: 'present'
+      };
+      expect(resolveEffectiveReferralStatus(entry, [])).toBe('present');
+    });
+
+    it('should not aggregate present status across different appointments (only submitted aggregates)', () => {
+      const entries = [
+        {
+          date: '2026-10-05',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'present'
+        },
+        {
+          date: '2026-11-20',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'needed'
+        }
+      ];
+      expect(resolveEffectiveReferralStatus(entries[0], entries)).toBe('present');
+      expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('needed');
+    });
+  });
+
+  describe('getLocalDateString', () => {
+    it('should format Date objects to YYYY-MM-DD in local time', () => {
+      const fixedDate = new Date(2026, 8, 27, 0, 30); // Sept 27, 2026, 00:30 local time
+      expect(getLocalDateString(fixedDate)).toBe('2026-09-27');
+    });
+
+    it('should format current date when called without arguments', () => {
+      const now = new Date();
+      const expected = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      expect(getLocalDateString()).toBe(expected);
+    });
+  });
+
+  describe('isPendingReferral', () => {
+    it('should return true for upcoming doctor appointments with needed referral', () => {
+      const entry = {
+        date: '2026-10-15',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      };
+      expect(isPendingReferral(entry, [entry], '2026-10-01')).toBe(true);
+    });
+
+    it('should return false for past doctor appointments or those with present/submitted status', () => {
+      const pastEntry = {
+        date: '2026-09-01',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      };
+      const submittedEntry = {
+        date: '2026-10-15',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      };
+      expect(isPendingReferral(pastEntry, [pastEntry], '2026-10-01')).toBe(false);
+      expect(isPendingReferral(submittedEntry, [submittedEntry], '2026-10-01')).toBe(false);
+    });
+
+    it('should use local date by default so yesterday appointment is not pending after midnight in UTC+ zones', () => {
+      // Create a date that is today in local time
+      const todayLocal = getLocalDateString();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayLocal = getLocalDateString(yesterday);
+
+      const yesterdayEntry = {
+        date: yesterdayLocal,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      };
+
+      expect(isPendingReferral(yesterdayEntry, [yesterdayEntry])).toBe(false);
     });
   });
 });

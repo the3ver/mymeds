@@ -91,4 +91,378 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.vm.confirmDeleteDialog).toBe(false);
     expect(wrapper.vm.entries.length).toBe(2);
   });
+
+  it('should render referral status chip on doctor entry card when needsReferral is true', () => {
+    const entries = [
+      {
+        title: 'Kardiologe Termin',
+        date: '2026-11-20',
+        type: 'doctor',
+        doctor: 'Dr. Herz',
+        location: 'Herzzentrum',
+        needsReferral: true,
+        referralStatus: 'needed'
+      },
+      {
+        title: 'Routine Kontrolltermin',
+        date: '2026-11-22',
+        type: 'doctor',
+        doctor: 'Dr. Check',
+        needsReferral: false
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const text = wrapper.text();
+    expect(text).toContain('Kardiologe Termin');
+    expect(text).toContain('Zu besorgen');
+  });
+
+  it('should dynamically show submitted referral status on all appointments for the same location and quarter', () => {
+    const entries = [
+      {
+        title: 'Nierenambulanz Termin 1',
+        date: '2026-10-05',
+        type: 'doctor',
+        doctor: 'Dr. A',
+        location: 'Nierenambulanz FFM',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      },
+      {
+        title: 'Nierenambulanz Termin 2',
+        date: '2026-11-20',
+        type: 'doctor',
+        doctor: 'Dr. B',
+        location: 'Nierenambulanz FFM',
+        needsReferral: true,
+        referralStatus: 'needed'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const entry0 = wrapper.find('#entry-0');
+    const entry1 = wrapper.find('#entry-1');
+    expect(entry0.text()).toContain('Abgegeben');
+    expect(entry1.text()).toContain('Abgegeben');
+  });
+
+  it('should render referral banner when future doctor visits need a referral', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 5);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Zukunft Facharzt',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      },
+      {
+        title: 'Vergangenheit Facharzt',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const banner = wrapper.find('.referral-alert-banner');
+    expect(banner.exists()).toBe(true);
+    expect(banner.text()).toContain('Für 1 anstehenden Arzttermin muss noch eine Überweisung besorgt werden.');
+  });
+
+  it('should not render referral banner when all upcoming referrals are present or submitted', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Zukunft Facharzt 1',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present'
+      },
+      {
+        title: 'Zukunft Facharzt 2',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const banner = wrapper.find('.referral-alert-banner');
+    expect(banner.exists()).toBe(false);
+  });
+
+  it('should filter entries to only upcoming appointments requiring a referral when open_referrals filter is active', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 10);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 10);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Anstehend ohne Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Anstehend mit Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Vergangen ohne Überweisung',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Anstehende Impfung',
+        date: futureDateStr,
+        type: 'vaccination',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    expect(wrapper.text()).toContain('Anstehend ohne Überweisung');
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+    expect(wrapper.text()).toContain('Vergangen ohne Überweisung');
+    expect(wrapper.text()).toContain('Anstehende Impfung');
+
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Anstehend ohne Überweisung');
+    expect(wrapper.text()).not.toContain('Anstehend mit Überweisung');
+    expect(wrapper.text()).not.toContain('Vergangen ohne Überweisung');
+    expect(wrapper.text()).not.toContain('Anstehende Impfung');
+
+    expect(wrapper.text()).toContain('Offene Überweisungen');
+
+    wrapper.vm.clearFilter();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+  });
+
+  it('should not show appointment under open_referrals if covered by another submitted referral in same quarter and location', async () => {
+    const futureDate1 = new Date();
+    futureDate1.setDate(futureDate1.getDate() + 5);
+    const futureDateStr1 = futureDate1.toISOString().split('T')[0];
+
+    const futureDate2 = new Date();
+    futureDate2.setDate(futureDate2.getDate() + 15);
+    const futureDateStr2 = futureDate2.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Praxisbesuch 1',
+        date: futureDateStr1,
+        type: 'doctor',
+        location: 'Gemeinschaftspraxis',
+        needsReferral: true,
+        referralStatus: 'submitted',
+      },
+      {
+        title: 'Praxisbesuch 2',
+        date: futureDateStr2,
+        type: 'doctor',
+        location: 'Gemeinschaftspraxis',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).not.toContain('Praxisbesuch 1');
+    expect(wrapper.text()).not.toContain('Praxisbesuch 2');
+  });
+
+  it('should union doctor type filter with open_referrals, and narrow correctly with open_referrals alone', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 5);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Arzttermin mit fehlender Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Arzttermin mit vorhandener Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Vergangener Arzttermin',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+
+    // Union: doctor OR open_referrals -> all 3 match doctor type
+    wrapper.vm.filterTypes = ['doctor', 'open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
+    expect(wrapper.text()).toContain('Arzttermin mit vorhandener Überweisung');
+    expect(wrapper.text()).toContain('Vergangener Arzttermin');
+
+    // open_referrals alone -> only future entries with needed referral
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
+    expect(wrapper.text()).not.toContain('Arzttermin mit vorhandener Überweisung');
+    expect(wrapper.text()).not.toContain('Vergangener Arzttermin');
+  });
+
+  it('should render a closable filter chip for open_referrals that removes the filter when closed', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Anstehend mit Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Anstehend ohne Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    const chip = wrapper.find('.open-referrals-filter-chip');
+    expect(chip.exists()).toBe(true);
+    expect(chip.text()).toContain('Offene Überweisungen');
+
+    // Call removeFilter or trigger click:close
+    wrapper.vm.removeFilter('open_referrals');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.filterTypes).not.toContain('open_referrals');
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+  });
+
+  it('should maintain true originalIndex so deleting a filtered entry deletes the correct item', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Entry 0 - Regular Doctor',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: false,
+      },
+      {
+        title: 'Entry 1 - Open Referral',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Entry 2 - Regular Note',
+        date: futureDateStr,
+        type: 'note',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.sortedEntries.length).toBe(1);
+    expect(wrapper.vm.sortedEntries[0].title).toBe('Entry 1 - Open Referral');
+    expect(wrapper.vm.sortedEntries[0].originalIndex).toBe(1);
+
+    // Delete the filtered item
+    wrapper.vm.requestDeleteEntry(wrapper.vm.sortedEntries[0].originalIndex);
+    wrapper.vm.confirmDelete();
+    await wrapper.vm.$nextTick();
+
+    // Verify Entry 1 was deleted, and Entry 0 and Entry 2 are retained in entries
+    expect(wrapper.vm.entries.map(e => e.title)).toEqual([
+      'Entry 0 - Regular Doctor',
+      'Entry 2 - Regular Note'
+    ]);
+  });
+
+  it('should combine open_referrals with type filters as union: show entries matching either condition', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Arzttermin mit fehlender Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Impfung Zukunft',
+        date: futureDateStr,
+        type: 'vaccination',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['vaccination', 'open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.sortedEntries.length).toBe(2);
+    expect(wrapper.text()).toContain('Impfung Zukunft');
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
+  });
 });

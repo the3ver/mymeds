@@ -1,0 +1,3 @@
+# Quarterly Referral Tracking on Doctor Appointments
+
+Medical referrals ("Überweisungen") are required per calendar quarter for specialized practices and clinics, where a single referral covers all visits to that practice within the same quarter. We track referrals directly on doctor calendar entries (`needsReferral: boolean` defaulting to true for new doctor entries, and `referralStatus: 'needed' | 'present' | 'submitted'`), dynamically resolving the status across all appointments with the same `location` in that quarter. This avoids redundant entity stores while accurately reflecting that referrals are tied to quarterly practice visits rather than individual physicians.

@@ -140,3 +140,66 @@ export function createDetailedCalendarEvent(entry) {
     downloadFile()
   }
 }
+
+export function getQuarterKey(dateString) {
+  if (!dateString) return ''
+  if (typeof dateString === 'string') {
+    const match = dateString.match(/^(\d{4})-(\d{2})/)
+    if (match) {
+      const year = match[1]
+      const month = parseInt(match[2], 10)
+      if (month >= 1 && month <= 12) {
+        const quarter = Math.floor((month - 1) / 3) + 1
+        return `${year}-Q${quarter}`
+      }
+    }
+  }
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+  const year = date.getFullYear()
+  const quarter = Math.floor(date.getMonth() / 3) + 1
+  return `${year}-Q${quarter}`
+}
+
+function normalizeLocation(location) {
+  return location ? location.trim().toLowerCase() : ''
+}
+
+export function resolveEffectiveReferralStatus(entry, allEntries = []) {
+  if (!entry || entry.type !== 'doctor' || !entry.needsReferral) {
+    return null
+  }
+
+  const normalizedLocation = normalizeLocation(entry.location)
+  if (!normalizedLocation) {
+    return entry.referralStatus || 'needed'
+  }
+
+  const quarterKey = getQuarterKey(entry.date)
+
+  const entriesPool = allEntries.includes(entry) ? allEntries : [entry, ...allEntries]
+
+  const sameQuarterAppointments = entriesPool.filter((e) => {
+    if (!e || e.type !== 'doctor' || !e.needsReferral) return false
+    return normalizeLocation(e.location) === normalizedLocation && getQuarterKey(e.date) === quarterKey
+  })
+
+  if (sameQuarterAppointments.some((e) => e.referralStatus === 'submitted')) {
+    return 'submitted'
+  }
+  return entry.referralStatus || 'needed'
+}
+
+export function getLocalDateString(date = new Date()) {
+  const d = typeof date === 'string' ? new Date(date) : date
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+export function isPendingReferral(entry, allEntries = [], todayStr = getLocalDateString()) {
+  if (!entry || entry.type !== 'doctor' || !entry.needsReferral) return false
+  if (entry.date < todayStr) return false
+  return resolveEffectiveReferralStatus(entry, allEntries) === 'needed'
+}

@@ -1,9 +1,10 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LinkDialog from './LinkDialog.vue'
 import { useDoctorTypes, useVaccinationMethods } from '../utils/calendarOptions.js'
 import { appendLink } from '../../common/utils/stringUtils.js'
+import { getLocalDateString } from '../utils/calendarUtils.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -23,7 +24,9 @@ const props = defineProps({
       pathogen: '',
       symptoms: '',
       endDate: '',
-      notes: ''
+      notes: '',
+      needsReferral: true,
+      referralStatus: 'needed'
     })
   },
   suggestions: {
@@ -37,32 +40,55 @@ const props = defineProps({
   confirmText: {
     type: String,
     default: 'Save'
+  },
+  isEdit: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
 const { t } = useI18n()
 
-const localEntry = ref({ ...props.entry })
-const treatmentsInput = ref(null) // Reference to textarea
-const showLinkDialog = ref(false)
-
 const doctorTypes = useDoctorTypes()
 const vaccinationMethods = useVaccinationMethods()
+
+const referralStatusOptions = computed(() => [
+  { title: t('calendar.referral.status.needed'), value: 'needed' },
+  { title: t('calendar.referral.status.present'), value: 'present' },
+  { title: t('calendar.referral.status.submitted'), value: 'submitted' }
+])
+
+function normalizeEntry(entry) {
+  const norm = { ...entry }
+  if (!norm.date) {
+    norm.date = getLocalDateString()
+  }
+  // Ensure treatments is a string (migration from array if needed)
+  if (Array.isArray(norm.treatments)) {
+    norm.treatments = norm.treatments.join(', ')
+  } else if (!norm.treatments) {
+    norm.treatments = ''
+  }
+  if (norm.type === 'doctor') {
+    if (norm.needsReferral === undefined) {
+      norm.needsReferral = !props.isEdit
+    }
+    if (!norm.referralStatus) {
+      norm.referralStatus = 'needed'
+    }
+  }
+  return norm
+}
+
+const localEntry = ref(normalizeEntry(props.entry))
+const treatmentsInput = ref(null) // Reference to textarea
+const showLinkDialog = ref(false)
 
 // Watch for dialog opening to reset/set values
 watch(() => props.modelValue, (val) => {
   if (val) {
-    localEntry.value = { ...props.entry }
-    if (!localEntry.value.date) {
-      localEntry.value.date = new Date().toISOString().split('T')[0]
-    }
-    // Ensure treatments is a string (migration from array if needed)
-    if (Array.isArray(localEntry.value.treatments)) {
-      localEntry.value.treatments = localEntry.value.treatments.join(', ')
-    } else if (!localEntry.value.treatments) {
-      localEntry.value.treatments = ''
-    }
+    localEntry.value = normalizeEntry(props.entry)
   }
 })
 
@@ -142,6 +168,27 @@ const save = () => {
             :label="t('calendar.fields.location')"
             variant="underlined"
           ></v-text-field>
+
+          <!-- Referral Section -->
+          <v-switch
+            v-model="localEntry.needsReferral"
+            :label="t('calendar.referral.needsReferral')"
+            color="primary"
+            density="compact"
+            class="mt-2"
+            hide-details
+          ></v-switch>
+
+          <v-select
+            v-if="localEntry.needsReferral"
+            v-model="localEntry.referralStatus"
+            :items="referralStatusOptions"
+            :label="t('calendar.referral.statusLabel')"
+            variant="underlined"
+            item-title="title"
+            item-value="value"
+            class="mt-1"
+          ></v-select>
 
           <!-- Treatments Textarea -->
           <v-textarea
