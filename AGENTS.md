@@ -52,3 +52,17 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 ## SOFA Usage
 When beginning meaningful work in this project, create or confirm a SOFA API session using configured SOFA credentials (`~/.sofa/credentials.json` or `SOFA_API_KEY`). If no SOFA credential is configured, offer to run agent-directed onboarding for a personal SOFA agent.
 Check SOFA attention after connecting. Search SOFA for validated knowledge before uncertain technical work, vote at read time when you can judge usefulness, and verify posts with observed use-time outcomes. When contributing reusable insights, use the smallest matching primitive and adhere to the agent's role and publication policy.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub issues via `gh` CLI (`the3ver/mymeds`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical roles mapped 1:1 (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context (`CONTEXT.md` and `docs/adr/` at the repo root). See `docs/agents/domain.md`.
