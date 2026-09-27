@@ -331,18 +331,41 @@ const openFilterDialog = () => {
   filterDialog.value = true
 }
 
+const pendingReferralsCount = computed(() => {
+  const today = new Date().toISOString().split('T')[0]
+  return entries.value.filter((e) => {
+    if (!e || e.type !== 'doctor' || !e.needsReferral || e.date < today) {
+      return false
+    }
+    return resolveEffectiveReferralStatus(e, entries.value) === 'needed'
+  }).length
+})
+
 defineExpose({
   openFilterDialog,
   openTypeDialog,
   requestDeleteEntry,
   confirmDelete,
   confirmDeleteDialog,
-  entries
+  entries,
+  pendingReferralsCount
 })
 </script>
 
 <template>
   <v-container>
+    <!-- Referral Alert Banner -->
+    <v-alert
+      v-if="pendingReferralsCount > 0"
+      type="warning"
+      variant="tonal"
+      density="compact"
+      icon="mdi-alert-circle-outline"
+      class="mb-4 referral-alert-banner"
+    >
+      {{ pendingReferralsCount === 1 ? t('calendar.referral.banner.singular') : t('calendar.referral.banner.plural', { count: pendingReferralsCount }) }}
+    </v-alert>
+
     <v-card v-if="filterTypes.length > 0" class="mb-4 bg-primary-lighten-5" variant="tonal" density="compact">
       <v-card-text class="d-flex align-center justify-space-between py-2">
         <span class="text-body-2 font-weight-bold text-truncate mr-2">{{ filterText }}</span>

@@ -146,4 +146,63 @@ describe('CalendarPage.vue', () => {
     expect(entry0.text()).toContain('Abgegeben');
     expect(entry1.text()).toContain('Abgegeben');
   });
+
+  it('should render referral banner when future doctor visits need a referral', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 5);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Zukunft Facharzt',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      },
+      {
+        title: 'Vergangenheit Facharzt',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const banner = wrapper.find('.referral-alert-banner');
+    expect(banner.exists()).toBe(true);
+    expect(banner.text()).toContain('Für 1 anstehenden Arzttermin muss noch eine Überweisung besorgt werden.');
+  });
+
+  it('should not render referral banner when all upcoming referrals are present or submitted', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Zukunft Facharzt 1',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present'
+      },
+      {
+        title: 'Zukunft Facharzt 2',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const banner = wrapper.find('.referral-alert-banner');
+    expect(banner.exists()).toBe(false);
+  });
 });
