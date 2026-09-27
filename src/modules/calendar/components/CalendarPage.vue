@@ -5,7 +5,7 @@ import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent, resolveEffectiveReferralStatus } from '../utils/calendarUtils'
+import { createDetailedCalendarEvent, resolveEffectiveReferralStatus, isPendingReferral } from '../utils/calendarUtils'
 import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const props = defineProps({
@@ -53,21 +53,16 @@ const sortedEntries = computed(() => {
 
     filtered = filtered.filter(entry => {
       const today = new Date().toISOString().split('T')[0]
-      const matchesOpenReferrals = hasOpenReferrals &&
-        entry.type === 'doctor' &&
-        Boolean(entry.needsReferral) &&
-        entry.date >= today &&
-        resolveEffectiveReferralStatus(entry, entries.value) === 'needed'
-
+      const matchesOpenReferrals = hasOpenReferrals && isPendingReferral(entry, entries.value, today)
       const matchesRegular = regularTypes.length > 0 && regularTypes.includes(entry.type)
 
-      if (hasOpenReferrals && regularTypes.length > 0) {
-        return matchesOpenReferrals || matchesRegular
-      } else if (hasOpenReferrals) {
-        return matchesOpenReferrals
-      } else {
-        return matchesRegular
+      if (hasOpenReferrals) {
+        if (entry.type === 'doctor') {
+          return matchesOpenReferrals
+        }
+        return regularTypes.includes(entry.type)
       }
+      return matchesRegular
     })
   }
 
@@ -192,23 +187,14 @@ const getEffectiveReferralStatus = (entry) => {
   return resolveEffectiveReferralStatus(entry, entries.value) || 'needed'
 }
 
-const getReferralChipColor = (status) => {
-  switch (status) {
-    case 'submitted': return 'success'
-    case 'present': return 'info'
-    case 'needed':
-    default: return 'warning'
-  }
+const REFERRAL_STATUS_CONFIG = {
+  submitted: { color: 'success', icon: 'mdi-check-circle' },
+  present: { color: 'info', icon: 'mdi-file-check' },
+  needed: { color: 'warning', icon: 'mdi-file-clock' }
 }
 
-const getReferralChipIcon = (status) => {
-  switch (status) {
-    case 'submitted': return 'mdi-check-circle'
-    case 'present': return 'mdi-file-check'
-    case 'needed':
-    default: return 'mdi-file-clock'
-  }
-}
+const getReferralChipColor = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).color
+const getReferralChipIcon = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).icon
 
 const openTypeDialog = () => {
   typeDialog.value = true
@@ -306,6 +292,10 @@ const clearFilter = () => {
   filterTypes.value = []
 }
 
+const removeFilter = (filterType) => {
+  filterTypes.value = filterTypes.value.filter(t => t !== filterType)
+}
+
 const filterText = computed(() => {
   if (filterTypes.value.length === 0) return ''
   const typeNames = filterTypes.value.map(type => {
@@ -358,12 +348,7 @@ const openFilterDialog = () => {
 
 const pendingReferralsCount = computed(() => {
   const today = new Date().toISOString().split('T')[0]
-  return entries.value.filter((e) => {
-    if (!e || e.type !== 'doctor' || !e.needsReferral || e.date < today) {
-      return false
-    }
-    return resolveEffectiveReferralStatus(e, entries.value) === 'needed'
-  }).length
+  return entries.value.filter(e => isPendingReferral(e, entries.value, today)).length
 })
 
 defineExpose({
@@ -376,6 +361,7 @@ defineExpose({
   pendingReferralsCount,
   filterTypes,
   clearFilter,
+  removeFilter,
   filterText
 })
 </script>
@@ -396,7 +382,20 @@ defineExpose({
 
     <v-card v-if="filterTypes.length > 0" class="mb-4 bg-primary-lighten-5" variant="tonal" density="compact">
       <v-card-text class="d-flex align-center justify-space-between py-2">
-        <span class="text-body-2 font-weight-bold text-truncate mr-2">{{ filterText }}</span>
+        <div class="d-flex align-center flex-wrap ga-2 mr-2">
+          <v-chip
+            v-if="filterTypes.includes('open_referrals')"
+            class="open-referrals-filter-chip"
+            color="amber-darken-3"
+            size="small"
+            closable
+            @click:close="removeFilter('open_referrals')"
+          >
+            <v-icon start size="16">mdi-file-alert-outline</v-icon>
+            {{ t('calendar.referral.filter') }}
+          </v-chip>
+          <span class="text-body-2 font-weight-bold text-truncate">{{ filterText }}</span>
+        </div>
         <v-btn icon="mdi-delete" variant="text" density="compact" size="small" :title="t('calendar.clearFilter')" @click="clearFilter"></v-btn>
       </v-card-text>
     </v-card>
@@ -488,7 +487,7 @@ defineExpose({
     </div>
 
     <EntryTypeDialog v-model="typeDialog" @select="onTypeSelected" />
-    <CalendarEntryDialog v-model="entryDialog" :entry="currentEntry" :suggestions="existingTreatments" :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')" :confirm-text="t('dialog.save')" @confirm="saveEntry" />
+    <CalendarEntryDialog v-model="entryDialog" :entry="currentEntry" :suggestions="existingTreatments" :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')" :confirm-text="t('dialog.save')" :is-edit="editingIndex > -1" @confirm="saveEntry" />
     <ConfirmDialog v-model="exportDialog" :title="t('calendar.export')" :message="t('calendar.exportConfirm')" :confirm-text="t('dialog.yes')" :cancel-text="t('dialog.no')" @confirm="confirmExport" />
     <ConfirmDialog v-model="confirmDeleteDialog" :title="t('calendar.deleteEntryTitle')" :message="entryToDelete ? t('calendar.deleteEntryConfirmNamed', { name: entryToDelete.title }) : t('calendar.deleteEntryConfirm')" :confirm-text="t('dialog.delete')" :cancel-text="t('dialog.cancel')" @confirm="confirmDelete" />
     <FilterDialog v-model="filterDialog" v-model:selected-filters="filterTypes" />

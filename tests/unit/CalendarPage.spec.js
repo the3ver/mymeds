@@ -300,4 +300,84 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.text()).not.toContain('Praxisbesuch 1');
     expect(wrapper.text()).not.toContain('Praxisbesuch 2');
   });
+
+  it('should not neutralize open_referrals filter when doctor filter is also selected', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 5);
+    const pastDateStr = pastDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Arzttermin mit fehlender Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Arzttermin mit vorhandener Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Vergangener Arzttermin',
+        date: pastDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['doctor', 'open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
+    expect(wrapper.text()).not.toContain('Arzttermin mit vorhandener Überweisung');
+    expect(wrapper.text()).not.toContain('Vergangener Arzttermin');
+  });
+
+  it('should render a closable filter chip for open_referrals that removes the filter when closed', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Anstehend mit Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'present',
+      },
+      {
+        title: 'Anstehend ohne Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    const chip = wrapper.find('.open-referrals-filter-chip');
+    expect(chip.exists()).toBe(true);
+    expect(chip.text()).toContain('Offene Überweisungen');
+
+    // Call removeFilter or trigger click:close
+    wrapper.vm.removeFilter('open_referrals');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.filterTypes).not.toContain('open_referrals');
+    expect(wrapper.text()).toContain('Anstehend mit Überweisung');
+  });
 });

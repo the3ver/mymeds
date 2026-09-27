@@ -39,6 +39,10 @@ const props = defineProps({
   confirmText: {
     type: String,
     default: 'Save'
+  },
+  isEdit: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -67,7 +71,7 @@ function normalizeEntry(entry) {
   }
   if (norm.type === 'doctor') {
     if (norm.needsReferral === undefined) {
-      norm.needsReferral = true
+      norm.needsReferral = !props.isEdit
     }
     if (!norm.referralStatus) {
       norm.referralStatus = 'needed'

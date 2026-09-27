@@ -143,6 +143,17 @@ export function createDetailedCalendarEvent(entry) {
 
 export function getQuarterKey(dateString) {
   if (!dateString) return ''
+  if (typeof dateString === 'string') {
+    const match = dateString.match(/^(\d{4})-(\d{2})/)
+    if (match) {
+      const year = match[1]
+      const month = parseInt(match[2], 10)
+      if (month >= 1 && month <= 12) {
+        const quarter = Math.floor((month - 1) / 3) + 1
+        return `${year}-Q${quarter}`
+      }
+    }
+  }
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return ''
   const year = date.getFullYear()
@@ -176,4 +187,10 @@ export function resolveEffectiveReferralStatus(entry, allEntries = []) {
     return 'present'
   }
   return 'needed'
+}
+
+export function isPendingReferral(entry, allEntries = [], todayStr = new Date().toISOString().split('T')[0]) {
+  if (!entry || entry.type !== 'doctor' || !entry.needsReferral) return false
+  if (entry.date < todayStr) return false
+  return resolveEffectiveReferralStatus(entry, allEntries) === 'needed'
 }

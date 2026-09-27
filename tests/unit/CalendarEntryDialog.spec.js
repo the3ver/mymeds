@@ -11,7 +11,7 @@ const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
 
 describe('CalendarEntryDialog.vue - Referral tracking', () => {
-  const mountComponent = (entry = {}) => {
+  const mountComponent = (entry = {}, extraProps = {}) => {
     return mount(CalendarEntryDialog, {
       props: {
         modelValue: true,
@@ -20,7 +20,8 @@ describe('CalendarEntryDialog.vue - Referral tracking', () => {
           date: '2026-10-15',
           title: 'Facharztbesuch',
           ...entry
-        }
+        },
+        ...extraProps
       },
       global: {
         plugins: [vuetify, i18n]
@@ -36,6 +37,12 @@ describe('CalendarEntryDialog.vue - Referral tracking', () => {
 
   it('should preserve needsReferral: false when provided explicitly', () => {
     const wrapper = mountComponent({ needsReferral: false });
+    expect(wrapper.vm.localEntry.needsReferral).toBe(false);
+  });
+
+  it('should default needsReferral to false when editing a legacy doctor entry without needsReferral attribute', () => {
+    const legacyEntry = { type: 'doctor', title: 'Alter Arzttermin' };
+    const wrapper = mountComponent(legacyEntry, { isEdit: true });
     expect(wrapper.vm.localEntry.needsReferral).toBe(false);
   });
 

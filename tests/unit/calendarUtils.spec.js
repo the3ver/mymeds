@@ -3,7 +3,8 @@ import {
   createCalendarEvent,
   createDetailedCalendarEvent,
   getQuarterKey,
-  resolveEffectiveReferralStatus
+  resolveEffectiveReferralStatus,
+  isPendingReferral
 } from '../../src/modules/calendar/utils/calendarUtils';
 import { downloadIcsEvent } from '../../src/modules/calendar/utils/calendar';
 
@@ -245,6 +246,15 @@ describe('calendarUtils & calendar', () => {
       expect(getQuarterKey('2026-10-01')).toBe('2026-Q4');
       expect(getQuarterKey('2026-12-31')).toBe('2026-Q4');
     });
+
+    it('should parse YYYY-MM-DD string directly to avoid timezone shift at midnight', () => {
+      const getMonthSpy = vi.spyOn(Date.prototype, 'getMonth').mockReturnValue(2); // Simulated March in UTC-
+      try {
+        expect(getQuarterKey('2026-04-01')).toBe('2026-Q2');
+      } finally {
+        getMonthSpy.mockRestore();
+      }
+    });
   });
 
   describe('resolveEffectiveReferralStatus', () => {
@@ -296,6 +306,35 @@ describe('calendarUtils & calendar', () => {
       ];
 
       expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('needed');
+    });
+  });
+
+  describe('isPendingReferral', () => {
+    it('should return true for upcoming doctor appointments with needed referral', () => {
+      const entry = {
+        date: '2026-10-15',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      };
+      expect(isPendingReferral(entry, [entry], '2026-10-01')).toBe(true);
+    });
+
+    it('should return false for past doctor appointments or those with present/submitted status', () => {
+      const pastEntry = {
+        date: '2026-09-01',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed'
+      };
+      const submittedEntry = {
+        date: '2026-10-15',
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      };
+      expect(isPendingReferral(pastEntry, [pastEntry], '2026-10-01')).toBe(false);
+      expect(isPendingReferral(submittedEntry, [submittedEntry], '2026-10-01')).toBe(false);
     });
   });
 });

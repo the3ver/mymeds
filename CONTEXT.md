@@ -50,7 +50,7 @@ _Avoid_: Ampel, Alarmstufe, Status
 
 **Kalendereintrag**:
 Ein im Tresor verschlüsselter Gesundheitstermin (z. B. Arzttermin, Rezeptabholung oder Kontrolluntersuchung) mit Startzeit, Notizen und ICS-Exportfähigkeit.
-_Avoid_: Event, Termin, Reminder, Aufgabe
+_Avoid_: Event, Reminder, Aufgabe
 
 **Überweisung**:
 Ein ärztliches Dokument zur Weiterbehandlung bei einem Facharzt oder in einer spezialisierten Praxis innerhalb eines Quartals mit den Statusstufen `Zu besorgen` (`needed`), `Liegt vor` (`present`) und `Abgegeben` (`submitted`).
