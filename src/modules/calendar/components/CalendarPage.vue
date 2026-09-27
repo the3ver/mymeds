@@ -5,7 +5,7 @@ import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent, resolveEffectiveReferralStatus, isPendingReferral } from '../utils/calendarUtils'
+import { createDetailedCalendarEvent, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
 import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const props = defineProps({
@@ -44,34 +44,31 @@ onMounted(() => {
 })
 
 const sortedEntries = computed(() => {
-  // Sort by date descending (newest first)
-  let filtered = [...entries.value]
+  // Map originalIndex against the full entries array first to preserve correct reference on edit/delete
+  let filtered = entries.value.map((item, index) => ({ ...item, originalIndex: index }))
 
   if (filterTypes.value.length > 0) {
     const hasOpenReferrals = filterTypes.value.includes('open_referrals')
     const regularTypes = filterTypes.value.filter(t => t !== 'open_referrals')
+    const today = getLocalDateString()
 
     filtered = filtered.filter(entry => {
-      const today = new Date().toISOString().split('T')[0]
-      const matchesOpenReferrals = hasOpenReferrals && isPendingReferral(entry, entries.value, today)
-      const matchesRegular = regularTypes.length > 0 && regularTypes.includes(entry.type)
-
-      if (hasOpenReferrals) {
-        if (entry.type === 'doctor') {
-          return matchesOpenReferrals
-        }
+      const matchesOpen = isPendingReferral(entry, entries.value, today)
+      if (hasOpenReferrals && !matchesOpen) {
+        return false
+      }
+      if (regularTypes.length > 0) {
         return regularTypes.includes(entry.type)
       }
-      return matchesRegular
+      return true
     })
   }
 
-  return filtered.map((item, index) => ({ ...item, originalIndex: index }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+  return filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
 })
 
 const groupedEntries = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const combined = [...sortedEntries.value]
 
@@ -203,7 +200,7 @@ const openTypeDialog = () => {
 const onTypeSelected = (type) => {
   currentEntry.value = {
     type,
-    date: new Date().toISOString().split('T')[0],
+    date: getLocalDateString(),
     title: '',
     doctor: '', doctorType: '', location: '',
     agent: '', method: '', bodyPart: '',
@@ -219,7 +216,7 @@ const onTypeSelected = (type) => {
 
 const addEntry = (entry) => {
   entries.value.push(entry)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   if (entry.date >= today) {
     lastAddedEntry.value = entry
     exportDialog.value = true
@@ -297,13 +294,9 @@ const removeFilter = (filterType) => {
 }
 
 const filterText = computed(() => {
-  if (filterTypes.value.length === 0) return ''
-  const typeNames = filterTypes.value.map(type => {
-    if (type === 'open_referrals') {
-      return t('calendar.referral.filter')
-    }
-    return t(`calendar.types.${type}`)
-  }).join(', ')
+  const regularTypes = filterTypes.value.filter(t => t !== 'open_referrals')
+  if (regularTypes.length === 0) return ''
+  const typeNames = regularTypes.map(type => t(`calendar.types.${type}`)).join(', ')
   return t('calendar.filterBy', { types: typeNames })
 })
 
@@ -347,7 +340,7 @@ const openFilterDialog = () => {
 }
 
 const pendingReferralsCount = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   return entries.value.filter(e => isPendingReferral(e, entries.value, today)).length
 })
 

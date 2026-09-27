@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import LinkDialog from './LinkDialog.vue'
 import { useDoctorTypes, useVaccinationMethods } from '../utils/calendarOptions.js'
 import { appendLink } from '../../common/utils/stringUtils.js'
+import { getLocalDateString } from '../utils/calendarUtils.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -61,7 +62,7 @@ const referralStatusOptions = computed(() => [
 function normalizeEntry(entry) {
   const norm = { ...entry }
   if (!norm.date) {
-    norm.date = new Date().toISOString().split('T')[0]
+    norm.date = getLocalDateString()
   }
   // Ensure treatments is a string (migration from array if needed)
   if (Array.isArray(norm.treatments)) {

@@ -380,4 +380,79 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.vm.filterTypes).not.toContain('open_referrals');
     expect(wrapper.text()).toContain('Anstehend mit Überweisung');
   });
+
+  it('should maintain true originalIndex so deleting a filtered entry deletes the correct item', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Entry 0 - Regular Doctor',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: false,
+      },
+      {
+        title: 'Entry 1 - Open Referral',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Entry 2 - Regular Note',
+        date: futureDateStr,
+        type: 'note',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.sortedEntries.length).toBe(1);
+    expect(wrapper.vm.sortedEntries[0].title).toBe('Entry 1 - Open Referral');
+    expect(wrapper.vm.sortedEntries[0].originalIndex).toBe(1);
+
+    // Delete the filtered item
+    wrapper.vm.requestDeleteEntry(wrapper.vm.sortedEntries[0].originalIndex);
+    wrapper.vm.confirmDelete();
+    await wrapper.vm.$nextTick();
+
+    // Verify Entry 1 was deleted, and Entry 0 and Entry 2 are retained in entries
+    expect(wrapper.vm.entries.map(e => e.title)).toEqual([
+      'Entry 0 - Regular Doctor',
+      'Entry 2 - Regular Note'
+    ]);
+  });
+
+  it('should strictly isolate open referrals and exclude non-doctor types when open_referrals is active alongside other filters', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const entries = [
+      {
+        title: 'Arzttermin mit fehlender Überweisung',
+        date: futureDateStr,
+        type: 'doctor',
+        needsReferral: true,
+        referralStatus: 'needed',
+      },
+      {
+        title: 'Impfung Zukunft',
+        date: futureDateStr,
+        type: 'vaccination',
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    wrapper.vm.filterTypes = ['vaccination', 'open_referrals'];
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.sortedEntries.length).toBe(0);
+    expect(wrapper.text()).not.toContain('Impfung Zukunft');
+    expect(wrapper.text()).not.toContain('Arzttermin mit fehlender Überweisung');
+  });
 });

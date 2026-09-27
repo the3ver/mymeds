@@ -174,7 +174,9 @@ export function resolveEffectiveReferralStatus(entry, allEntries = []) {
   const normalizedLocation = rawLocation.toLowerCase()
   const quarterKey = getQuarterKey(entry.date)
 
-  const sameQuarterAppointments = allEntries.filter((e) => {
+  const entriesPool = allEntries.includes(entry) ? allEntries : [entry, ...allEntries]
+
+  const sameQuarterAppointments = entriesPool.filter((e) => {
     if (!e || e.type !== 'doctor' || !e.needsReferral) return false
     const loc = e.location ? e.location.trim().toLowerCase() : ''
     return loc === normalizedLocation && getQuarterKey(e.date) === quarterKey
@@ -183,13 +185,18 @@ export function resolveEffectiveReferralStatus(entry, allEntries = []) {
   if (sameQuarterAppointments.some((e) => e.referralStatus === 'submitted')) {
     return 'submitted'
   }
-  if (sameQuarterAppointments.some((e) => e.referralStatus === 'present')) {
-    return 'present'
-  }
-  return 'needed'
+  return entry.referralStatus || 'needed'
 }
 
-export function isPendingReferral(entry, allEntries = [], todayStr = new Date().toISOString().split('T')[0]) {
+export function getLocalDateString(date = new Date()) {
+  const d = typeof date === 'string' ? new Date(date) : date
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+export function isPendingReferral(entry, allEntries = [], todayStr = getLocalDateString()) {
   if (!entry || entry.type !== 'doctor' || !entry.needsReferral) return false
   if (entry.date < todayStr) return false
   return resolveEffectiveReferralStatus(entry, allEntries) === 'needed'
