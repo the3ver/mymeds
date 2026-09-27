@@ -168,6 +168,28 @@ const getEntrySubtitle = (entry) => {
   return dateStr
 }
 
+const getEffectiveReferralStatus = (entry) => {
+  return entry.referralStatus || 'needed'
+}
+
+const getReferralChipColor = (status) => {
+  switch (status) {
+    case 'submitted': return 'success'
+    case 'present': return 'info'
+    case 'needed':
+    default: return 'warning'
+  }
+}
+
+const getReferralChipIcon = (status) => {
+  switch (status) {
+    case 'submitted': return 'mdi-check-circle'
+    case 'present': return 'mdi-file-check'
+    case 'needed':
+    default: return 'mdi-file-clock'
+  }
+}
+
 const openTypeDialog = () => {
   typeDialog.value = true
 }
@@ -181,7 +203,9 @@ const onTypeSelected = (type) => {
     agent: '', method: '', bodyPart: '',
     pathogen: '', symptoms: '', endDate: '',
     notes: '',
-    treatments: ''
+    treatments: '',
+    needsReferral: type === 'doctor',
+    referralStatus: 'needed'
   }
   editingIndex.value = -1
   entryDialog.value = true
@@ -348,6 +372,16 @@ defineExpose({
             <v-card-title class="d-flex flex-wrap align-baseline" style="gap: 0.5rem; line-height: 1.2;">
               <div class="text-h6">{{ item.data.title }}</div>
               <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
+              <v-chip
+                v-if="item.data.type === 'doctor' && item.data.needsReferral"
+                size="small"
+                :color="getReferralChipColor(getEffectiveReferralStatus(item.data))"
+                variant="tonal"
+                class="ml-auto"
+              >
+                <v-icon start size="16">{{ getReferralChipIcon(getEffectiveReferralStatus(item.data)) }}</v-icon>
+                {{ t(`calendar.referral.status.${getEffectiveReferralStatus(item.data)}`) }}
+              </v-chip>
             </v-card-title>
           </v-card-item>
           <v-expand-transition>
@@ -355,6 +389,19 @@ defineExpose({
               <v-divider></v-divider>
               <v-card-text class="text-body-1">
                 <template v-if="item.data.type === 'doctor'">
+                  <div v-if="item.data.needsReferral" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.referral.statusLabel') }}:</span>
+                    <div class="mt-1">
+                      <v-chip
+                        size="small"
+                        :color="getReferralChipColor(getEffectiveReferralStatus(item.data))"
+                        variant="tonal"
+                      >
+                        <v-icon start size="16">{{ getReferralChipIcon(getEffectiveReferralStatus(item.data)) }}</v-icon>
+                        {{ t(`calendar.referral.status.${getEffectiveReferralStatus(item.data)}`) }}
+                      </v-chip>
+                    </div>
+                  </div>
                   <div v-if="item.data.doctor" class="mb-2"><span class="text-grey">{{ t('calendar.fields.doctor') }}:</span><div class="font-weight-medium">{{ item.data.doctor }}</div></div>
                   <div v-if="item.data.doctorType" class="mb-2"><span class="text-grey">{{ t('calendar.fields.type') }}:</span><div class="font-weight-medium">{{ t(`calendar.doctorTypes.${item.data.doctorType}`) }}</div></div>
                   <div v-if="item.data.location" class="mb-2"><span class="text-grey">{{ t('calendar.fields.location') }}:</span><div class="font-weight-medium">{{ item.data.location }}</div></div>

@@ -296,6 +296,20 @@ export const messages = {
       selectType: 'Select Entry Type',
       today: 'Today',
       quarter: 'Q{q}/{year}',
+      referral: {
+        needsReferral: 'Referral required',
+        statusLabel: 'Referral status',
+        status: {
+          needed: 'Needed',
+          present: 'Obtained',
+          submitted: 'Submitted'
+        },
+        banner: {
+          singular: '1 upcoming doctor appointment requires a referral to be obtained.',
+          plural: '{count} upcoming doctor appointments require referrals to be obtained.'
+        },
+        filter: 'Open referrals'
+      },
       fields: {
         date: 'Date',
         title: 'Title',
@@ -761,6 +775,20 @@ export const messages = {
       selectType: 'Art des Eintrags wählen',
       today: 'Heute',
       quarter: 'Q{q}/{year}',
+      referral: {
+        needsReferral: 'Überweisung erforderlich',
+        statusLabel: 'Überweisungsstatus',
+        status: {
+          needed: 'Zu besorgen',
+          present: 'Liegt vor',
+          submitted: 'Abgegeben'
+        },
+        banner: {
+          singular: 'Für 1 anstehenden Arzttermin muss noch eine Überweisung besorgt werden.',
+          plural: 'Für {count} anstehende Arzttermine müssen noch Überweisungen besorgt werden.'
+        },
+        filter: 'Offene Überweisungen'
+      },
       fields: {
         date: 'Datum',
         title: 'Bezeichnung',

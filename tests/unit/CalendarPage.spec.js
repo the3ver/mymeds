@@ -91,4 +91,30 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.vm.confirmDeleteDialog).toBe(false);
     expect(wrapper.vm.entries.length).toBe(2);
   });
+
+  it('should render referral status chip on doctor entry card when needsReferral is true', () => {
+    const entries = [
+      {
+        title: 'Kardiologe Termin',
+        date: '2026-11-20',
+        type: 'doctor',
+        doctor: 'Dr. Herz',
+        location: 'Herzzentrum',
+        needsReferral: true,
+        referralStatus: 'needed'
+      },
+      {
+        title: 'Routine Kontrolltermin',
+        date: '2026-11-22',
+        type: 'doctor',
+        doctor: 'Dr. Check',
+        needsReferral: false
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const text = wrapper.text();
+    expect(text).toContain('Kardiologe Termin');
+    expect(text).toContain('Zu besorgen');
+  });
 });
