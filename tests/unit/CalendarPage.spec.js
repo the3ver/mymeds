@@ -117,4 +117,33 @@ describe('CalendarPage.vue', () => {
     expect(text).toContain('Kardiologe Termin');
     expect(text).toContain('Zu besorgen');
   });
+
+  it('should dynamically show submitted referral status on all appointments for the same location and quarter', () => {
+    const entries = [
+      {
+        title: 'Nierenambulanz Termin 1',
+        date: '2026-10-05',
+        type: 'doctor',
+        doctor: 'Dr. A',
+        location: 'Nierenambulanz FFM',
+        needsReferral: true,
+        referralStatus: 'submitted'
+      },
+      {
+        title: 'Nierenambulanz Termin 2',
+        date: '2026-11-20',
+        type: 'doctor',
+        doctor: 'Dr. B',
+        location: 'Nierenambulanz FFM',
+        needsReferral: true,
+        referralStatus: 'needed'
+      }
+    ];
+
+    const wrapper = mountComponent({ initialEntries: entries });
+    const entry0 = wrapper.find('#entry-0');
+    const entry1 = wrapper.find('#entry-1');
+    expect(entry0.text()).toContain('Abgegeben');
+    expect(entry1.text()).toContain('Abgegeben');
+  });
 });

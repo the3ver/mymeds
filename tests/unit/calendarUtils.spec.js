@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   createCalendarEvent,
-  createDetailedCalendarEvent
+  createDetailedCalendarEvent,
+  getQuarterKey,
+  resolveEffectiveReferralStatus
 } from '../../src/modules/calendar/utils/calendarUtils';
 import { downloadIcsEvent } from '../../src/modules/calendar/utils/calendar';
 
@@ -231,6 +233,69 @@ describe('calendarUtils & calendar', () => {
 
       expect(clickedElements.length).toBe(1);
       expect(clickedElements[0].download).toBe('termin.ics');
+    });
+  });
+
+  describe('getQuarterKey', () => {
+    it('should compute the correct quarter key for various dates', () => {
+      expect(getQuarterKey('2026-01-15')).toBe('2026-Q1');
+      expect(getQuarterKey('2026-03-31')).toBe('2026-Q1');
+      expect(getQuarterKey('2026-04-01')).toBe('2026-Q2');
+      expect(getQuarterKey('2026-07-15')).toBe('2026-Q3');
+      expect(getQuarterKey('2026-10-01')).toBe('2026-Q4');
+      expect(getQuarterKey('2026-12-31')).toBe('2026-Q4');
+    });
+  });
+
+  describe('resolveEffectiveReferralStatus', () => {
+    it('should aggregate submitted status across appointments at same location and quarter', () => {
+      const entries = [
+        {
+          date: '2026-10-05',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'submitted'
+        },
+        {
+          date: '2026-11-20',
+          type: 'doctor',
+          location: '  nierenambulanz ffm  ',
+          needsReferral: true,
+          referralStatus: 'needed'
+        },
+        {
+          date: '2027-01-15',
+          type: 'doctor',
+          location: 'Nierenambulanz FFM',
+          needsReferral: true,
+          referralStatus: 'needed'
+        }
+      ];
+
+      expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('submitted');
+      expect(resolveEffectiveReferralStatus(entries[2], entries)).toBe('needed');
+    });
+
+    it('should evaluate isolated when location is empty', () => {
+      const entries = [
+        {
+          date: '2026-10-05',
+          type: 'doctor',
+          location: '',
+          needsReferral: true,
+          referralStatus: 'submitted'
+        },
+        {
+          date: '2026-10-20',
+          type: 'doctor',
+          location: '',
+          needsReferral: true,
+          referralStatus: 'needed'
+        }
+      ];
+
+      expect(resolveEffectiveReferralStatus(entries[1], entries)).toBe('needed');
     });
   });
 });

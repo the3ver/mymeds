@@ -140,3 +140,40 @@ export function createDetailedCalendarEvent(entry) {
     downloadFile()
   }
 }
+
+export function getQuarterKey(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+  const year = date.getFullYear()
+  const quarter = Math.floor(date.getMonth() / 3) + 1
+  return `${year}-Q${quarter}`
+}
+
+export function resolveEffectiveReferralStatus(entry, allEntries = []) {
+  if (!entry || entry.type !== 'doctor' || !entry.needsReferral) {
+    return null
+  }
+
+  const rawLocation = entry.location ? entry.location.trim() : ''
+  if (!rawLocation) {
+    return entry.referralStatus || 'needed'
+  }
+
+  const normalizedLocation = rawLocation.toLowerCase()
+  const quarterKey = getQuarterKey(entry.date)
+
+  const sameQuarterAppointments = allEntries.filter((e) => {
+    if (!e || e.type !== 'doctor' || !e.needsReferral) return false
+    const loc = e.location ? e.location.trim().toLowerCase() : ''
+    return loc === normalizedLocation && getQuarterKey(e.date) === quarterKey
+  })
+
+  if (sameQuarterAppointments.some((e) => e.referralStatus === 'submitted')) {
+    return 'submitted'
+  }
+  if (sameQuarterAppointments.some((e) => e.referralStatus === 'present')) {
+    return 'present'
+  }
+  return 'needed'
+}

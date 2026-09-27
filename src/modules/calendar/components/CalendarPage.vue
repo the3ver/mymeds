@@ -5,7 +5,7 @@ import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent } from '../utils/calendarUtils'
+import { createDetailedCalendarEvent, resolveEffectiveReferralStatus } from '../utils/calendarUtils'
 import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const props = defineProps({
@@ -169,7 +169,7 @@ const getEntrySubtitle = (entry) => {
 }
 
 const getEffectiveReferralStatus = (entry) => {
-  return entry.referralStatus || 'needed'
+  return resolveEffectiveReferralStatus(entry, entries.value) || 'needed'
 }
 
 const getReferralChipColor = (status) => {
