@@ -9,12 +9,12 @@ export function getSubtleCrypto(): SubtleCrypto {
   return cryptoObj.subtle;
 }
 
-function getRandomValues<T extends ArrayBufferView | null>(array: T): T {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+function randomBytes(byteLength: number): Uint8Array {
+  const cryptoObj = globalThis.crypto;
   if (!cryptoObj || !cryptoObj.getRandomValues) {
     throw new Error('Web Cryptography API (crypto.getRandomValues) is not available.');
   }
-  return cryptoObj.getRandomValues(array);
+  return cryptoObj.getRandomValues(new Uint8Array(byteLength));
 }
 
 /**
@@ -22,7 +22,7 @@ function getRandomValues<T extends ArrayBufferView | null>(array: T): T {
  * @param byteLength Default is 16 bytes (128-bit).
  */
 export function generateSalt(byteLength = 16): Uint8Array {
-  return getRandomValues(new Uint8Array(byteLength));
+  return randomBytes(byteLength);
 }
 
 /**
@@ -30,7 +30,7 @@ export function generateSalt(byteLength = 16): Uint8Array {
  * @param byteLength Default is 12 bytes (96-bit, recommended for AES-GCM).
  */
 export function generateIv(byteLength = 12): Uint8Array {
-  return getRandomValues(new Uint8Array(byteLength));
+  return randomBytes(byteLength);
 }
 
 /**
