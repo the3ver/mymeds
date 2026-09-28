@@ -1,8 +1,8 @@
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-function getSubtleCrypto(): SubtleCrypto {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+export function getSubtleCrypto(): SubtleCrypto {
+  const cryptoObj = globalThis.crypto;
   if (!cryptoObj || !cryptoObj.subtle) {
     throw new Error('Web Cryptography API (crypto.subtle) is not available in this environment.');
   }

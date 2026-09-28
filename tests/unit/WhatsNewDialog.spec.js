@@ -41,12 +41,13 @@ describe('WhatsNewDialog.vue', () => {
     expect(text).toContain('Verstanden');
   });
 
-  it('includes quarterly referral tracking in the latest changelog entry', () => {
+  it('includes the save-on-lock fix in the latest changelog entry', () => {
     const latest = getLatestChangelog();
-    expect(latest.title.de).toContain('Überweisungstracking');
-    expect(latest.title.en).toContain('Referral Tracking');
-    expect(latest.highlights.de.some(h => h.includes('Überweisungsstatus'))).toBe(true);
-    expect(latest.highlights.en.some(h => h.includes('referral requirements'))).toBe(true);
+    expect(latest.version).toBe('1.10.13');
+    expect(latest.title.de).toContain('Sperren');
+    expect(latest.title.en).toContain('Lock');
+    expect(latest.highlights.de.some(h => h.includes('gespeichert'))).toBe(true);
+    expect(latest.highlights.en.some(h => h.includes('saved'))).toBe(true);
   });
 
   it('toggles older versions when button is clicked', async () => {

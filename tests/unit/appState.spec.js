@@ -73,6 +73,24 @@ describe('app-state', () => {
       expect(state.deductions).toEqual({});
     });
 
+    it('should flush pending changes before clearing data', async () => {
+      unlock(1, 'password', { meds: [] });
+      await vi.runAllTimersAsync();
+      vi.clearAllMocks();
+      const savedSnapshots = [];
+      dataService.saveAndLockDatabase.mockImplementationOnce(async (_id, _pw, data) => {
+        savedSnapshots.push(JSON.parse(JSON.stringify(data)));
+      });
+
+      state.decryptedData.meds.push({ name: 'Letzte Änderung', count: 5 });
+      await Promise.resolve(); // let the deep watcher schedule the save
+      await lock();
+      await vi.runAllTimersAsync();
+
+      expect(savedSnapshots).toHaveLength(1);
+      expect(savedSnapshots[0].meds).toEqual([{ name: 'Letzte Änderung', count: 5 }]);
+    });
+
     it('should clear app badge on lock', async () => {
       const badgingService = await import('../../src/modules/common/utils/badgingService');
       await lock();

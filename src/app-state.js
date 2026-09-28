@@ -18,13 +18,22 @@ export const state = reactive({
 
 // --- Debounce Utility ---
 function debounce(func, timeout = 500) {
-  let timer;
-  return (...args) => {
+  let timer = null;
+  const debounced = () => {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      func.apply(this, args);
+      timer = null;
+      func();
     }, timeout);
   };
+  // Runs a pending call immediately and returns its promise
+  debounced.flush = async () => {
+    if (timer === null) return;
+    clearTimeout(timer);
+    timer = null;
+    await func();
+  };
+  return debounced;
 }
 
 // --- Auto-Save Logic ---
@@ -66,7 +75,7 @@ export function unlock(id, password, data, deductions = {}) {
 
 export async function lock() {
   // Ensure the very last changes are saved before locking
-  await saveState(); 
+  await saveState.flush();
 
   state.activeDatabaseId = null;
   state.activeDatabasePassword = null;

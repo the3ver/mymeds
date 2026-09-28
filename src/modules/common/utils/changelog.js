@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.13',
+    date: '2026-09-28',
+    title: {
+      de: 'Zuverlässiges Speichern beim Sperren',
+      en: 'Reliable Saving on Lock'
+    },
+    highlights: {
+      de: [
+        'Änderungen kurz vor dem Sperren des Tresors werden jetzt immer gespeichert',
+        'Interne Aufräumarbeiten an der Vorratsberechnung und der Verschlüsselung'
+      ],
+      en: [
+        'Changes made right before locking the vault are now always saved',
+        'Internal cleanup of stock calculation and encryption code'
+      ]
+    }
+  },
+  {
     version: '1.10.12',
     date: '2026-09-28',
     title: {

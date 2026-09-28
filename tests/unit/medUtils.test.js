@@ -158,6 +158,21 @@ describe('checkAndUpdateDailyDose', () => {
     expect(res2.updatedItems[0].count).toBe(9);
   });
 
+  it('should count interval occurrences relative to startDate', () => {
+    const now = new Date(2026, 2, 10, 12, 0, 0);
+    const meds = [
+      { name: 'Every3', count: 10, dose: '2', schedule: { type: 'interval', intervalDays: 3, startDate: '2026-03-01' } },
+      { name: 'FutureStart', count: 10, dose: '1', schedule: { type: 'interval', intervalDays: 2, startDate: '2026-03-09' } }
+    ];
+
+    // Days 03-04 .. 03-10: occurrences on 03-04, 03-07, 03-10 -> 3 * 2
+    const res = checkAndUpdateDailyDose(meds, new Date(2026, 2, 3).toDateString(), now);
+    expect(res.deductions['Every3']).toBe(6);
+    // Start 03-09: only 03-09 is in range (03-11 is not)
+    expect(res.deductions['FutureStart']).toBe(1);
+    expect(res.updatedItems[1].count).toBe(9);
+  });
+
   it('should handle missing lastUpdateDate by setting it to today and not deducting', () => {
     const { updated, updatedItems, newDate, deductions } = checkAndUpdateDailyDose(
       mockMeds,

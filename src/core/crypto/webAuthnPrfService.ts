@@ -1,16 +1,8 @@
-import { generateSalt, generateIv } from './cryptoService';
+import { generateSalt, generateIv, getSubtleCrypto } from './cryptoService';
 import { bufferToBase64, base64ToBuffer } from './base64';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-
-function getSubtleCrypto(): SubtleCrypto {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
-  if (!cryptoObj || !cryptoObj.subtle) {
-    throw new Error('Web Cryptography API (crypto.subtle) is not available in this environment.');
-  }
-  return cryptoObj.subtle;
-}
 
 /**
  * Checks whether WebAuthn is available in the current environment.

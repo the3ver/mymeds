@@ -43,6 +43,23 @@ export const normalizeWeekday = (day) => {
   return WEEKDAY_MAP[str] !== undefined ? WEEKDAY_MAP[str] : -1;
 };
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const getIntervalDays = (schedule) =>
+  schedule.intervalDays && schedule.intervalDays > 0 ? schedule.intervalDays : 1;
+
+// Count days in (lastDate, todayDate] that match the predicate
+const countMatchingDays = (lastDate, todayDate, matches) => {
+  let count = 0;
+  const cursor = new Date(lastDate);
+  cursor.setDate(cursor.getDate() + 1);
+  while (cursor <= todayDate) {
+    if (matches(cursor)) count++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return count;
+};
+
 const calculateItemDeduction = (item, lastDate, todayDate, diffDays) => {
   const dose = parseDose(item.dose);
   if (!dose || dose <= 0) return 0;
@@ -57,39 +74,20 @@ const calculateItemDeduction = (item, lastDate, todayDate, diffDays) => {
       return 0;
     }
     const targetDays = new Set(schedule.days.map(normalizeWeekday));
-    let matchingDays = 0;
-    const cursor = new Date(lastDate);
-    cursor.setDate(cursor.getDate() + 1);
-
-    while (cursor <= todayDate) {
-      if (targetDays.has(cursor.getDay())) {
-        matchingDays++;
-      }
-      cursor.setDate(cursor.getDate() + 1);
-    }
-    return dose * matchingDays;
+    return dose * countMatchingDays(lastDate, todayDate, (day) => targetDays.has(day.getDay()));
   }
 
   if (schedule.type === 'interval') {
-    const intervalDays = schedule.intervalDays && schedule.intervalDays > 0 ? schedule.intervalDays : 1;
-    if (schedule.startDate) {
-      const start = new Date(schedule.startDate);
-      start.setHours(0, 0, 0, 0);
-      let occurrences = 0;
-      const cursor = new Date(lastDate);
-      cursor.setDate(cursor.getDate() + 1);
-
-      while (cursor <= todayDate) {
-        const diffFromStart = Math.round((cursor - start) / (1000 * 60 * 60 * 24));
-        if (diffFromStart >= 0 && diffFromStart % intervalDays === 0) {
-          occurrences++;
-        }
-        cursor.setDate(cursor.getDate() + 1);
-      }
-      return dose * occurrences;
-    } else {
+    const intervalDays = getIntervalDays(schedule);
+    if (!schedule.startDate) {
       return dose * Math.floor(diffDays / intervalDays);
     }
+    const start = new Date(schedule.startDate);
+    start.setHours(0, 0, 0, 0);
+    return dose * countMatchingDays(lastDate, todayDate, (day) => {
+      const diffFromStart = Math.round((day - start) / MS_PER_DAY);
+      return diffFromStart >= 0 && diffFromStart % intervalDays === 0;
+    });
   }
 
   return dose * diffDays;
@@ -114,7 +112,7 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
     todayDate.setHours(0, 0, 0, 0)
     
     const diffTime = Math.abs(todayDate - lastDate)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
+    const diffDays = Math.ceil(diffTime / MS_PER_DAY) 
     
     if (diffDays >= 1) {
       const updatedItems = savedItems.map(item => {
@@ -156,7 +154,7 @@ export const calculateDaysRemaining = (item) => {
   }
 
   if (schedule && schedule.type === 'interval') {
-    const intervalDays = schedule.intervalDays && schedule.intervalDays > 0 ? schedule.intervalDays : 1
+    const intervalDays = getIntervalDays(schedule)
     const dailyAverage = dose / intervalDays
     return Math.floor(item.count / dailyAverage)
   }
