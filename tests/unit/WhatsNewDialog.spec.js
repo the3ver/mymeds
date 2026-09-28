@@ -41,6 +41,14 @@ describe('WhatsNewDialog.vue', () => {
     expect(text).toContain('Verstanden');
   });
 
+  it('includes quarterly referral tracking in the latest changelog entry', () => {
+    const latest = getLatestChangelog();
+    expect(latest.title.de).toContain('Überweisungstracking');
+    expect(latest.title.en).toContain('Referral Tracking');
+    expect(latest.highlights.de.some(h => h.includes('Überweisungsstatus'))).toBe(true);
+    expect(latest.highlights.en.some(h => h.includes('referral requirements'))).toBe(true);
+  });
+
   it('toggles older versions when button is clicked', async () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();

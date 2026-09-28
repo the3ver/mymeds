@@ -5,6 +5,30 @@
 
 export const changelog = [
   {
+    version: '1.10.12',
+    date: '2026-09-28',
+    title: {
+      de: 'Quartalsweises Überweisungstracking für Facharzttermine',
+      en: 'Quarterly Referral Tracking for Doctor Visits'
+    },
+    highlights: {
+      de: [
+        'Erfassung des Überweisungsstatus für Facharzttermine in drei Stufen: Zu besorgen, Liegt vor und Abgegeben (#39, #40)',
+        'Dynamische Quartals-Aggregation: Sobald für eine Praxis im selben Quartal eine Überweisung als abgegeben markiert ist, gilt der Bedarf für alle weiteren Termine dieser Praxis automatisch als erfüllt (#41)',
+        'Hinweis-Banner am Kopf des Kalenders erinnert rechtzeitig an fehlende Überweisungen für anstehende Termine (#42)',
+        'Neuer Filter „Offene Überweisungen“ im Filter-Dialog zum gezielten Isolieren anstehender Termine mit Handlungsbedarf (#43)',
+        'Farbige Status-Chips direkt auf den Terminkarten im Kalender zur schnellen Übersicht'
+      ],
+      en: [
+        'Track referral requirements for doctor appointments across three states: Needed, Obtained, and Submitted (#39, #40)',
+        'Dynamic quarterly aggregation: Submitting a referral for a medical clinic automatically covers all other appointments at the same clinic in that quarter (#41)',
+        'Alert banner at the top of the calendar highlights upcoming visits that still require a referral (#42)',
+        'New "Open referrals" filter in the calendar filter dialog to quickly locate upcoming appointments with missing referrals (#43)',
+        'Color-coded status chips directly on appointment cards in the calendar for instant visual clarity'
+      ]
+    }
+  },
+  {
     version: '1.10.3',
     date: '2026-09-23',
     title: {

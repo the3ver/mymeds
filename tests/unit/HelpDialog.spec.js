@@ -40,6 +40,21 @@ describe('HelpDialog.vue', () => {
     expect(bodyText).toContain('Datensicherung & Import/Export');
   });
 
+  it('should include referral tracking details in the calendar section', async () => {
+    const wrapper = mountComponent();
+    await wrapper.vm.$nextTick();
+
+    const titles = wrapper.findAllComponents(components.VExpansionPanelTitle);
+    const calendarTitle = titles.find(t => t.text().includes('Gesundheitskalender'));
+    expect(calendarTitle).toBeDefined();
+
+    await calendarTitle.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.textContent).toContain('Überweisungstracking');
+    expect(messages.en.help.sections.calendar.content).toContain('Referral Tracking');
+  });
+
   it('should emit update:modelValue with false when close button is clicked', async () => {
     const wrapper = mountComponent();
 

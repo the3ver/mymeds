@@ -269,7 +269,7 @@ export const messages = {
         },
         calendar: {
           title: 'Health Calendar & ICS Export',
-          content: 'The Calendar tab tracks doctor visits, vaccinations, illnesses, and general health notes.\n• Timeline: Entries are organized into quarter sections with a dedicated "Today" divider.\n• Filtering: Use the filter button in the top bar to filter entries by type.\n• Calendar Export (.ics): Tap the calendar icon on any entry or restock warning to export an .ics file or share it directly into your device calendar (Google Calendar, Apple Calendar, Outlook).'
+          content: 'The Calendar tab tracks doctor visits, vaccinations, illnesses, and general health notes.\n• Timeline: Entries are organized into quarter sections with a dedicated "Today" divider.\n• Referral Tracking: For doctor appointments, you can track required referrals across three status stages ("Needed", "Obtained", "Submitted"). When having multiple appointments at the same clinic in the same quarter, a submitted referral automatically covers all subsequent visits in that quarter. An alert banner at the top of the calendar and the "Open referrals" filter highlight pending referrals.\n• Filtering: Use the filter button in the top bar to filter entries by type or pending referrals.\n• Calendar Export (.ics): Tap the calendar icon on any entry or restock warning to export an .ics file or share it directly into your device calendar (Google Calendar, Apple Calendar, Outlook).'
         },
         exportImport: {
           title: 'Backups & Data Management',
@@ -747,7 +747,7 @@ export const messages = {
         },
         calendar: {
           title: 'Gesundheitskalender & ICS-Export',
-          content: 'Im Reiter "Kalender" protokollierst und planst du Arztbesuche, Impfungen, Erkrankungen und Notizen.\n• Timeline: Termine sind nach Quartalen gegliedert und durch eine "Heute"-Trennlinie getrennt.\n• Filter: Über das Filtersymbol in der oberen Leiste kannst du gezielt nach bestimmten Eintragstypen filtern.\n• Kalender-Export (.ics): Über das Kalendersymbol kannst du Termine oder Nachbestell-Erinnerungen direkt über die Teilen-Funktion in deinen Smartphone- oder Desktop-Kalender (Google Kalender, Apple Kalender, Outlook) exportieren.'
+          content: 'Im Reiter "Kalender" protokollierst und planst du Arztbesuche, Impfungen, Erkrankungen und Notizen.\n• Timeline: Termine sind nach Quartalen gegliedert und durch eine "Heute"-Trennlinie getrennt.\n• Überweisungstracking: Bei Arztterminen kannst du den Überweisungsstatus in drei Stufen erfassen ("Zu besorgen", "Liegt vor", "Abgegeben"). Bei mehreren Terminen in derselben Facharztpraxis im selben Quartal deckt eine abgegebene Überweisung automatisch alle weiteren Termine ab. Ein Hinweis-Banner oben im Kalender und der Filter „Offene Überweisungen“ erinnern dich rechtzeitig.\n• Filter: Über das Filtersymbol in der oberen Leiste kannst du gezielt nach bestimmten Eintragstypen oder offenen Überweisungen filtern.\n• Kalender-Export (.ics): Über das Kalendersymbol kannst du Termine oder Nachbestell-Erinnerungen direkt über die Teilen-Funktion in deinen Smartphone- oder Desktop-Kalender (Google Kalender, Apple Kalender, Outlook) exportieren.'
         },
         exportImport: {
           title: 'Datensicherung & Import/Export',
