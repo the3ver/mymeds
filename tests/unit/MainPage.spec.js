@@ -53,7 +53,12 @@ describe('MainPage.vue', () => {
       global: {
         plugins: [vuetify, i18n],
         stubs: {
-          CalendarPage: { template: '<div class="calendar-stub"></div>' }
+          CalendarPage: { template: '<div class="calendar-stub"></div>' },
+          // Async dialogs would lazy-load qrcode/@zxing after the test file ends
+          // (EnvironmentTeardownError on slower CI runners)
+          BmpScanDialog: true,
+          BmpExportDialog: true,
+          DataDialog: true
         }
       }
     });
