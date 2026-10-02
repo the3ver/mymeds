@@ -6,7 +6,7 @@ import { state as appState, lock } from './app-state';
 import * as dataService from './modules/common/utils/dataService';
 import { onServiceWorkerUpdate, applyUpdateAndReload } from './modules/common/utils/updateService';
 import { autoRequestPersistence } from './modules/common/utils/storagePersistenceService';
-import packageJson from '../package.json';
+import { getLatestChangelog } from './modules/common/utils/changelog';
 import * as reminderService from './modules/common/utils/reminderService';
 import NavDrawer from './modules/common/components/NavDrawer.vue';
 import DatabaseListPage from './modules/common/components/DatabaseListPage.vue';
@@ -45,6 +45,9 @@ function isNewerVersion(current, previous) {
 }
 
 onMounted(async () => {
+  // Compare against the version the dialog stores on close, not the app version:
+  // a release without its own changelog entry has nothing new to show.
+  const latestChangelogVersion = getLatestChangelog().version;
   const [settings, dbs] = await Promise.all([
     dataService.getSettings(),
     dataService.getDatabaseList()
@@ -54,11 +57,11 @@ onMounted(async () => {
   if (!settings?.disclaimerAccepted) {
     welcomeDialog.value = true;
     if (!settings?.lastSeenChangelogVersion) {
-      dataService.saveLastSeenChangelogVersion(packageJson.version);
+      dataService.saveLastSeenChangelogVersion(latestChangelogVersion);
     }
   } else {
     const lastSeen = settings?.lastSeenChangelogVersion;
-    if (!lastSeen || isNewerVersion(packageJson.version, lastSeen)) {
+    if (!lastSeen || isNewerVersion(latestChangelogVersion, lastSeen)) {
       whatsNewDialog.value = true;
     }
   }

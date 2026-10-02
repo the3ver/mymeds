@@ -41,13 +41,13 @@ describe('WhatsNewDialog.vue', () => {
     expect(text).toContain('Verstanden');
   });
 
-  it('includes the save-on-lock fix in the latest changelog entry', () => {
+  it("includes the What's New fix in the latest changelog entry", () => {
     const latest = getLatestChangelog();
-    expect(latest.version).toBe('1.10.13');
-    expect(latest.title.de).toContain('Sperren');
-    expect(latest.title.en).toContain('Lock');
-    expect(latest.highlights.de.some(h => h.includes('gespeichert'))).toBe(true);
-    expect(latest.highlights.en.some(h => h.includes('saved'))).toBe(true);
+    expect(latest.version).toBe('1.10.15');
+    expect(latest.title.de).toContain('nur noch einmal');
+    expect(latest.title.en).toContain('Only Once');
+    expect(latest.highlights.de.some(h => h.includes('jedem Start'))).toBe(true);
+    expect(latest.highlights.en.some(h => h.includes('every app start'))).toBe(true);
   });
 
   it('toggles older versions when button is clicked', async () => {

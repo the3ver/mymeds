@@ -5,6 +5,22 @@
 
 export const changelog = [
   {
+    version: '1.10.15',
+    date: '2026-10-02',
+    title: {
+      de: 'Neuigkeiten-Dialog erscheint nur noch einmal',
+      en: "What's New Dialog Shows Only Once"
+    },
+    highlights: {
+      de: [
+        'Der Dialog „Was gibt es Neues“ öffnete sich bei jedem Start der App. Er erscheint jetzt nur noch einmal pro neuer Version'
+      ],
+      en: [
+        "The What's New dialog opened on every app start. It now appears only once per new version"
+      ]
+    }
+  },
+  {
     version: '1.10.13',
     date: '2026-09-28',
     title: {

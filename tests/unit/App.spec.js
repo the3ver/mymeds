@@ -7,6 +7,7 @@ import App from '../../src/App.vue';
 import * as components from 'vuetify/components';
 import { state as appState } from '../../src/app-state';
 import * as dataService from '../../src/modules/common/utils/dataService';
+import { getLatestChangelog } from '../../src/modules/common/utils/changelog';
 
 vi.mock('../../src/modules/common/utils/storagePersistenceService', () => ({
   autoRequestPersistence: vi.fn().mockResolvedValue(true),
@@ -102,6 +103,34 @@ describe('App.vue', () => {
     expect(welcomeComponent.exists()).toBe(true);
     expect(welcomeComponent.props('modelValue')).toBe(true);
     expect(welcomeComponent.props('isExistingUser')).toBe(true);
+  });
+
+  it('does not show WhatsNewDialog again once the latest changelog version was seen', async () => {
+    // The dialog stores the latest changelog version on close; a later app
+    // release without its own changelog entry must not reopen it.
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({
+      disclaimerAccepted: true,
+      lastSeenChangelogVersion: getLatestChangelog().version,
+    });
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([{ id: 1, name: 'Mein Tresor' }]);
+    const wrapper = mountApp();
+    await flushPromises();
+
+    const whatsNew = wrapper.findComponent({ name: 'WhatsNewDialog' });
+    expect(whatsNew.props('modelValue')).toBe(false);
+  });
+
+  it('shows WhatsNewDialog when a newer changelog entry exists than the one seen', async () => {
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({
+      disclaimerAccepted: true,
+      lastSeenChangelogVersion: '1.0.0',
+    });
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([{ id: 1, name: 'Mein Tresor' }]);
+    const wrapper = mountApp();
+    await flushPromises();
+
+    const whatsNew = wrapper.findComponent({ name: 'WhatsNewDialog' });
+    expect(whatsNew.props('modelValue')).toBe(true);
   });
 
   it('triggers autoRequestPersistence in background on mount', async () => {
