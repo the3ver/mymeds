@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "check": "bash scripts/check.sh",
     "icons": "node scripts/generate-icon-css.mjs"
   },
   "dependencies": {

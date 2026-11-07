@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./pat.txt)",
+      "Read(./*.keystore)",
+      "Read(./*.jks)",
+      "Read(./.env*)",
+      "Read(./android-build/**)",
+      "Read(./dist/**)",
+      "Read(./node_modules/**)",
+      "Read(./.idea/**)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/check.sh\" --hook",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -11,7 +11,9 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 
 ## Commands
 - Dev Server: `npm run dev`
-- Tests ausführen: `& "C:\Program Files\Git\bin\bash.exe" -c "npm test -- --run"` (oder `npx vitest run`)
+- Check (tsc + Tests, eine Zeile wenn grün): `npm run check`. Läuft auch als Claude-Code-Stop-Hook (`.claude/settings.json`).
+- Tests ausführen: `npx vitest run` (`npm test` ohne `--run` startet den Watch-Mode und hängt)
+- Icon-Subset neu erzeugen nach neuem `mdi-*`-Icon: `npm run icons` (ein Test prüft, dass kein Icon fehlt)
 - Build PWA: `npm run build`
 - Preview: `npm run preview`
 - Type Check: `npx tsc --noEmit`
