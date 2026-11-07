@@ -1,4 +1,21 @@
 import { openDB } from 'idb';
+import { toRaw } from 'vue';
+
+/**
+ * Strips Vue reactive proxies (also nested) so IndexedDB can structured-clone the value.
+ * Binary data, dates and other non-plain objects pass through unchanged.
+ * @template T
+ * @param {T} value
+ * @returns {T}
+ */
+export function toStorable(value) {
+  const raw = toRaw(value);
+  if (Array.isArray(raw)) return /** @type {T} */ (raw.map(toStorable));
+  if (raw && typeof raw === 'object' && Object.getPrototypeOf(raw) === Object.prototype) {
+    return /** @type {T} */ (Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, toStorable(v)])));
+  }
+  return raw;
+}
 
 const DB_NAME = 'MyMedsDB';
 const DB_VERSION = 4; // Incremented to force a clean upgrade
@@ -42,7 +59,7 @@ export async function getDatabaseList() {
 
 export async function createDatabase(dbEntry) {
   const db = await dbPromise;
-  return db.add(DB_STORE_NAME, dbEntry);
+  return db.add(DB_STORE_NAME, toStorable(dbEntry));
 }
 
 export async function getFullDatabase(id) {
@@ -52,7 +69,7 @@ export async function getFullDatabase(id) {
 
 export async function updateDatabase(dbEntry) {
   const db = await dbPromise;
-  return db.put(DB_STORE_NAME, dbEntry);
+  return db.put(DB_STORE_NAME, toStorable(dbEntry));
 }
 
 export async function renameDatabase(id, newName) {
@@ -83,7 +100,7 @@ export const getSetting = async (key, defaultValue) => {
 
 export const setSetting = async (key, value) => {
   const db = await dbPromise;
-  return db.put(SETTINGS_STORE_NAME, value, key);
+  return db.put(SETTINGS_STORE_NAME, toStorable(value), key);
 };
 
 export const CURRENT_DISCLAIMER_VERSION = 1;

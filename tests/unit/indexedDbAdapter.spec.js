@@ -1,10 +1,37 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { reactive } from 'vue';
 import * as dbAdapter from '../../src/modules/common/utils/indexedDbAdapter';
 
 describe('indexedDbAdapter', () => {
   beforeEach(async () => {
     // Clear all data between tests for isolation
     await dbAdapter.deleteAllData();
+  });
+
+  // Vue reactive proxies are not structured-cloneable (DataCloneError, 057219c)
+  describe('Vue reactive input', () => {
+    const entry = () =>
+      reactive({
+        name: 'Proxy-Tresor',
+        encryptionStrategy: 'password',
+        passwordData: { salt: new Uint8Array([1]), iv: new Uint8Array([2]) },
+        encryptedData: new ArrayBuffer(4)
+      });
+
+    it('stores a reactive database entry on create and update', async () => {
+      const id = await dbAdapter.createDatabase(entry());
+      await dbAdapter.updateDatabase(reactive({ ...entry(), id, name: 'Umbenannt' }));
+      const stored = await dbAdapter.getFullDatabase(id);
+      expect(stored.name).toBe('Umbenannt');
+      // Type tags, not instanceof: fake-indexeddb clones in another realm
+      expect(Object.prototype.toString.call(stored.passwordData.salt)).toBe('[object Uint8Array]');
+      expect(Object.prototype.toString.call(stored.encryptedData)).toBe('[object ArrayBuffer]');
+    });
+
+    it('stores reactive settings values', async () => {
+      await dbAdapter.saveReminderSettings(reactive({ enabled: true, lowStock: { days: 3 } }));
+      expect((await dbAdapter.getReminderSettings()).lowStock.days).toBe(3);
+    });
   });
 
   describe('Database (Tresor) CRUD Operations', () => {
