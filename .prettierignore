@@ -1,0 +1,7 @@
+dist/
+dev-dist/
+android-build/
+node_modules/
+package-lock.json
+src/styles/icons.css
+*.md

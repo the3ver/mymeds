@@ -10,7 +10,9 @@
     "test": "vitest",
     "lint": "eslint .",
     "check": "bash scripts/check.sh",
-    "icons": "node scripts/generate-icon-css.mjs"
+    "icons": "node scripts/generate-icon-css.mjs",
+    "fmt": "prettier --write --log-level warn \"src/**/*.{js,vue,ts}\" \"tests/**/*.{js,ts}\" \"scripts/*.mjs\" \"*.config.js\"",
+    "fmt:check": "prettier --check --log-level warn \"src/**/*.{js,vue,ts}\" \"tests/**/*.{js,ts}\" \"scripts/*.mjs\" \"*.config.js\""
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -35,6 +37,7 @@
     "fake-indexeddb": "^6.2.5",
     "globals": "^16.5.0",
     "jsdom": "^28.1.0",
+    "prettier": "3.9.10",
     "resize-observer-polyfill": "^1.5.1",
     "typescript": "^7.0.2",
     "vite": "^7.3.1",
