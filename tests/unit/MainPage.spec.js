@@ -11,6 +11,30 @@ import * as shortcutService from '../../src/modules/common/utils/shortcutService
 import * as badgingService from '../../src/modules/common/utils/badgingService';
 import * as dataService from '../../src/modules/common/utils/dataService';
 
+const loaded = vi.hoisted(() => ({ scanner: false }));
+
+// Records whether a test pulls in the real scanner (and with it @zxing/library)
+vi.mock('../../src/modules/meds/utils/bmpScannerService', async (importOriginal) => {
+  loaded.scanner = true;
+  return importOriginal();
+});
+
+// MainPage loads these dialogs via defineAsyncComponent. Name-based stubs do not
+// reach an async wrapper, so the real dialog (qrcode, @zxing) would load and could
+// finish after teardown (EnvironmentTeardownError on slower CI runners).
+vi.mock('../../src/modules/meds/components/BmpScanDialog.vue', () => ({
+  __esModule: true,
+  default: { name: 'BmpScanDialog', template: '<div class="bmp-scan-stub"></div>' },
+}));
+vi.mock('../../src/modules/meds/components/BmpExportDialog.vue', () => ({
+  __esModule: true,
+  default: { name: 'BmpExportDialog', template: '<div class="bmp-export-stub"></div>' },
+}));
+vi.mock('../../src/modules/common/components/DataDialog.vue', () => ({
+  __esModule: true,
+  default: { name: 'DataDialog', template: '<div class="data-dialog-stub"></div>' },
+}));
+
 vi.mock('../../src/modules/common/utils/shortcutService', () => ({
   consumeShortcutIntent: vi.fn().mockReturnValue({ tab: null, action: null }),
 }));
@@ -53,12 +77,7 @@ describe('MainPage.vue', () => {
       global: {
         plugins: [vuetify, i18n],
         stubs: {
-          CalendarPage: { template: '<div class="calendar-stub"></div>' },
-          // Async dialogs would lazy-load qrcode/@zxing after the test file ends
-          // (EnvironmentTeardownError on slower CI runners)
-          BmpScanDialog: true,
-          BmpExportDialog: true,
-          DataDialog: true
+          CalendarPage: { template: '<div class="calendar-stub"></div>' }
         }
       }
     });
@@ -90,6 +109,16 @@ describe('MainPage.vue', () => {
     const mainPageVm = wrapper.findComponent(MainPage).vm;
 
     expect(mainPageVm.bmpScanDialog).toBe(true);
+  });
+
+  it('does not load the real scanner dialog when the scan dialog opens', async () => {
+    shortcutService.consumeShortcutIntent.mockReturnValue({ tab: null, action: 'scan' });
+
+    mountMainPage();
+    // Give a lazy import time to resolve; it would otherwise finish after teardown
+    await new Promise(r => setTimeout(r, 1000));
+
+    expect(loaded.scanner).toBe(false);
   });
 
   it('updates critical meds badge on mount', async () => {
