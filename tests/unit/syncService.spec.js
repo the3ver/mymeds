@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import * as syncService from '../../src/modules/common/utils/syncService';
 import * as dbAdapter from '../../src/modules/common/utils/indexedDbAdapter';
 

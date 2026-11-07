@@ -95,7 +95,7 @@ describe('SyncDialog.vue', () => {
       }
     };
 
-    vi.spyOn(syncService, 'startReceiverSession').mockImplementation(({ syncCode, onConnected, onPayloadReceived }) => {
+    vi.spyOn(syncService, 'startReceiverSession').mockImplementation(({ onConnected, onPayloadReceived }) => {
       setTimeout(() => {
         if (onConnected) onConnected();
         if (onPayloadReceived) onPayloadReceived(mockPayload);

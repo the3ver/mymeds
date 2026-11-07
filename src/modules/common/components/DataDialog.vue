@@ -9,7 +9,7 @@ import ImportDialog from './ImportDialog.vue'
 import BmpScanDialog from '../../meds/components/BmpScanDialog.vue'
 import BmpExportDialog from '../../meds/components/BmpExportDialog.vue'
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean
 })
 

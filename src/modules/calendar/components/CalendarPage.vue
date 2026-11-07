@@ -274,10 +274,6 @@ const confirmDelete = () => {
   confirmDeleteDialog.value = false
 }
 
-const deleteEntry = (index) => {
-  requestDeleteEntry(index)
-}
-
 const toggleExpand = (index) => {
   expandedIndex.value = expandedIndex.value === index ? -1 : index
 }

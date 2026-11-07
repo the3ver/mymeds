@@ -6,7 +6,7 @@ const DB_STORE_NAME = 'databases';
 const SETTINGS_STORE_NAME = 'settings';
 
 const dbPromise = openDB(DB_NAME, DB_VERSION, {
-  upgrade(db, oldVersion, newVersion, tx) {
+  upgrade(db) {
     // This is the most robust upgrade path: ensure the required stores for the current version exist.
     if (!db.objectStoreNames.contains(SETTINGS_STORE_NAME)) {
       db.createObjectStore(SETTINGS_STORE_NAME);

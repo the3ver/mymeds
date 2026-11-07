@@ -4,7 +4,7 @@ import { useTheme } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import * as dataService from '../utils/dataService'
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean,
   isExistingUser: {
     type: Boolean,

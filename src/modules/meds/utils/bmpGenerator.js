@@ -13,7 +13,7 @@ function getDataMatrixWriter() {
 /**
  * Generates an ECC 200 DataMatrix BitMatrix (1:1 module matrix).
  */
-export function generateBmpBitMatrix(payload, options = {}) {
+export function generateBmpBitMatrix(payload) {
   const writer = getDataMatrixWriter();
   // Using 0, 0 returns the pure 1:1 module matrix, avoiding floating-point rounding issues in ZXing
   return writer.encode(payload, BarcodeFormat.DATA_MATRIX, 0, 0);

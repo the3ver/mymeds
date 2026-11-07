@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean,
 });
 const emit = defineEmits(['update:modelValue', 'created']);

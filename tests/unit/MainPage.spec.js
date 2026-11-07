@@ -9,7 +9,6 @@ import { messages } from '../../src/i18n';
 import { state as appState } from '../../src/app-state';
 import * as shortcutService from '../../src/modules/common/utils/shortcutService';
 import * as badgingService from '../../src/modules/common/utils/badgingService';
-import * as dataService from '../../src/modules/common/utils/dataService';
 
 const loaded = vi.hoisted(() => ({ scanner: false }));
 

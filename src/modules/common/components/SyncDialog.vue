@@ -536,7 +536,7 @@ async function handleConnectAndReceive() {
           conflictMode.value = 'copy';
         }
       },
-      onError: (err) => {
+      onError: () => {
         receiverStatus.value = 'error';
         errorMessage.value = t('sync.errorConnectionFailed');
       }

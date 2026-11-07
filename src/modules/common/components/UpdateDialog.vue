@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import packageJson from '../../../../package.json'
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean
 })
 

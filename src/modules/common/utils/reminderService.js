@@ -1,4 +1,3 @@
-import { getReminderSettings, saveReminderSettings } from './dataService';
 
 export const PERIODIC_SYNC_TAG = 'daily-med-reminder';
 export const LOOKBACK_MINUTES = 120; // Allow trigger within 2 hours of scheduled time
@@ -19,6 +18,7 @@ export function isTwaEnvironment() {
     if (
       urlParams.get('twa') === '1' ||
       urlParams.get('debug_reminders') === '1' ||
+      // eslint-disable-next-line no-restricted-globals -- device-local debug flag, no user data
       localStorage.getItem('force_enable_reminders') === 'true'
     ) {
       return true;
@@ -71,6 +71,7 @@ export function isReminderSupported() {
     if (
       urlParams.get('twa') === '1' ||
       urlParams.get('debug_reminders') === '1' ||
+      // eslint-disable-next-line no-restricted-globals -- device-local debug flag, no user data
       localStorage.getItem('force_enable_reminders') === 'true'
     ) {
       return 'Notification' in window;

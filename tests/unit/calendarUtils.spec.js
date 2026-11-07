@@ -418,7 +418,6 @@ describe('calendarUtils & calendar', () => {
 
     it('should use local date by default so yesterday appointment is not pending after midnight in UTC+ zones', () => {
       // Create a date that is today in local time
-      const todayLocal = getLocalDateString();
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayLocal = getLocalDateString(yesterday);

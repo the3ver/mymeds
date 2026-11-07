@@ -29,7 +29,9 @@ export function setHapticsEnabled(enabled) {
   hapticsEnabled = Boolean(enabled);
   try {
     setSetting('hapticFeedback', hapticsEnabled).catch(() => {});
-  } catch (e) {}
+  } catch {
+    // Settings store unavailable: keep the in-memory value
+  }
 }
 
 /**

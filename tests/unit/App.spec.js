@@ -135,7 +135,7 @@ describe('App.vue', () => {
 
   it('triggers autoRequestPersistence in background on mount', async () => {
     const storageService = await import('../../src/modules/common/utils/storagePersistenceService');
-    const wrapper = mountApp();
+    mountApp();
     await flushPromises();
     expect(storageService.autoRequestPersistence).toHaveBeenCalled();
   });

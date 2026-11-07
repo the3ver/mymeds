@@ -11,7 +11,7 @@ const HelpDialog = defineAsyncComponent(() => import('./HelpDialog.vue'))
 const SettingsDialog = defineAsyncComponent(() => import('./SettingsDialog.vue'))
 const SyncDialog = defineAsyncComponent(() => import('./SyncDialog.vue'))
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean
 })
 

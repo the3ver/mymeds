@@ -32,7 +32,6 @@ describe('reminderService', () => {
 
   describe('isTwaEnvironment & isReminderSupported', () => {
     const originalUserAgent = navigator.userAgent;
-    const originalReferrer = document.referrer;
 
     afterEach(() => {
       Object.defineProperty(navigator, 'userAgent', {
