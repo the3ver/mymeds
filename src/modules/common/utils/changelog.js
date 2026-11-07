@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.16',
+    date: '2026-11-07',
+    title: {
+      de: 'Korrekte Quartale und Überweisungs-Symbole',
+      en: 'Correct Quarters and Referral Icons'
+    },
+    highlights: {
+      de: [
+        'Quartalsüberschriften im Kalender standen auf dem letzten Tag des Vorquartals. Sie stehen jetzt auf dem ersten Tag des Quartals',
+        'Die Symbole für Überweisungen (vorhanden, benötigt, offen) fehlten. Sie werden jetzt angezeigt'
+      ],
+      en: [
+        'Quarter headers in the calendar sat on the last day of the previous quarter. They now sit on the first day of the quarter',
+        'Referral icons (present, needed, open) were missing. They are shown again'
+      ]
+    }
+  },
+  {
     version: '1.10.15',
     date: '2026-10-02',
     title: {

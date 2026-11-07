@@ -7,7 +7,7 @@ import * as directives from 'vuetify/directives';
 import { messages } from '../../src/i18n';
 import WhatsNewDialog from '../../src/modules/common/components/WhatsNewDialog.vue';
 import * as dataService from '../../src/modules/common/utils/dataService';
-import { getLatestChangelog } from '../../src/modules/common/utils/changelog';
+import { getLatestChangelog, getChangelogForVersion } from '../../src/modules/common/utils/changelog';
 
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
@@ -41,8 +41,8 @@ describe('WhatsNewDialog.vue', () => {
     expect(text).toContain('Verstanden');
   });
 
-  it("includes the What's New fix in the latest changelog entry", () => {
-    const latest = getLatestChangelog();
+  it("includes the What's New fix in the 1.10.15 changelog entry", () => {
+    const latest = getChangelogForVersion('1.10.15');
     expect(latest.version).toBe('1.10.15');
     expect(latest.title.de).toContain('nur noch einmal');
     expect(latest.title.en).toContain('Only Once');
