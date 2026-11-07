@@ -10,7 +10,7 @@ import * as dataService from '../../src/modules/common/utils/dataService';
 import { getLatestChangelog } from '../../src/modules/common/utils/changelog';
 
 vi.mock('../../src/modules/common/utils/storagePersistenceService', () => ({
-  autoRequestPersistence: vi.fn().mockResolvedValue(true),
+  autoRequestPersistence: vi.fn().mockResolvedValue(true)
 }));
 
 // Minimal DOM mocks
@@ -20,7 +20,7 @@ if (typeof global.document === 'undefined') {
     body: { setAttribute: () => {}, removeAttribute: () => {} },
     querySelector: () => {},
     getElementById: () => null,
-    createElement: () => ({ style: {}, appendChild: () => {}, getBoundingClientRect: () => ({}) }),
+    createElement: () => ({ style: {}, appendChild: () => {}, getBoundingClientRect: () => ({}) })
   };
 }
 global.visualViewport = { addEventListener: () => {}, removeEventListener: () => {} };
@@ -31,7 +31,6 @@ const i18n = createI18n({ legacy: false, locale: 'en', fallbackLocale: 'en', mes
 const flushPromises = () => new Promise(setImmediate);
 
 describe('App.vue', () => {
-
   beforeEach(() => {
     // Reset state before each test
     appState.isLocked = true;
@@ -45,14 +44,14 @@ describe('App.vue', () => {
         stubs: {
           // Stub child components to isolate App.vue's logic
           DatabaseListPage: {
-            template: '<div data-testid="db-list-page"></div>',
+            template: '<div data-testid="db-list-page"></div>'
           },
           MainPage: {
-            template: '<div data-testid="main-page"></div>',
+            template: '<div data-testid="main-page"></div>'
           },
-          NavDrawer: true, // Stub the nav drawer completely
-        },
-      },
+          NavDrawer: true // Stub the nav drawer completely
+        }
+      }
     });
   };
 
@@ -72,7 +71,7 @@ describe('App.vue', () => {
     appState.isLocked = false;
     // Provide minimal data to prevent errors in MainPage rendering
     appState.decryptedData = { meds: [], calendar: [], version: 1 };
-    
+
     const wrapper = mountApp();
     await flushPromises();
 
@@ -110,7 +109,7 @@ describe('App.vue', () => {
     // release without its own changelog entry must not reopen it.
     vi.spyOn(dataService, 'getSettings').mockResolvedValue({
       disclaimerAccepted: true,
-      lastSeenChangelogVersion: getLatestChangelog().version,
+      lastSeenChangelogVersion: getLatestChangelog().version
     });
     vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([{ id: 1, name: 'Mein Tresor' }]);
     const wrapper = mountApp();
@@ -123,7 +122,7 @@ describe('App.vue', () => {
   it('shows WhatsNewDialog when a newer changelog entry exists than the one seen', async () => {
     vi.spyOn(dataService, 'getSettings').mockResolvedValue({
       disclaimerAccepted: true,
-      lastSeenChangelogVersion: '1.0.0',
+      lastSeenChangelogVersion: '1.0.0'
     });
     vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([{ id: 1, name: 'Mein Tresor' }]);
     const wrapper = mountApp();

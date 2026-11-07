@@ -15,11 +15,11 @@ describe('HelpDialog.vue', () => {
     return mount(HelpDialog, {
       props: {
         modelValue: true,
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 
@@ -45,7 +45,7 @@ describe('HelpDialog.vue', () => {
     await wrapper.vm.$nextTick();
 
     const titles = wrapper.findAllComponents(components.VExpansionPanelTitle);
-    const calendarTitle = titles.find(t => t.text().includes('Gesundheitskalender'));
+    const calendarTitle = titles.find((t) => t.text().includes('Gesundheitskalender'));
     expect(calendarTitle).toBeDefined();
 
     await calendarTitle.trigger('click');
@@ -58,7 +58,7 @@ describe('HelpDialog.vue', () => {
   it('should emit update:modelValue with false when close button is clicked', async () => {
     const wrapper = mountComponent();
 
-    const closeBtn = wrapper.findAllComponents(components.VBtn).find(btn => btn.props('icon') === 'mdi-close');
+    const closeBtn = wrapper.findAllComponents(components.VBtn).find((btn) => btn.props('icon') === 'mdi-close');
     expect(closeBtn).toBeDefined();
 
     await closeBtn.trigger('click');

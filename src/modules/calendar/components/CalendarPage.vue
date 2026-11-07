@@ -1,12 +1,19 @@
 <script setup>
-import { ref, onMounted, watch, computed, nextTick } from 'vue'
-import { useI18n } from 'vue-i18n'
-import EntryTypeDialog from './EntryTypeDialog.vue'
-import CalendarEntryDialog from './CalendarEntryDialog.vue'
-import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
-import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent, compareEntries, formatEntryTime, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
-import { renderMarkdownLinks } from '../../common/utils/stringUtils'
+import { ref, onMounted, watch, computed, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
+import EntryTypeDialog from './EntryTypeDialog.vue';
+import CalendarEntryDialog from './CalendarEntryDialog.vue';
+import ConfirmDialog from '../../common/components/ConfirmDialog.vue';
+import FilterDialog from './FilterDialog.vue';
+import {
+  createDetailedCalendarEvent,
+  compareEntries,
+  formatEntryTime,
+  resolveEffectiveReferralStatus,
+  isPendingReferral,
+  getLocalDateString
+} from '../utils/calendarUtils';
+import { renderMarkdownLinks } from '../../common/utils/stringUtils';
 
 const props = defineProps({
   initialEntries: {
@@ -16,129 +23,133 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:entries']);
 
-const { t, locale } = useI18n()
-const entries = ref(props.initialEntries)
-const typeDialog = ref(false)
-const entryDialog = ref(false)
-const exportDialog = ref(false)
-const filterDialog = ref(false)
-const currentEntry = ref({})
-const editingIndex = ref(-1)
-const expandedIndex = ref(-1)
-const lastAddedEntry = ref(null)
-const filterTypes = ref([])
+const { t, locale } = useI18n();
+const entries = ref(props.initialEntries);
+const typeDialog = ref(false);
+const entryDialog = ref(false);
+const exportDialog = ref(false);
+const filterDialog = ref(false);
+const currentEntry = ref({});
+const editingIndex = ref(-1);
+const expandedIndex = ref(-1);
+const lastAddedEntry = ref(null);
+const filterTypes = ref([]);
 
 // Emit updates back to the parent
-watch(entries, (newVal) => {
-  emit('update:entries', newVal)
-}, { deep: true })
+watch(
+  entries,
+  (newVal) => {
+    emit('update:entries', newVal);
+  },
+  { deep: true }
+);
 
 onMounted(() => {
   // Scroll to today separator after render
   nextTick(() => {
-    const todayEl = document.getElementById('separator-today')
+    const todayEl = document.getElementById('separator-today');
     if (todayEl) {
-      todayEl.scrollIntoView({ behavior: 'auto', block: 'center' })
+      todayEl.scrollIntoView({ behavior: 'auto', block: 'center' });
     }
-  })
-})
+  });
+});
 
 const sortedEntries = computed(() => {
   // Map originalIndex against the full entries array first to preserve correct reference on edit/delete
-  let filtered = entries.value.map((item, index) => ({ ...item, originalIndex: index }))
+  let filtered = entries.value.map((item, index) => ({ ...item, originalIndex: index }));
 
   if (filterTypes.value.length > 0) {
-    const hasOpenReferrals = filterTypes.value.includes('open_referrals')
-    const regularTypes = filterTypes.value.filter(t => t !== 'open_referrals')
-    const today = getLocalDateString()
+    const hasOpenReferrals = filterTypes.value.includes('open_referrals');
+    const regularTypes = filterTypes.value.filter((t) => t !== 'open_referrals');
+    const today = getLocalDateString();
 
-    filtered = filtered.filter(entry => {
-      const matchesOpen = hasOpenReferrals && isPendingReferral(entry, entries.value, today)
-      const matchesType = regularTypes.length > 0 && regularTypes.includes(entry.type)
+    filtered = filtered.filter((entry) => {
+      const matchesOpen = hasOpenReferrals && isPendingReferral(entry, entries.value, today);
+      const matchesType = regularTypes.length > 0 && regularTypes.includes(entry.type);
 
       if (hasOpenReferrals && regularTypes.length > 0) {
-        return matchesOpen || matchesType
+        return matchesOpen || matchesType;
       }
       if (hasOpenReferrals) {
-        return matchesOpen
+        return matchesOpen;
       }
-      return matchesType
-    })
+      return matchesType;
+    });
   }
 
-  const sorted = filtered.sort(compareEntries)
+  const sorted = filtered.sort(compareEntries);
 
   // Pre-compute effective referral status once per entry (avoids O(N^2) in template)
-  return sorted.map(entry => {
+  return sorted.map((entry) => {
     if (entry.type === 'doctor' && entry.needsReferral) {
-      return { ...entry, effectiveReferralStatus: resolveEffectiveReferralStatus(entry, entries.value) || 'needed' }
+      return { ...entry, effectiveReferralStatus: resolveEffectiveReferralStatus(entry, entries.value) || 'needed' };
     }
-    return entry
-  })
-})
+    return entry;
+  });
+});
 
 const groupedEntries = computed(() => {
-  const today = getLocalDateString()
+  const today = getLocalDateString();
 
-  const combined = [...sortedEntries.value]
+  const combined = [...sortedEntries.value];
 
   if (combined.length > 0) {
-    const minDate = new Date(combined[combined.length - 1].date)
-    const maxDate = new Date(combined[0].date)
+    const minDate = new Date(combined[combined.length - 1].date);
+    const maxDate = new Date(combined[0].date);
 
-    const now = new Date()
-    if (now > maxDate) maxDate.setTime(now.getTime())
+    const now = new Date();
+    if (now > maxDate) maxDate.setTime(now.getTime());
 
-    let current = new Date(minDate.getFullYear(), Math.floor(minDate.getMonth() / 3) * 3, 1)
+    let current = new Date(minDate.getFullYear(), Math.floor(minDate.getMonth() / 3) * 3, 1);
 
     while (current <= maxDate) {
-      const qDate = new Date(current)
-      const qStr = getLocalDateString(qDate)
-      const q = Math.floor((qDate.getMonth() + 3) / 3)
-      const y = qDate.getFullYear()
+      const qDate = new Date(current);
+      const qStr = getLocalDateString(qDate);
+      const q = Math.floor((qDate.getMonth() + 3) / 3);
+      const y = qDate.getFullYear();
 
       combined.push({
         date: qStr,
         title: t('calendar.quarter', { q, year: y }),
         type: 'quarter',
         isVirtual: true
-      })
-      current.setMonth(current.getMonth() + 3)
+      });
+      current.setMonth(current.getMonth() + 3);
     }
   }
 
-  combined.sort(compareEntries)
+  combined.sort(compareEntries);
 
-  const finalResult = []
-  let todayInsertedLoop = false
+  const finalResult = [];
+  let todayInsertedLoop = false;
 
   for (const entry of combined) {
     if (!todayInsertedLoop && entry.date < today) {
-      finalResult.push({ type: 'separator-today', date: today })
-      todayInsertedLoop = true
+      finalResult.push({ type: 'separator-today', date: today });
+      todayInsertedLoop = true;
     }
     if (entry.isVirtual) {
-      finalResult.push({ type: 'quarter', data: entry })
+      finalResult.push({ type: 'quarter', data: entry });
     } else {
-      finalResult.push({ type: 'entry', data: entry })
+      finalResult.push({ type: 'entry', data: entry });
     }
   }
 
   if (!todayInsertedLoop) {
-    finalResult.push({ type: 'separator-today', date: today })
+    finalResult.push({ type: 'separator-today', date: today });
   }
 
-  return finalResult
-})
+  return finalResult;
+});
 
 const formatDate = (dateStr, forceShort = false) => {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  const today = new Date()
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to the start of the day
 
-  const currentQuarter = Math.floor(today.getMonth() / 3)
-  const dateQuarter = Math.floor(date.getMonth() / 3)
+  const currentQuarter = Math.floor(today.getMonth() / 3);
+  const dateQuarter = Math.floor(date.getMonth() / 3);
 
   const isFuture = date >= today;
   const isRecentPast = date.getFullYear() === today.getFullYear() && dateQuarter === currentQuarter;
@@ -147,62 +158,74 @@ const formatDate = (dateStr, forceShort = false) => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
-  }
+  };
 
   if ((isFuture || isRecentPast) && !forceShort) {
-    options.weekday = 'short'
+    options.weekday = 'short';
   }
 
-  return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
-}
+  return date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options);
+};
 
 const getEntryIcon = (type) => {
   switch (type) {
-    case 'doctor': return 'mdi-doctor'
-    case 'vaccination': return 'mdi-needle'
-    case 'illness': return 'mdi-emoticon-sick'
-    case 'note': return 'mdi-note-text'
-    case 'quarter': return 'mdi-calendar-range'
-    default: return 'mdi-calendar'
+    case 'doctor':
+      return 'mdi-doctor';
+    case 'vaccination':
+      return 'mdi-needle';
+    case 'illness':
+      return 'mdi-emoticon-sick';
+    case 'note':
+      return 'mdi-note-text';
+    case 'quarter':
+      return 'mdi-calendar-range';
+    default:
+      return 'mdi-calendar';
   }
-}
+};
 
 const getEntryColor = (type) => {
   switch (type) {
-    case 'doctor': return 'primary'
-    case 'vaccination': return 'teal'
-    case 'illness': return 'orange'
-    case 'note': return 'blue-grey'
-    case 'quarter': return 'grey'
-    default: return 'grey'
+    case 'doctor':
+      return 'primary';
+    case 'vaccination':
+      return 'teal';
+    case 'illness':
+      return 'orange';
+    case 'note':
+      return 'blue-grey';
+    case 'quarter':
+      return 'grey';
+    default:
+      return 'grey';
   }
-}
+};
 
 const getEntrySubtitle = (entry) => {
-  const time = formatEntryTime(entry.time, locale.value)
-  const dateStr = time ? `${formatDate(entry.date)}, ${time}` : formatDate(entry.date)
+  const time = formatEntryTime(entry.time, locale.value);
+  const dateStr = time ? `${formatDate(entry.date)}, ${time}` : formatDate(entry.date);
   if (entry.type === 'illness' && entry.endDate) {
-    const start = new Date(entry.date)
-    const end = new Date(entry.endDate)
-    const diffTime = Math.abs(end - start)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
-    return `${dateStr} - ${formatDate(entry.endDate, true)} (${diffDays} ${t('app.showDays')})`
+    const start = new Date(entry.date);
+    const end = new Date(entry.endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return `${dateStr} - ${formatDate(entry.endDate, true)} (${diffDays} ${t('app.showDays')})`;
   }
-  return dateStr
-}
+  return dateStr;
+};
 
 const REFERRAL_STATUS_CONFIG = {
   submitted: { color: 'success', icon: 'mdi-check-circle' },
   present: { color: 'info', icon: 'mdi-file-check' },
   needed: { color: 'warning', icon: 'mdi-file-clock' }
-}
+};
 
-const getReferralChipColor = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).color
-const getReferralChipIcon = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).icon
+const getReferralChipColor = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).color;
+const getReferralChipIcon = (status) => (REFERRAL_STATUS_CONFIG[status] || REFERRAL_STATUS_CONFIG.needed).icon;
 
 const openTypeDialog = () => {
-  typeDialog.value = true
-}
+  typeDialog.value = true;
+};
 
 const onTypeSelected = (type) => {
   currentEntry.value = {
@@ -210,143 +233,149 @@ const onTypeSelected = (type) => {
     date: getLocalDateString(),
     time: '',
     title: '',
-    doctor: '', doctorType: '', location: '',
-    agent: '', method: '', bodyPart: '',
-    pathogen: '', symptoms: '', endDate: '',
+    doctor: '',
+    doctorType: '',
+    location: '',
+    agent: '',
+    method: '',
+    bodyPart: '',
+    pathogen: '',
+    symptoms: '',
+    endDate: '',
     notes: '',
     treatments: '',
     needsReferral: type === 'doctor',
     referralStatus: 'needed'
-  }
-  editingIndex.value = -1
-  entryDialog.value = true
-}
+  };
+  editingIndex.value = -1;
+  entryDialog.value = true;
+};
 
 const addEntry = (entry) => {
-  entries.value.push(entry)
-  const today = getLocalDateString()
+  entries.value.push(entry);
+  const today = getLocalDateString();
   if (entry.date >= today) {
-    lastAddedEntry.value = entry
-    exportDialog.value = true
+    lastAddedEntry.value = entry;
+    exportDialog.value = true;
   }
-}
+};
 
 const openEditDialog = (entry) => {
-  currentEntry.value = { ...entry }
+  currentEntry.value = { ...entry };
   if (Array.isArray(currentEntry.value.treatments)) {
-    currentEntry.value.treatments = currentEntry.value.treatments.join(', ')
+    currentEntry.value.treatments = currentEntry.value.treatments.join(', ');
   } else if (!currentEntry.value.treatments) {
-    currentEntry.value.treatments = ''
+    currentEntry.value.treatments = '';
   }
-  editingIndex.value = entry.originalIndex
-  entryDialog.value = true
-}
+  editingIndex.value = entry.originalIndex;
+  entryDialog.value = true;
+};
 
 const saveEntry = (entry) => {
   if (editingIndex.value > -1) {
-    entries.value[editingIndex.value] = entry
-    editingIndex.value = -1
+    entries.value[editingIndex.value] = entry;
+    editingIndex.value = -1;
   } else {
-    addEntry(entry)
+    addEntry(entry);
   }
-}
+};
 
-const confirmDeleteDialog = ref(false)
-const entryIndexToDelete = ref(-1)
+const confirmDeleteDialog = ref(false);
+const entryIndexToDelete = ref(-1);
 const entryToDelete = computed(() => {
   if (entryIndexToDelete.value > -1 && entries.value[entryIndexToDelete.value]) {
-    return entries.value[entryIndexToDelete.value]
+    return entries.value[entryIndexToDelete.value];
   }
-  return null
-})
+  return null;
+});
 
 const requestDeleteEntry = (index) => {
-  entryIndexToDelete.value = index
-  confirmDeleteDialog.value = true
-}
+  entryIndexToDelete.value = index;
+  confirmDeleteDialog.value = true;
+};
 
 const confirmDelete = () => {
   if (entryIndexToDelete.value > -1) {
-    entries.value.splice(entryIndexToDelete.value, 1)
-    entryIndexToDelete.value = -1
-    expandedIndex.value = -1
+    entries.value.splice(entryIndexToDelete.value, 1);
+    entryIndexToDelete.value = -1;
+    expandedIndex.value = -1;
   }
-  confirmDeleteDialog.value = false
-}
+  confirmDeleteDialog.value = false;
+};
 
 const toggleExpand = (index) => {
-  expandedIndex.value = expandedIndex.value === index ? -1 : index
-}
+  expandedIndex.value = expandedIndex.value === index ? -1 : index;
+};
 
 const exportToCalendar = (entry) => {
-  createDetailedCalendarEvent(entry)
-}
+  createDetailedCalendarEvent(entry);
+};
 
 const confirmExport = () => {
   if (lastAddedEntry.value) {
-    exportToCalendar(lastAddedEntry.value)
-    lastAddedEntry.value = null
+    exportToCalendar(lastAddedEntry.value);
+    lastAddedEntry.value = null;
   }
-}
+};
 
 const clearFilter = () => {
-  filterTypes.value = []
-}
+  filterTypes.value = [];
+};
 
 const removeFilter = (filterType) => {
-  filterTypes.value = filterTypes.value.filter(t => t !== filterType)
-}
+  filterTypes.value = filterTypes.value.filter((t) => t !== filterType);
+};
 
 const filterText = computed(() => {
-  const regularTypes = filterTypes.value.filter(t => t !== 'open_referrals')
-  if (regularTypes.length === 0) return ''
-  const typeNames = regularTypes.map(type => t(`calendar.types.${type}`)).join(', ')
-  return t('calendar.filterBy', { types: typeNames })
-})
+  const regularTypes = filterTypes.value.filter((t) => t !== 'open_referrals');
+  if (regularTypes.length === 0) return '';
+  const typeNames = regularTypes.map((type) => t(`calendar.types.${type}`)).join(', ');
+  return t('calendar.filterBy', { types: typeNames });
+});
 
 const existingTreatments = computed(() => {
-  const treatments = new Set()
-  const regex = /#([^#]+)#/g
-  entries.value.forEach(entry => {
+  const treatments = new Set();
+  const regex = /#([^#]+)#/g;
+  entries.value.forEach((entry) => {
     if (typeof entry.treatments === 'string') {
-      let match
+      let match;
       while ((match = regex.exec(entry.treatments)) !== null) {
-        treatments.add(match[1])
+        treatments.add(match[1]);
       }
     } else if (Array.isArray(entry.treatments)) {
-      entry.treatments.forEach(t => treatments.add(t))
+      entry.treatments.forEach((t) => treatments.add(t));
     }
-  })
-  return Array.from(treatments).sort()
-})
+  });
+  return Array.from(treatments).sort();
+});
 
 const parseTreatmentText = (text) => {
-  if (!text) return []
-  const segments = []
-  const regex = /#([^#]+)#/g
-  let lastIndex = 0
-  let match
+  if (!text) return [];
+  const segments = [];
+  const regex = /#([^#]+)#/g;
+  let lastIndex = 0;
+  let match;
   while ((match = regex.exec(text)) !== null) {
     if (match.index > lastIndex) {
-      segments.push({ type: 'text', content: text.substring(lastIndex, match.index) })
+      segments.push({ type: 'text', content: text.substring(lastIndex, match.index) });
     }
-    segments.push({ type: 'tag', content: match[1] })
-    lastIndex = regex.lastIndex
+    segments.push({ type: 'tag', content: match[1] });
+    lastIndex = regex.lastIndex;
   }
   if (lastIndex < text.length) {
-    segments.push({ type: 'text', content: text.substring(lastIndex) })
+    segments.push({ type: 'text', content: text.substring(lastIndex) });
   }
-  return segments
-}
+  return segments;
+};
 
 const openFilterDialog = () => {
-  filterDialog.value = true
-}
+  filterDialog.value = true;
+};
 
 const pendingReferralsCount = computed(() => {
-  const today = getLocalDateString()
-  return entries.value.filter(e => isPendingReferral(e, entries.value, today)).length
-})
+  const today = getLocalDateString();
+  return entries.value.filter((e) => isPendingReferral(e, entries.value, today)).length;
+});
 
 defineExpose({
   openFilterDialog,
@@ -360,7 +389,7 @@ defineExpose({
   clearFilter,
   removeFilter,
   filterText
-})
+});
 </script>
 
 <template>
@@ -393,7 +422,14 @@ defineExpose({
           </v-chip>
           <span class="text-body-2 font-weight-bold text-truncate">{{ filterText }}</span>
         </div>
-        <v-btn icon="mdi-delete" variant="text" density="compact" size="small" :title="t('calendar.clearFilter')" @click="clearFilter"></v-btn>
+        <v-btn
+          icon="mdi-delete"
+          variant="text"
+          density="compact"
+          size="small"
+          :title="t('calendar.clearFilter')"
+          @click="clearFilter"
+        ></v-btn>
       </v-card-text>
     </v-card>
 
@@ -409,14 +445,20 @@ defineExpose({
           <span class="mx-4 text-body-1 font-weight-bold">{{ item.data.title }}</span>
           <v-divider class="flex-grow-1"></v-divider>
         </div>
-        <v-card v-else :id="`entry-${item.data.originalIndex}`" class="mb-4" variant="elevated" @click="toggleExpand(item.data.originalIndex)">
+        <v-card
+          v-else
+          :id="`entry-${item.data.originalIndex}`"
+          class="mb-4"
+          variant="elevated"
+          @click="toggleExpand(item.data.originalIndex)"
+        >
           <v-card-item class="py-3">
             <template v-slot:prepend>
               <v-avatar :color="getEntryColor(item.data.type)" size="36" class="mr-3">
                 <v-icon color="white" size="20">{{ getEntryIcon(item.data.type) }}</v-icon>
               </v-avatar>
             </template>
-            <v-card-title class="d-flex flex-wrap align-baseline" style="gap: 0.5rem; line-height: 1.2;">
+            <v-card-title class="d-flex flex-wrap align-baseline" style="gap: 0.5rem; line-height: 1.2">
               <div class="text-h6">{{ item.data.title }}</div>
               <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
               <v-chip
@@ -449,29 +491,90 @@ defineExpose({
                       </v-chip>
                     </div>
                   </div>
-                  <div v-if="item.data.doctor" class="mb-2"><span class="text-grey">{{ t('calendar.fields.doctor') }}:</span><div class="font-weight-medium">{{ item.data.doctor }}</div></div>
-                  <div v-if="item.data.doctorType" class="mb-2"><span class="text-grey">{{ t('calendar.fields.type') }}:</span><div class="font-weight-medium">{{ t(`calendar.doctorTypes.${item.data.doctorType}`) }}</div></div>
-                  <div v-if="item.data.location" class="mb-2"><span class="text-grey">{{ t('calendar.fields.location') }}:</span><div class="font-weight-medium">{{ item.data.location }}</div></div>
-                  <div v-if="item.data.treatments" class="mb-2"><span class="text-grey">{{ t('calendar.fields.treatments') }}:</span><div class="mt-1"><template v-for="(segment, idx) in parseTreatmentText(item.data.treatments)" :key="idx"><span v-if="segment.type === 'text'">{{ segment.content }}</span><v-chip v-else size="small" color="primary" variant="tonal" class="mx-1">{{ segment.content }}</v-chip></template></div></div>
+                  <div v-if="item.data.doctor" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.doctor') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.doctor }}</div>
+                  </div>
+                  <div v-if="item.data.doctorType" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.type') }}:</span>
+                    <div class="font-weight-medium">{{ t(`calendar.doctorTypes.${item.data.doctorType}`) }}</div>
+                  </div>
+                  <div v-if="item.data.location" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.location') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.location }}</div>
+                  </div>
+                  <div v-if="item.data.treatments" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.treatments') }}:</span>
+                    <div class="mt-1">
+                      <template v-for="(segment, idx) in parseTreatmentText(item.data.treatments)" :key="idx"
+                        ><span v-if="segment.type === 'text'">{{ segment.content }}</span
+                        ><v-chip v-else size="small" color="primary" variant="tonal" class="mx-1">{{
+                          segment.content
+                        }}</v-chip></template
+                      >
+                    </div>
+                  </div>
                 </template>
                 <template v-if="item.data.type === 'vaccination'">
-                  <div v-if="item.data.agent" class="mb-2"><span class="text-grey">{{ t('calendar.fields.agent') }}:</span><div class="font-weight-medium">{{ item.data.agent }}</div></div>
-                  <div v-if="item.data.method" class="mb-2"><span class="text-grey">{{ t('calendar.fields.method') }}:</span><div class="font-weight-medium">{{ t(`calendar.methods.${item.data.method}`) }}</div></div>
-                  <div v-if="item.data.bodyPart" class="mb-2"><span class="text-grey">{{ t('calendar.fields.bodyPart') }}:</span><div class="font-weight-medium">{{ item.data.bodyPart }}</div></div>
+                  <div v-if="item.data.agent" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.agent') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.agent }}</div>
+                  </div>
+                  <div v-if="item.data.method" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.method') }}:</span>
+                    <div class="font-weight-medium">{{ t(`calendar.methods.${item.data.method}`) }}</div>
+                  </div>
+                  <div v-if="item.data.bodyPart" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.bodyPart') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.bodyPart }}</div>
+                  </div>
                 </template>
                 <template v-if="item.data.type === 'illness'">
-                  <div v-if="item.data.pathogen" class="mb-2"><span class="text-grey">{{ t('calendar.fields.pathogen') }}:</span><div class="font-weight-medium">{{ item.data.pathogen }}</div></div>
-                  <div v-if="item.data.symptoms" class="mb-2"><span class="text-grey">{{ t('calendar.fields.symptoms') }}:</span><div class="font-weight-medium">{{ item.data.symptoms }}</div></div>
-                  <div v-if="item.data.endDate" class="mb-2"><span class="text-grey">{{ t('calendar.fields.endDate') }}:</span><div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div></div>
+                  <div v-if="item.data.pathogen" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.pathogen') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.pathogen }}</div>
+                  </div>
+                  <div v-if="item.data.symptoms" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.symptoms') }}:</span>
+                    <div class="font-weight-medium">{{ item.data.symptoms }}</div>
+                  </div>
+                  <div v-if="item.data.endDate" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
+                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
+                  </div>
                 </template>
                 <template v-if="item.data.type === 'note'">
-                   <div v-if="item.data.endDate" class="mb-2"><span class="text-grey">{{ t('calendar.fields.endDate') }}:</span><div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div></div>
+                  <div v-if="item.data.endDate" class="mb-2">
+                    <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
+                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
+                  </div>
                 </template>
-                <div v-if="item.data.notes" class="mb-4"><span class="text-grey">{{ t('calendar.fields.notes') }}:</span><div class="text-body-2 mt-1" v-html="renderMarkdownLinks(item.data.notes)"></div></div>
+                <div v-if="item.data.notes" class="mb-4">
+                  <span class="text-grey">{{ t('calendar.fields.notes') }}:</span>
+                  <div class="text-body-2 mt-1" v-html="renderMarkdownLinks(item.data.notes)"></div>
+                </div>
                 <div class="d-flex justify-end gap-2 mt-4">
-                  <v-btn icon="mdi-calendar-export" variant="text" color="primary" :aria-label="t('calendar.export')" @click.stop="exportToCalendar(item.data)"></v-btn>
-                  <v-btn icon="mdi-pencil" variant="text" color="primary" :aria-label="t('dialog.edit')" @click.stop="openEditDialog(item.data)"></v-btn>
-                  <v-btn icon="mdi-delete" variant="text" color="error" :aria-label="t('dialog.delete')" @click.stop="requestDeleteEntry(item.data.originalIndex)"></v-btn>
+                  <v-btn
+                    icon="mdi-calendar-export"
+                    variant="text"
+                    color="primary"
+                    :aria-label="t('calendar.export')"
+                    @click.stop="exportToCalendar(item.data)"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-pencil"
+                    variant="text"
+                    color="primary"
+                    :aria-label="t('dialog.edit')"
+                    @click.stop="openEditDialog(item.data)"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-delete"
+                    variant="text"
+                    color="error"
+                    :aria-label="t('dialog.delete')"
+                    @click.stop="requestDeleteEntry(item.data.originalIndex)"
+                  ></v-btn>
                 </div>
               </v-card-text>
             </div>
@@ -484,9 +587,35 @@ defineExpose({
     </div>
 
     <EntryTypeDialog v-model="typeDialog" @select="onTypeSelected" />
-    <CalendarEntryDialog v-model="entryDialog" :entry="currentEntry" :suggestions="existingTreatments" :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')" :confirm-text="t('dialog.save')" :is-edit="editingIndex > -1" @confirm="saveEntry" />
-    <ConfirmDialog v-model="exportDialog" :title="t('calendar.export')" :message="t('calendar.exportConfirm')" :confirm-text="t('dialog.yes')" :cancel-text="t('dialog.no')" @confirm="confirmExport" />
-    <ConfirmDialog v-model="confirmDeleteDialog" :title="t('calendar.deleteEntryTitle')" :message="entryToDelete ? t('calendar.deleteEntryConfirmNamed', { name: entryToDelete.title }) : t('calendar.deleteEntryConfirm')" :confirm-text="t('dialog.delete')" :cancel-text="t('dialog.cancel')" @confirm="confirmDelete" />
+    <CalendarEntryDialog
+      v-model="entryDialog"
+      :entry="currentEntry"
+      :suggestions="existingTreatments"
+      :title="editingIndex > -1 ? t('calendar.edit') : t('calendar.add')"
+      :confirm-text="t('dialog.save')"
+      :is-edit="editingIndex > -1"
+      @confirm="saveEntry"
+    />
+    <ConfirmDialog
+      v-model="exportDialog"
+      :title="t('calendar.export')"
+      :message="t('calendar.exportConfirm')"
+      :confirm-text="t('dialog.yes')"
+      :cancel-text="t('dialog.no')"
+      @confirm="confirmExport"
+    />
+    <ConfirmDialog
+      v-model="confirmDeleteDialog"
+      :title="t('calendar.deleteEntryTitle')"
+      :message="
+        entryToDelete
+          ? t('calendar.deleteEntryConfirmNamed', { name: entryToDelete.title })
+          : t('calendar.deleteEntryConfirm')
+      "
+      :confirm-text="t('dialog.delete')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="confirmDelete"
+    />
     <FilterDialog v-model="filterDialog" v-model:selected-filters="filterTypes" />
   </v-container>
 </template>

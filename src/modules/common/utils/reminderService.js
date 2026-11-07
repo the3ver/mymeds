@@ -1,4 +1,3 @@
-
 export const PERIODIC_SYNC_TAG = 'daily-med-reminder';
 export const LOOKBACK_MINUTES = 120; // Allow trigger within 2 hours of scheduled time
 
@@ -47,7 +46,8 @@ export function isTwaEnvironment() {
   }
 
   // Check standalone mode (PWA installed as WebAPK / TWA)
-  const isStandalone = typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches;
+  const isStandalone =
+    typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches;
   return isStandalone;
 }
 
@@ -83,8 +83,7 @@ export function isReminderSupported() {
   const hasSW = 'serviceWorker' in navigator;
   const hasNotification = 'Notification' in window;
   const hasPeriodicSync =
-    typeof ServiceWorkerRegistration !== 'undefined' &&
-    'periodicSync' in ServiceWorkerRegistration.prototype;
+    typeof ServiceWorkerRegistration !== 'undefined' && 'periodicSync' in ServiceWorkerRegistration.prototype;
 
   return hasSW && hasNotification && hasPeriodicSync;
 }
@@ -116,7 +115,7 @@ export function parseTimeToMinutes(timeStr) {
 
 /**
  * Pure function: Evaluates which configured slots are currently due for notification.
- * 
+ *
  * @param {Object} reminderSettings
  * @param {Date} [now=new Date()]
  * @param {number} [lookbackMinutes=LOOKBACK_MINUTES]
@@ -163,7 +162,7 @@ export function evaluateDueReminders(reminderSettings, now = new Date(), lookbac
   return {
     dueSlots,
     updatedLastNotified,
-    hasChanges: dueSlots.length > 0,
+    hasChanges: dueSlots.length > 0
   };
 }
 
@@ -205,7 +204,7 @@ export async function registerPeriodicSync() {
     const registration = await navigator.serviceWorker.ready;
     if ('periodicSync' in registration) {
       await registration.periodicSync.register(PERIODIC_SYNC_TAG, {
-        minInterval: 60 * 60 * 1000, // 1 hour minimum interval
+        minInterval: 60 * 60 * 1000 // 1 hour minimum interval
       });
       return true;
     }
@@ -264,7 +263,7 @@ export async function sendTestNotification(title = 'MyMeds', body = 'Erinnerung:
           body,
           icon: '/mymeds/pwa-192x192.png',
           badge: '/mymeds/pwa-192x192.png',
-          tag: 'med-reminder-test',
+          tag: 'med-reminder-test'
         });
         return true;
       }

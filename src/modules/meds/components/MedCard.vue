@@ -1,9 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import * as dataService from '../../common/utils/dataService'
-import { parseDose, getStatusColor, calculateDaysRemaining } from '../utils/medUtils'
-import PillAvatar from './PillAvatar.vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import * as dataService from '../../common/utils/dataService';
+import { parseDose, getStatusColor, calculateDaysRemaining } from '../utils/medUtils';
+import PillAvatar from './PillAvatar.vue';
 
 const props = defineProps({
   item: {
@@ -14,122 +14,119 @@ const props = defineProps({
     type: Number,
     default: 0
   }
-})
+});
 
-const emit = defineEmits(['edit', 'delete'])
-const { t } = useI18n()
+const emit = defineEmits(['edit', 'delete']);
+const { t } = useI18n();
 
-const isExpanded = ref(false)
-const displayMode = ref('pills') // 'pills', 'days', 'packages'
-const yellowLimit = ref(21)
-const redLimit = ref(7)
-const showDeduction = ref(false)
+const isExpanded = ref(false);
+const displayMode = ref('pills'); // 'pills', 'days', 'packages'
+const yellowLimit = ref(21);
+const redLimit = ref(7);
+const showDeduction = ref(false);
 
 async function updateSettings() {
-  const settings = await dataService.getSettings()
-  if (settings.displayMode) displayMode.value = settings.displayMode
-  if (settings.yellowLimit !== undefined) yellowLimit.value = settings.yellowLimit
-  if (settings.redLimit !== undefined) redLimit.value = settings.redLimit
+  const settings = await dataService.getSettings();
+  if (settings.displayMode) displayMode.value = settings.displayMode;
+  if (settings.yellowLimit !== undefined) yellowLimit.value = settings.yellowLimit;
+  if (settings.redLimit !== undefined) redLimit.value = settings.redLimit;
 }
 
 onMounted(() => {
-  updateSettings()
-  window.addEventListener('storage-display-mode-changed', updateSettings)
-  window.addEventListener('storage-limits-changed', updateSettings)
+  updateSettings();
+  window.addEventListener('storage-display-mode-changed', updateSettings);
+  window.addEventListener('storage-limits-changed', updateSettings);
 
   if (props.deduction > 0) {
-    showDeduction.value = true
+    showDeduction.value = true;
     setTimeout(() => {
-      showDeduction.value = false
-    }, 4000) // Show for 4 seconds
+      showDeduction.value = false;
+    }, 4000); // Show for 4 seconds
   }
-})
+});
 
 onUnmounted(() => {
-  window.removeEventListener('storage-display-mode-changed', updateSettings)
-  window.removeEventListener('storage-limits-changed', updateSettings)
-})
+  window.removeEventListener('storage-display-mode-changed', updateSettings);
+  window.removeEventListener('storage-limits-changed', updateSettings);
+});
 
 const dailyDoseTotal = computed(() => {
-  return parseDose(props.item.dose)
-})
+  return parseDose(props.item.dose);
+});
 
 const displayPlan = computed(() => {
-  const dose = props.item.dose || ''
-  if (!dose) return '0-0-0'
+  const dose = props.item.dose || '';
+  if (!dose) return '0-0-0';
 
   if (dose.includes('-')) {
-    const parts = dose.split('-')
+    const parts = dose.split('-');
     while (parts.length < 3) {
-      parts.push('0')
+      parts.push('0');
     }
     if (parts.length >= 4) {
-      const nightDose = parts[3]
+      const nightDose = parts[3];
       if (nightDose && nightDose !== '0' && nightDose !== '') {
-        return parts.slice(0, 4).join('-')
+        return parts.slice(0, 4).join('-');
       }
     }
-    return parts.slice(0, 3).join('-')
+    return parts.slice(0, 3).join('-');
   }
-  return `${dose}-0-0`
-})
+  return `${dose}-0-0`;
+});
 
 const daysRemaining = computed(() => {
-  return calculateDaysRemaining(props.item)
-})
+  return calculateDaysRemaining(props.item);
+});
 
 const scheduleChipText = computed(() => {
-  const schedule = props.item.schedule
-  if (!schedule || schedule.type === 'daily') return ''
+  const schedule = props.item.schedule;
+  if (!schedule || schedule.type === 'daily') return '';
   if (schedule.type === 'weekly') {
-    const days = Array.isArray(schedule.days) ? schedule.days : []
-    const dayLabels = days.map(d => {
-      const code = String(d).toLowerCase().slice(0, 2)
-      const capitalized = code.charAt(0).toUpperCase() + code.slice(1)
-      return t(`med.day${capitalized}`)
-    }).join(', ')
-    return dayLabels || t('med.scheduleWeekly')
+    const days = Array.isArray(schedule.days) ? schedule.days : [];
+    const dayLabels = days
+      .map((d) => {
+        const code = String(d).toLowerCase().slice(0, 2);
+        const capitalized = code.charAt(0).toUpperCase() + code.slice(1);
+        return t(`med.day${capitalized}`);
+      })
+      .join(', ');
+    return dayLabels || t('med.scheduleWeekly');
   }
   if (schedule.type === 'interval') {
-    return t('med.everyXDays', { n: schedule.intervalDays || 1 })
+    return t('med.everyXDays', { n: schedule.intervalDays || 1 });
   }
-  return ''
-})
+  return '';
+});
 
 const emptyDate = computed(() => {
-  const days = daysRemaining.value
-  if (days === null) return null
-  const date = new Date()
-  date.setDate(date.getDate() + days)
-  return date.toLocaleDateString()
-})
+  const days = daysRemaining.value;
+  if (days === null) return null;
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toLocaleDateString();
+});
 
 const packagesRemaining = computed(() => {
-  const size = parseFloat(props.item.packageSize)
-  if (!size || size <= 0) return 0
-  return props.item.count / size
-})
+  const size = parseFloat(props.item.packageSize);
+  if (!size || size <= 0) return 0;
+  return props.item.count / size;
+});
 
 const fullPackages = computed(() => {
-  return Math.floor(packagesRemaining.value)
-})
+  return Math.floor(packagesRemaining.value);
+});
 
 const hasPartialPackage = computed(() => {
-  return packagesRemaining.value > fullPackages.value
-})
+  return packagesRemaining.value > fullPackages.value;
+});
 
 const statusColor = computed(() => {
-  return getStatusColor(daysRemaining.value, yellowLimit.value, redLimit.value)
-})
+  return getStatusColor(daysRemaining.value, yellowLimit.value, redLimit.value);
+});
 </script>
 
 <template>
-  <v-card
-    class="mb-4"
-    variant="elevated"
-    @click="isExpanded = !isExpanded"
-    :ripple="true"
-  >
+  <v-card class="mb-4" variant="elevated" @click="isExpanded = !isExpanded" :ripple="true">
     <v-card-item>
       <template v-slot:prepend>
         <div class="mr-3 d-flex align-center justify-center">
@@ -143,12 +140,14 @@ const statusColor = computed(() => {
         </div>
       </template>
 
-      <v-card-title class="text-wrap" style="line-height: 1.2;">
+      <v-card-title class="text-wrap" style="line-height: 1.2">
         <div class="text-h6 mb-1">{{ item.name }}</div>
         <div class="d-flex flex-wrap align-center gap-2 text-body-1 text-grey">
           <span v-if="item.ingredient">({{ item.ingredient }})</span>
           <span class="text-high-emphasis text-body-2 font-weight-bold ml-1">{{ displayPlan }}</span>
-          <v-chip v-if="scheduleChipText" size="x-small" color="primary" variant="tonal" class="ml-1">{{ scheduleChipText }}</v-chip>
+          <v-chip v-if="scheduleChipText" size="x-small" color="primary" variant="tonal" class="ml-1">{{
+            scheduleChipText
+          }}</v-chip>
         </div>
       </v-card-title>
 
@@ -156,58 +155,32 @@ const statusColor = computed(() => {
         <div class="d-flex align-center pl-2 position-relative">
           <!-- Deduction Animation -->
           <transition name="float-up">
-            <div
-              v-if="showDeduction"
-              class="deduction-badge text-error font-weight-bold"
-            >
-              -{{ deduction }}
-            </div>
+            <div v-if="showDeduction" class="deduction-badge text-error font-weight-bold">-{{ deduction }}</div>
           </transition>
 
           <div v-if="displayMode === 'packages'" class="d-flex align-center gap-1">
             <template v-if="item.packageSize && item.packageSize > 0">
-              <div
-                v-for="n in Math.min(fullPackages, 5)"
-                :key="n"
-                class="package-icon-wrapper"
-              >
-                <v-icon
-                  icon="mdi-package-variant-closed"
-                  color="primary"
-                  size="small"
-                ></v-icon>
+              <div v-for="n in Math.min(fullPackages, 5)" :key="n" class="package-icon-wrapper">
+                <v-icon icon="mdi-package-variant-closed" color="primary" size="small"></v-icon>
               </div>
-              <div
-                v-if="hasPartialPackage && fullPackages < 5"
-                class="package-icon-wrapper"
-                style="opacity: 0.7;"
-              >
-                <v-icon
-                  icon="mdi-package-variant"
-                  color="primary"
-                  size="small"
-                ></v-icon>
+              <div v-if="hasPartialPackage && fullPackages < 5" class="package-icon-wrapper" style="opacity: 0.7">
+                <v-icon icon="mdi-package-variant" color="primary" size="small"></v-icon>
               </div>
-              <span v-if="fullPackages >= 5" class="text-caption font-weight-bold ml-1">+{{ Math.floor(packagesRemaining) - 4 }}</span>
+              <span v-if="fullPackages >= 5" class="text-caption font-weight-bold ml-1"
+                >+{{ Math.floor(packagesRemaining) - 4 }}</span
+              >
             </template>
             <span v-else class="text-caption text-grey">-</span>
           </div>
 
           <v-chip v-else color="primary" variant="tonal" class="mr-2 text-body-1 font-weight-bold">
-            <template v-if="displayMode === 'pills'">
-              {{ item.count }} {{ t('med.unitPills') }}
-            </template>
+            <template v-if="displayMode === 'pills'"> {{ item.count }} {{ t('med.unitPills') }} </template>
             <template v-else-if="displayMode === 'days'">
               {{ daysRemaining !== null ? daysRemaining : '-' }} {{ t('med.unitDays') }}
             </template>
           </v-chip>
 
-          <v-icon
-            v-if="statusColor"
-            icon="mdi-alert"
-            :color="statusColor"
-            class="ml-1"
-          ></v-icon>
+          <v-icon v-if="statusColor" icon="mdi-alert" :color="statusColor" class="ml-1"></v-icon>
         </div>
       </template>
     </v-card-item>
@@ -240,20 +213,10 @@ const statusColor = computed(() => {
           </div>
 
           <div class="d-flex justify-end gap-2">
-            <v-btn
-              variant="text"
-              color="primary"
-              prepend-icon="mdi-pencil"
-              @click.stop="emit('edit')"
-            >
+            <v-btn variant="text" color="primary" prepend-icon="mdi-pencil" @click.stop="emit('edit')">
               {{ t('dialog.edit') }}
             </v-btn>
-            <v-btn
-              variant="text"
-              color="error"
-              prepend-icon="mdi-delete"
-              @click.stop="emit('delete')"
-            >
+            <v-btn variant="text" color="error" prepend-icon="mdi-delete" @click.stop="emit('delete')">
               {{ t('dialog.delete') }}
             </v-btn>
           </div>
@@ -294,7 +257,7 @@ const statusColor = computed(() => {
   border-radius: 4px;
   z-index: 10;
   pointer-events: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .float-up-enter-active,

@@ -5,9 +5,11 @@ let hapticsEnabled = true;
 // Initialize setting from IndexedDB asynchronously if available
 if (typeof indexedDB !== 'undefined') {
   try {
-    getSetting('hapticFeedback', true).then((val) => {
-      hapticsEnabled = val !== false;
-    }).catch(() => {});
+    getSetting('hapticFeedback', true)
+      .then((val) => {
+        hapticsEnabled = val !== false;
+      })
+      .catch(() => {});
   } catch (e) {
     // Ignore in non-browser/unit-test environments without full IndexedDB
   }
@@ -39,9 +41,7 @@ export function setHapticsEnabled(enabled) {
  * @returns {boolean}
  */
 export function isHapticsSupported() {
-  return typeof navigator !== 'undefined' &&
-    'vibrate' in navigator &&
-    typeof navigator.vibrate === 'function';
+  return typeof navigator !== 'undefined' && 'vibrate' in navigator && typeof navigator.vibrate === 'function';
 }
 
 /**
@@ -81,4 +81,3 @@ export function vibrateWarning() {
 export function vibrateError() {
   return vibrate([80, 50, 80]);
 }
-

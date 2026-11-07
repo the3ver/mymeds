@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
 
 defineProps({
-  modelValue: Boolean,
+  modelValue: Boolean
 });
 const emit = defineEmits(['update:modelValue', 'created']);
 
@@ -19,11 +19,11 @@ const close = () => emit('update:modelValue', false);
 
 async function createDatabase() {
   if (password.value !== passwordConfirm.value) {
-    error.value = "Passwords do not match.";
+    error.value = 'Passwords do not match.';
     return;
   }
   if (!dbName.value || !password.value) {
-    error.value = "Name and password are required.";
+    error.value = 'Name and password are required.';
     return;
   }
 
@@ -33,8 +33,8 @@ async function createDatabase() {
     await dataService.createDatabaseWithPassword(dbName.value, password.value);
     emit('created');
   } catch (e) {
-    console.error("Failed to create database:", e);
-    error.value = "Could not create database.";
+    console.error('Failed to create database:', e);
+    error.value = 'Could not create database.';
   } finally {
     loading.value = false;
   }
@@ -48,21 +48,11 @@ async function createDatabase() {
       <v-card-text>
         <v-alert v-if="error" type="error" density="compact" class="mb-4">{{ error }}</v-alert>
 
-        <v-alert
-          type="warning"
-          variant="tonal"
-          class="mb-4"
-          icon="mdi-key-alert"
-        >
+        <v-alert type="warning" variant="tonal" class="mb-4" icon="mdi-key-alert">
           {{ t('dialog.createDbWarning') }}
         </v-alert>
 
-        <v-text-field
-          v-model="dbName"
-          :label="t('dialog.dbNameLabel')"
-          variant="outlined"
-          autofocus
-        ></v-text-field>
+        <v-text-field v-model="dbName" :label="t('dialog.dbNameLabel')" variant="outlined" autofocus></v-text-field>
         <v-text-field
           v-model="password"
           :label="t('dialog.passwordLabel')"

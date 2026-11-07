@@ -57,4 +57,3 @@ export function consumeShortcutIntent() {
 
   return { tab, action };
 }
-

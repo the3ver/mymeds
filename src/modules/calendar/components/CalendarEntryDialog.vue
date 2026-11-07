@@ -1,10 +1,10 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import LinkDialog from './LinkDialog.vue'
-import { useDoctorTypes, useVaccinationMethods } from '../utils/calendarOptions.js'
-import { appendLink } from '../../common/utils/stringUtils.js'
-import { getLocalDateString } from '../utils/calendarUtils.js'
+import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import LinkDialog from './LinkDialog.vue';
+import { useDoctorTypes, useVaccinationMethods } from '../utils/calendarOptions.js';
+import { appendLink } from '../../common/utils/stringUtils.js';
+import { getLocalDateString } from '../utils/calendarUtils.js';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -46,86 +46,89 @@ const props = defineProps({
     type: Boolean,
     default: false
   }
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'confirm'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'confirm']);
+const { t } = useI18n();
 
-const doctorTypes = useDoctorTypes()
-const vaccinationMethods = useVaccinationMethods()
+const doctorTypes = useDoctorTypes();
+const vaccinationMethods = useVaccinationMethods();
 
 const referralStatusOptions = computed(() => [
   { title: t('calendar.referral.status.needed'), value: 'needed' },
   { title: t('calendar.referral.status.present'), value: 'present' },
   { title: t('calendar.referral.status.submitted'), value: 'submitted' }
-])
+]);
 
 function normalizeEntry(entry) {
-  const norm = { ...entry }
+  const norm = { ...entry };
   if (!norm.date) {
-    norm.date = getLocalDateString()
+    norm.date = getLocalDateString();
   }
   if (!norm.time) {
-    norm.time = ''
+    norm.time = '';
   }
   // Ensure treatments is a string (migration from array if needed)
   if (Array.isArray(norm.treatments)) {
-    norm.treatments = norm.treatments.join(', ')
+    norm.treatments = norm.treatments.join(', ');
   } else if (!norm.treatments) {
-    norm.treatments = ''
+    norm.treatments = '';
   }
   if (norm.type === 'doctor') {
     if (norm.needsReferral === undefined) {
-      norm.needsReferral = !props.isEdit
+      norm.needsReferral = !props.isEdit;
     }
     if (!norm.referralStatus) {
-      norm.referralStatus = 'needed'
+      norm.referralStatus = 'needed';
     }
   }
-  return norm
+  return norm;
 }
 
-const localEntry = ref(normalizeEntry(props.entry))
-const treatmentsInput = ref(null) // Reference to textarea
-const showLinkDialog = ref(false)
+const localEntry = ref(normalizeEntry(props.entry));
+const treatmentsInput = ref(null); // Reference to textarea
+const showLinkDialog = ref(false);
 
 // Watch for dialog opening to reset/set values
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    localEntry.value = normalizeEntry(props.entry)
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      localEntry.value = normalizeEntry(props.entry);
+    }
   }
-})
+);
 
 const addSuggestion = (suggestion) => {
-  const tag = `#${suggestion}#`
-  const currentText = localEntry.value.treatments || ''
+  const tag = `#${suggestion}#`;
+  const currentText = localEntry.value.treatments || '';
 
   // Append tag. If text is not empty and doesn't end with space, add space.
   if (currentText && !currentText.endsWith(' ')) {
-    localEntry.value.treatments = currentText + ' ' + tag + ' '
+    localEntry.value.treatments = currentText + ' ' + tag + ' ';
   } else {
-    localEntry.value.treatments = currentText + tag + ' '
+    localEntry.value.treatments = currentText + tag + ' ';
   }
 
   // Focus back to textarea
   // Note: Vuetify refs might need .value.$el.querySelector('textarea') or similar
   // but simple focus might work if user clicks chip
-}
+};
 
 const addLink = (link) => {
-  localEntry.value.notes = appendLink(localEntry.value.notes, link)
-}
+  localEntry.value.notes = appendLink(localEntry.value.notes, link);
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 
 const save = () => {
   if (localEntry.value.date && localEntry.value.title) {
-    emit('confirm', localEntry.value)
-    close()
+    emit('confirm', localEntry.value);
+    close();
   }
-}
+};
 </script>
 
 <template>
@@ -283,7 +286,7 @@ const save = () => {
 
         <!-- Note Fields -->
         <template v-if="localEntry.type === 'note'">
-           <v-text-field
+          <v-text-field
             v-model="localEntry.endDate"
             :label="t('calendar.fields.endDate')"
             type="date"
@@ -305,7 +308,6 @@ const save = () => {
             </v-btn>
           </template>
         </v-textarea>
-
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>

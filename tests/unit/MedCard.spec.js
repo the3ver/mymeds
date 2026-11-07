@@ -20,7 +20,7 @@ describe('MedCard.vue', () => {
     dose: '1-0-1',
     packageSize: 50,
     color: '#1976D2',
-    notes: 'Nach dem Essen',
+    notes: 'Nach dem Essen'
   };
 
   const mountComponent = (props = {}) => {
@@ -28,11 +28,11 @@ describe('MedCard.vue', () => {
       props: {
         item: defaultItem,
         deduction: 0,
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 
@@ -47,7 +47,7 @@ describe('MedCard.vue', () => {
   it('should display count and pills unit in default pills display mode', async () => {
     await dataService.saveDisplayMode('pills');
     const wrapper = mountComponent();
-    await new Promise(r => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 20));
 
     expect(wrapper.text()).toContain('20');
   });
@@ -55,12 +55,12 @@ describe('MedCard.vue', () => {
   it('should display remaining days when display mode is set to days', async () => {
     await dataService.saveDisplayMode('days');
     const wrapper = mountComponent({
-      item: { ...defaultItem, count: 20, dose: '2' }, // 20 / 2 = 10 days
+      item: { ...defaultItem, count: 20, dose: '2' } // 20 / 2 = 10 days
     });
 
     // Dispatch event to trigger setting update listener
     window.dispatchEvent(new Event('storage-display-mode-changed'));
-    await new Promise(r => setTimeout(r, 30));
+    await new Promise((r) => setTimeout(r, 30));
 
     expect(wrapper.text()).toContain('10');
   });
@@ -71,7 +71,7 @@ describe('MedCard.vue', () => {
     // Click card to expand
     await wrapper.findComponent(components.VCard).trigger('click');
 
-    const editBtn = wrapper.findAllComponents(components.VBtn).find(btn => btn.props('prependIcon') === 'mdi-pencil');
+    const editBtn = wrapper.findAllComponents(components.VBtn).find((btn) => btn.props('prependIcon') === 'mdi-pencil');
     expect(editBtn).toBeDefined();
 
     await editBtn.trigger('click');
@@ -86,7 +86,9 @@ describe('MedCard.vue', () => {
     // Click card to expand
     await wrapper.findComponent(components.VCard).trigger('click');
 
-    const deleteBtn = wrapper.findAllComponents(components.VBtn).find(btn => btn.props('prependIcon') === 'mdi-delete');
+    const deleteBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.props('prependIcon') === 'mdi-delete');
     expect(deleteBtn).toBeDefined();
 
     await deleteBtn.trigger('click');
@@ -119,7 +121,7 @@ describe('MedCard.vue', () => {
         ...defaultItem,
         shape: 'round-score',
         pillSize: 'small',
-        color: 'deep-orange',
+        color: 'deep-orange'
       }
     });
 
@@ -134,7 +136,7 @@ describe('MedCard.vue', () => {
     const wrapper = mountComponent({
       item: {
         ...defaultItem,
-        shape: 'letter',
+        shape: 'letter'
       }
     });
 

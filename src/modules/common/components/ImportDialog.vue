@@ -1,33 +1,36 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   modelValue: Boolean,
   stats: Object
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'confirm'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'confirm']);
+const { t } = useI18n();
 
-const confirmInput = ref('')
+const confirmInput = ref('');
 
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    confirmInput.value = ''
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      confirmInput.value = '';
+    }
   }
-})
+);
 
 const confirm = () => {
   if (confirmInput.value === t('app.importConfirmValue')) {
-    emit('confirm')
-    close()
+    emit('confirm');
+    close();
   }
-}
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -71,5 +74,4 @@ const close = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

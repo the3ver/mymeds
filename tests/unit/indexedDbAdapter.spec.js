@@ -18,7 +18,7 @@ describe('indexedDbAdapter', () => {
         passwordData: { salt: new Uint8Array([1, 2, 3]), iv: new Uint8Array([4, 5, 6]) },
         encryptedData: new ArrayBuffer(8),
         medsCount: 5,
-        calendarCount: 2,
+        calendarCount: 2
       };
 
       const id = await dbAdapter.createDatabase(newEntry);
@@ -45,7 +45,7 @@ describe('indexedDbAdapter', () => {
         createdAt: now,
         modifiedAt: now,
         medsCount: 1,
-        calendarCount: 0,
+        calendarCount: 0
       });
 
       const entry = await dbAdapter.getFullDatabase(id);
@@ -63,7 +63,7 @@ describe('indexedDbAdapter', () => {
       const id = await dbAdapter.createDatabase({
         name: 'Alter Name',
         createdAt: initialDate,
-        modifiedAt: initialDate,
+        modifiedAt: initialDate
       });
 
       await dbAdapter.renameDatabase(id, 'Neuer Name');
@@ -107,7 +107,7 @@ describe('indexedDbAdapter', () => {
       expect((await dbAdapter.getSettings()).disclaimerAccepted).toBe(false);
 
       await dbAdapter.saveDisclaimerVersion(1);
-      
+
       const updated = await dbAdapter.getSettings();
       expect(updated.disclaimerVersion).toBe(1);
       expect(updated.disclaimerAccepted).toBe(true);

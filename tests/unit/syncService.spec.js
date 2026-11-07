@@ -36,9 +36,9 @@ describe('syncService', () => {
         encryptionStrategy: 'password',
         passwordData: {
           salt: new Uint8Array([1, 2, 3, 4]),
-          iv: new Uint8Array([5, 6, 7, 8]),
+          iv: new Uint8Array([5, 6, 7, 8])
         },
-        encryptedData: new Uint8Array([9, 10, 11, 12]),
+        encryptedData: new Uint8Array([9, 10, 11, 12])
       };
 
       const payload = syncService.exportVaultForSync(mockDbEntry);
@@ -77,9 +77,9 @@ describe('syncService', () => {
         encryptionStrategy: 'password',
         passwordData: {
           salt: new Uint8Array([11, 22, 33]),
-          iv: new Uint8Array([44, 55, 66]),
+          iv: new Uint8Array([44, 55, 66])
         },
-        encryptedData: new Uint8Array([77, 88, 99]),
+        encryptedData: new Uint8Array([77, 88, 99])
       };
 
       const payload = syncService.exportVaultForSync(mockDbEntry);
@@ -106,13 +106,13 @@ describe('syncService', () => {
         calendarCount: 0,
         encryptionStrategy: 'password',
         passwordData: { salt: new Uint8Array([1]), iv: new Uint8Array([2]) },
-        encryptedData: new Uint8Array([3, 4]),
+        encryptedData: new Uint8Array([3, 4])
       };
 
       const payload = syncService.exportVaultForSync(mockDbEntry);
       const newId = await syncService.importVaultFromSync(payload, {
         mode: 'create',
-        newName: 'Haupttresor (vom Handy)',
+        newName: 'Haupttresor (vom Handy)'
       });
 
       const stored = await dbAdapter.getFullDatabase(newId);
@@ -129,7 +129,7 @@ describe('syncService', () => {
         calendarCount: 0,
         encryptionStrategy: 'password',
         passwordData: { salt: new Uint8Array([1]), iv: new Uint8Array([2]) },
-        encryptedData: new Uint8Array([10]),
+        encryptedData: new Uint8Array([10])
       });
 
       // 2. Prepare payload from new source
@@ -141,13 +141,13 @@ describe('syncService', () => {
         calendarCount: 3,
         encryptionStrategy: 'password',
         passwordData: { salt: new Uint8Array([5, 6]), iv: new Uint8Array([7, 8]) },
-        encryptedData: new Uint8Array([100, 101]),
+        encryptedData: new Uint8Array([100, 101])
       };
       const payload = syncService.exportVaultForSync(incomingEntry);
 
       await syncService.importVaultFromSync(payload, {
         mode: 'overwrite',
-        targetId: existingId,
+        targetId: existingId
       });
 
       const updated = await dbAdapter.getFullDatabase(existingId);
@@ -170,7 +170,7 @@ describe('syncService', () => {
           encryptionStrategy: 'password',
           passwordData: {
             salt: 'AQIDBAUG',
-            iv: 'BwgJCgsM',
+            iv: 'BwgJCgsM'
           },
           encryptedData: 'DQ4PEBES',
           metadata: { customField: 'test' }
@@ -199,7 +199,7 @@ describe('syncService', () => {
 
     it('round-trips a real encrypted vault through sync and unlocks successfully with dataService', async () => {
       const { createDatabaseWithPassword, unlockDatabase } = await import('../../src/modules/common/utils/dataService');
-      
+
       // 1. Create real vault with password
       const originalId = await createDatabaseWithPassword('Echt-Tresor', 'geheim123');
       const originalVault = await dbAdapter.getFullDatabase(originalId);
@@ -246,7 +246,7 @@ describe('syncService', () => {
     it('creates sender session object with close function', () => {
       const session = syncService.startSenderSession({
         vaultId: 1,
-        onCodeReady: () => {},
+        onCodeReady: () => {}
       });
       expect(session).toBeDefined();
       expect(typeof session.close).toBe('function');
@@ -255,7 +255,7 @@ describe('syncService', () => {
 
     it('creates receiver session object with close function', () => {
       const session = syncService.startReceiverSession({
-        syncCode: '123456',
+        syncCode: '123456'
       });
       expect(session).toBeDefined();
       expect(typeof session.close).toBe('function');

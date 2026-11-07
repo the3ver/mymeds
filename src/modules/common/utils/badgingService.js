@@ -8,11 +8,13 @@ import { calculateDaysRemaining } from '../../meds/utils/medUtils';
  * @returns {boolean}
  */
 export function isBadgingSupported() {
-  return typeof navigator !== 'undefined' &&
+  return (
+    typeof navigator !== 'undefined' &&
     'setAppBadge' in navigator &&
     typeof navigator.setAppBadge === 'function' &&
     'clearAppBadge' in navigator &&
-    typeof navigator.clearAppBadge === 'function';
+    typeof navigator.clearAppBadge === 'function'
+  );
 }
 
 /**
@@ -78,5 +80,3 @@ export async function updateCriticalMedsBadge(meds, redLimit = 7) {
 
   return criticalCount;
 }
-
-

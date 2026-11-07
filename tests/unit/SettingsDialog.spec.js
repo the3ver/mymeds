@@ -21,11 +21,11 @@ vi.mock('../../src/modules/common/utils/dataService', () => ({
   saveRedLimit: vi.fn(),
   saveShowOverview: vi.fn(),
   getReminderSettings: vi.fn(),
-  saveReminderSettings: vi.fn(),
+  saveReminderSettings: vi.fn()
 }));
 
 vi.mock('../../src/modules/common/utils/biometricSessionService', () => ({
-  clearAllBiometrics: vi.fn().mockResolvedValue(undefined),
+  clearAllBiometrics: vi.fn().mockResolvedValue(undefined)
 }));
 
 vi.mock('../../src/modules/common/utils/reminderService', async (importOriginal) => {
@@ -36,7 +36,7 @@ vi.mock('../../src/modules/common/utils/reminderService', async (importOriginal)
     requestNotificationPermission: vi.fn().mockResolvedValue('granted'),
     registerPeriodicSync: vi.fn().mockResolvedValue(true),
     unregisterPeriodicSync: vi.fn().mockResolvedValue(true),
-    sendTestNotification: vi.fn().mockResolvedValue(true),
+    sendTestNotification: vi.fn().mockResolvedValue(true)
   };
 });
 
@@ -50,14 +50,14 @@ vi.mock('../../src/modules/common/utils/storagePersistenceService', () => ({
     quota: 104857600,
     usageFormatted: '1 MB',
     quotaFormatted: '100 MB',
-    percentUsed: 1,
-  }),
+    percentUsed: 1
+  })
 }));
 
 vi.mock('../../src/modules/common/utils/hapticService', () => ({
   isHapticsSupported: vi.fn().mockReturnValue(true),
   isHapticsEnabled: vi.fn().mockReturnValue(true),
-  setHapticsEnabled: vi.fn(),
+  setHapticsEnabled: vi.fn()
 }));
 
 const vuetify = createVuetify({ components, directives });
@@ -75,7 +75,7 @@ describe('SettingsDialog.vue', () => {
       displayMode: 'pills',
       vaultDisplayMode: 'simple',
       yellowLimit: 21,
-      redLimit: 7,
+      redLimit: 7
     });
     dataService.getReminderSettings.mockResolvedValue({
       enabled: false,
@@ -83,9 +83,9 @@ describe('SettingsDialog.vue', () => {
         { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
         { id: 'noon', labelKey: 'reminders.noon', time: '12:00', enabled: true },
         { id: 'evening', labelKey: 'reminders.evening', time: '18:00', enabled: true },
-        { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false },
+        { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false }
       ],
-      lastNotified: {},
+      lastNotified: {}
     });
   });
 
@@ -97,12 +97,12 @@ describe('SettingsDialog.vue', () => {
     return mount(SettingsDialog, {
       props: {
         modelValue: true,
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
+        plugins: [vuetify, i18n]
       },
-      attachTo: document.body,
+      attachTo: document.body
     });
   };
 
@@ -136,9 +136,9 @@ describe('SettingsDialog.vue', () => {
         { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
         { id: 'noon', labelKey: 'reminders.noon', time: '12:00', enabled: true },
         { id: 'evening', labelKey: 'reminders.evening', time: '18:00', enabled: true },
-        { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false },
+        { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false }
       ],
-      lastNotified: {},
+      lastNotified: {}
     });
 
     const wrapper = mountComponent();
@@ -159,10 +159,8 @@ describe('SettingsDialog.vue', () => {
     reminderService.isReminderSupported.mockReturnValue(true);
     dataService.getReminderSettings.mockResolvedValue({
       enabled: false,
-      slots: [
-        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
-      ],
-      lastNotified: {},
+      slots: [{ id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true }],
+      lastNotified: {}
     });
 
     const wrapper = mountComponent();
@@ -200,10 +198,8 @@ describe('SettingsDialog.vue', () => {
     reminderService.requestNotificationPermission.mockResolvedValue('denied');
     dataService.getReminderSettings.mockResolvedValue({
       enabled: false,
-      slots: [
-        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
-      ],
-      lastNotified: {},
+      slots: [{ id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true }],
+      lastNotified: {}
     });
 
     const wrapper = mountComponent();
@@ -226,10 +222,8 @@ describe('SettingsDialog.vue', () => {
     reminderService.isReminderSupported.mockReturnValue(true);
     dataService.getReminderSettings.mockResolvedValue({
       enabled: true,
-      slots: [
-        { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
-      ],
-      lastNotified: {},
+      slots: [{ id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true }],
+      lastNotified: {}
     });
 
     const wrapper = mountComponent();
@@ -250,7 +244,7 @@ describe('SettingsDialog.vue', () => {
     expect(document.body.textContent).toContain('Detailliert (Mit Zählern & Datumsangaben)');
 
     const radioInputs = Array.from(document.body.querySelectorAll('input[type="radio"]'));
-    const comfortableRadio = radioInputs.find(input => input.value === 'comfortable');
+    const comfortableRadio = radioInputs.find((input) => input.value === 'comfortable');
     expect(comfortableRadio).toBeDefined();
 
     comfortableRadio.click();
@@ -276,8 +270,8 @@ describe('SettingsDialog.vue', () => {
     expect(document.body.textContent).toContain('1 MB / 100 MB');
 
     // Request persistence button click
-    const requestBtn = Array.from(document.body.querySelectorAll('button')).find(
-      btn => btn.textContent.includes('Dauerhaften Schutz anfordern')
+    const requestBtn = Array.from(document.body.querySelectorAll('button')).find((btn) =>
+      btn.textContent.includes('Dauerhaften Schutz anfordern')
     );
     expect(requestBtn).toBeDefined();
 

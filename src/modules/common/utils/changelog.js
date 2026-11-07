@@ -51,9 +51,7 @@ export const changelog = [
       de: [
         'Der Dialog „Was gibt es Neues“ öffnete sich bei jedem Start der App. Er erscheint jetzt nur noch einmal pro neuer Version'
       ],
-      en: [
-        "The What's New dialog opened on every app start. It now appears only once per new version"
-      ]
+      en: ["The What's New dialog opened on every app start. It now appears only once per new version"]
     }
   },
   {
@@ -212,12 +210,8 @@ export const changelog = [
       en: 'Confirmation Dialog for Calendar Entry Deletion'
     },
     highlights: {
-      de: [
-        'Bestätigungsdialog vor dem endgültigen Löschen eines Kalendereintrags hinzugefügt (#32)'
-      ],
-      en: [
-        'Added confirmation dialog before deleting calendar entries (#32)'
-      ]
+      de: ['Bestätigungsdialog vor dem endgültigen Löschen eines Kalendereintrags hinzugefügt (#32)'],
+      en: ['Added confirmation dialog before deleting calendar entries (#32)']
     }
   },
   {
@@ -398,12 +392,8 @@ export const changelog = [
       en: 'New Icon for Vault Synchronization'
     },
     highlights: {
-      de: [
-        'Klareres Hoch-Runter-Pfeil-Icon (mdi-swap-vertical) auf den Tresorkarten für den Datentransfer'
-      ],
-      en: [
-        'Clearer up-down transfer arrow icon (mdi-swap-vertical) on vault cards for synchronization'
-      ]
+      de: ['Klareres Hoch-Runter-Pfeil-Icon (mdi-swap-vertical) auf den Tresorkarten für den Datentransfer'],
+      en: ['Clearer up-down transfer arrow icon (mdi-swap-vertical) on vault cards for synchronization']
     }
   },
   {
@@ -574,7 +564,7 @@ export function getLatestChangelog() {
 
 export function getChangelogForVersion(version) {
   const cleanVersion = String(version || '').replace(/^v/, '');
-  return changelog.find(entry => entry.version === cleanVersion);
+  return changelog.find((entry) => entry.version === cleanVersion);
 }
 
 export function getAllChangelogs() {

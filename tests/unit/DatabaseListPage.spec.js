@@ -24,7 +24,7 @@ describe('DatabaseListPage.vue', () => {
       medsCount: 4,
       calendarCount: 2,
       createdAt: '2026-01-15T10:00:00.000Z',
-      modifiedAt: '2026-03-01T14:30:00.000Z',
+      modifiedAt: '2026-03-01T14:30:00.000Z'
     },
     {
       id: 2,
@@ -32,8 +32,8 @@ describe('DatabaseListPage.vue', () => {
       medsCount: 1,
       calendarCount: 0,
       createdAt: '2026-02-10T12:00:00.000Z',
-      modifiedAt: '2026-02-12T15:00:00.000Z',
-    },
+      modifiedAt: '2026-02-12T15:00:00.000Z'
+    }
   ];
 
   it('renders vault cards in simple mode by default (calm, minimal layout with menu and summary)', async () => {
@@ -50,9 +50,9 @@ describe('DatabaseListPage.vue', () => {
           DatabaseUnlockDialog: true,
           RenameDatabaseDialog: true,
           SyncDialog: true,
-          ConfirmDialog: true,
-        },
-      },
+          ConfirmDialog: true
+        }
+      }
     });
 
     await wrapper.vm.$nextTick();
@@ -92,9 +92,9 @@ describe('DatabaseListPage.vue', () => {
           DatabaseUnlockDialog: true,
           RenameDatabaseDialog: true,
           SyncDialog: true,
-          ConfirmDialog: true,
-        },
-      },
+          ConfirmDialog: true
+        }
+      }
     });
 
     await wrapper.vm.$nextTick();
@@ -129,9 +129,9 @@ describe('DatabaseListPage.vue', () => {
           DatabaseUnlockDialog: true,
           RenameDatabaseDialog: true,
           SyncDialog: true,
-          ConfirmDialog: true,
-        },
-      },
+          ConfirmDialog: true
+        }
+      }
     });
 
     await wrapper.vm.$nextTick();
@@ -157,9 +157,9 @@ describe('DatabaseListPage.vue', () => {
           DatabaseUnlockDialog: true,
           RenameDatabaseDialog: true,
           SyncDialog: true,
-          ConfirmDialog: true,
-        },
-      },
+          ConfirmDialog: true
+        }
+      }
     });
 
     await wrapper.vm.$nextTick();

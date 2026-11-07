@@ -1,28 +1,28 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { createCalendarEvent } from '../../calendar/utils/calendarUtils'
+import { useI18n } from 'vue-i18n';
+import { createCalendarEvent } from '../../calendar/utils/calendarUtils';
 
 const props = defineProps({
   modelValue: Boolean,
   date: String,
   rawDate: Date
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 
 const createEvent = () => {
-  const title = t('app.calendarTitle')
-  const appUrl = 'https://the3ver.github.io/mymeds/'
-  const description = `${t('app.calendarDesc')}\n${appUrl}`
+  const title = t('app.calendarTitle');
+  const appUrl = 'https://the3ver.github.io/mymeds/';
+  const description = `${t('app.calendarDesc')}\n${appUrl}`;
 
-  createCalendarEvent(title, description, props.rawDate, appUrl)
-  close()
-}
+  createCalendarEvent(title, description, props.rawDate, appUrl);
+  close();
+};
 </script>
 
 <template>
@@ -41,5 +41,4 @@ const createEvent = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

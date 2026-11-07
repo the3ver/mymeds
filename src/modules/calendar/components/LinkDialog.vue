@@ -1,35 +1,38 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   modelValue: Boolean
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'add'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'add']);
+const { t } = useI18n();
 
-const linkUrl = ref('')
-const linkLabel = ref('')
+const linkUrl = ref('');
+const linkLabel = ref('');
 
 // Reset when dialog opens
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    linkUrl.value = ''
-    linkLabel.value = ''
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      linkUrl.value = '';
+      linkLabel.value = '';
+    }
   }
-})
+);
 
 const add = () => {
   if (linkUrl.value) {
-    emit('add', { url: linkUrl.value, label: linkLabel.value })
-    close()
+    emit('add', { url: linkUrl.value, label: linkLabel.value });
+    close();
   }
-}
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>

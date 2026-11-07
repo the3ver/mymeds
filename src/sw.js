@@ -146,9 +146,7 @@ async function handlePeriodicReminder() {
       await putInSettings(db, 'reminderSettings', reminderSettings);
 
       const title = 'MyMeds';
-      const body = locale === 'de'
-        ? 'Erinnerung: Zeit für deine Medikamente.'
-        : 'Reminder: Time for your medication.';
+      const body = locale === 'de' ? 'Erinnerung: Zeit für deine Medikamente.' : 'Reminder: Time for your medication.';
 
       if (self.navigator && 'setAppBadge' in self.navigator) {
         self.navigator.setAppBadge(dueCount).catch(() => {});
@@ -158,7 +156,7 @@ async function handlePeriodicReminder() {
         body,
         icon: './pwa-192x192.png',
         badge: './pwa-192x192.png',
-        tag: 'med-reminder',
+        tag: 'med-reminder'
       });
     }
 

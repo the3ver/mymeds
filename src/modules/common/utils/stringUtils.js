@@ -9,16 +9,16 @@
  * @returns {string} The updated text.
  */
 export function appendLink(currentText, { url, label }) {
-  if (!url) return currentText
+  if (!url) return currentText;
 
-  const linkText = label ? `[${label}](${url})` : url
-  const text = currentText || ''
+  const linkText = label ? `[${label}](${url})` : url;
+  const text = currentText || '';
 
   if (text && !text.endsWith(' ')) {
-    return text + ' ' + linkText
+    return text + ' ' + linkText;
   }
-  
-  return text + linkText
+
+  return text + linkText;
 }
 
 /**
@@ -33,9 +33,17 @@ export function renderMarkdownLinks(text) {
 
   const escapeHtml = (str) => {
     if (typeof str !== 'string') return '';
-    return str.replace(/[&<>"']/g, (match) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[match]));
+    return str.replace(
+      /[&<>"']/g,
+      (match) =>
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[match]
+    );
   };
 
   // This regex finds both markdown links and standalone URLs.
@@ -54,14 +62,16 @@ export function renderMarkdownLinks(text) {
     let url, label, fullMatch;
     let trailingChars = '';
 
-    if (match[1]) { // Markdown link [label](url)
+    if (match[1]) {
+      // Markdown link [label](url)
       fullMatch = match[1];
       label = match[2];
       url = match[3];
-    } else { // Standalone URL
+    } else {
+      // Standalone URL
       fullMatch = url = match[4];
       label = url;
-      
+
       // Trim trailing punctuation from standalone URLs
       const punctuationRegex = /[.,?!;:]*$/;
       const trailing = url.match(punctuationRegex)[0];

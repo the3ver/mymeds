@@ -11,9 +11,9 @@ export const state = reactive({
     version: 1,
     meds: [],
     calendar: [],
-    lastDoseUpdate: null,
+    lastDoseUpdate: null
   },
-  deductions: {}, // To show animations on unlock
+  deductions: {} // To show animations on unlock
 });
 
 // --- Debounce Utility ---
@@ -46,11 +46,7 @@ const saveState = debounce(async () => {
   console.log('[app-state] Auto-saving data...');
   try {
     // We only need to save the main data, not re-encrypt the password
-    await dataService.saveAndLockDatabase(
-      state.activeDatabaseId,
-      state.activeDatabasePassword,
-      state.decryptedData
-    );
+    await dataService.saveAndLockDatabase(state.activeDatabaseId, state.activeDatabasePassword, state.decryptedData);
     console.log('[app-state] Auto-save successful.');
   } catch (error) {
     console.error('[app-state] Auto-save failed:', error);
@@ -59,7 +55,6 @@ const saveState = debounce(async () => {
 
 // Watch for changes in the decrypted data and trigger the debounced save
 watch(() => state.decryptedData, saveState, { deep: true });
-
 
 // --- State Management Functions ---
 export function unlock(id, password, data, deductions = {}) {
@@ -86,5 +81,5 @@ export async function lock() {
   state.isLocked = true;
 
   // Clear badge on lock for privacy
-  clearBadge().catch(err => console.warn('[app-state] Error clearing badge on lock:', err));
+  clearBadge().catch((err) => console.warn('[app-state] Error clearing badge on lock:', err));
 }

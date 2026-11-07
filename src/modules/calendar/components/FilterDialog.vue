@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -8,27 +8,32 @@ const props = defineProps({
     type: Array,
     default: () => []
   }
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'update:selectedFilters'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'update:selectedFilters']);
+const { t } = useI18n();
 
 const availableTypes = computed(() => [
   { title: t('calendar.types.doctor'), value: 'doctor', icon: 'mdi-doctor', color: 'primary' },
-  { title: t('calendar.referral.filter'), value: 'open_referrals', icon: 'mdi-file-alert-outline', color: 'amber-darken-3' },
+  {
+    title: t('calendar.referral.filter'),
+    value: 'open_referrals',
+    icon: 'mdi-file-alert-outline',
+    color: 'amber-darken-3'
+  },
   { title: t('calendar.types.vaccination'), value: 'vaccination', icon: 'mdi-needle', color: 'teal' },
   { title: t('calendar.types.illness'), value: 'illness', icon: 'mdi-emoticon-sick', color: 'orange' },
   { title: t('calendar.types.note'), value: 'note', icon: 'mdi-note-text', color: 'blue-grey' }
-])
+]);
 
 const localFilters = computed({
   get: () => props.selectedFilters,
   set: (val) => emit('update:selectedFilters', val)
-})
+});
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -58,5 +63,4 @@ const close = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

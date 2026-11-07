@@ -36,7 +36,9 @@ const getRandomColor = (id) => {
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   return new Date(dateString).toLocaleDateString(locale.value, {
-    year: 'numeric', month: '2-digit', day: '2-digit'
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   });
 };
 
@@ -153,13 +155,7 @@ function onDatabaseUnlocked(result, password) {
     </div>
 
     <v-row>
-      <v-col
-        v-for="db in databases"
-        :key="db.id"
-        cols="12"
-        sm="6"
-        md="4"
-      >
+      <v-col v-for="db in databases" :key="db.id" cols="12" sm="6" md="4">
         <!-- Simple / Ruhige Ansicht -->
         <v-card
           v-if="vaultDisplayMode === 'simple'"
@@ -168,7 +164,9 @@ function onDatabaseUnlocked(result, password) {
           variant="tonal"
           @click="handleDbClick(db)"
         >
-          <v-card-title class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4">
+          <v-card-title
+            class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4"
+          >
             <div class="d-flex align-center min-width-0 mr-2">
               <v-icon size="22" class="mr-2 flex-shrink-0 opacity-80">mdi-shield-lock-outline</v-icon>
               <span class="text-truncate">{{ db.name }}</span>
@@ -237,13 +235,11 @@ function onDatabaseUnlocked(result, password) {
         </v-card>
 
         <!-- Comfortable / Detaillierte Ansicht -->
-        <v-card
-          v-else
-          class="d-flex flex-column fill-height db-card"
-          :color="getRandomColor(db.id)"
-          variant="tonal"
-        >
-          <v-card-title class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1" @click="handleDbClick(db)">
+        <v-card v-else class="d-flex flex-column fill-height db-card" :color="getRandomColor(db.id)" variant="tonal">
+          <v-card-title
+            class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1"
+            @click="handleDbClick(db)"
+          >
             <span class="text-truncate mr-2">{{ db.name }}</span>
             <v-chip
               v-if="activeBiometricVaults.has(db.id)"
@@ -279,7 +275,9 @@ function onDatabaseUnlocked(result, password) {
             </div>
 
             <!-- Horizontal dates row utilizing the available horizontal space -->
-            <div class="db-dates-row d-flex flex-wrap justify-space-between align-center ga-2 pt-2 border-t text-body-1">
+            <div
+              class="db-dates-row d-flex flex-wrap justify-space-between align-center ga-2 pt-2 border-t text-body-1"
+            >
               <div class="d-flex align-center py-1">
                 <v-icon size="22" class="mr-2 opacity-80 flex-shrink-0">mdi-calendar-plus</v-icon>
                 <span class="db-date-label">
@@ -315,18 +313,8 @@ function onDatabaseUnlocked(result, password) {
               @click.stop="handleRevokeBiometrics(db)"
             ></v-btn>
             <v-spacer></v-spacer>
-            <v-btn
-              icon="mdi-pencil"
-              variant="text"
-              size="default"
-              @click.stop="handleRenameClick(db)"
-            ></v-btn>
-            <v-btn
-              icon="mdi-delete-outline"
-              variant="text"
-              size="default"
-              @click.stop="handleDeleteClick(db)"
-            ></v-btn>
+            <v-btn icon="mdi-pencil" variant="text" size="default" @click.stop="handleRenameClick(db)"></v-btn>
+            <v-btn icon="mdi-delete-outline" variant="text" size="default" @click.stop="handleDeleteClick(db)"></v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -349,10 +337,7 @@ function onDatabaseUnlocked(result, password) {
     @click="handleCreateNew"
   ></v-fab>
 
-  <CreateDatabaseDialog
-    v-model="createDialog"
-    @created="onDatabaseCreated"
-  />
+  <CreateDatabaseDialog v-model="createDialog" @created="onDatabaseCreated" />
 
   <DatabaseUnlockDialog
     v-model="unlockDialog"
@@ -361,11 +346,7 @@ function onDatabaseUnlocked(result, password) {
     @biometric-updated="loadBiometrics"
   />
 
-  <RenameDatabaseDialog
-    v-model="renameDialog"
-    :current-name="selectedDb?.name"
-    @save="handleSaveName"
-  />
+  <RenameDatabaseDialog v-model="renameDialog" :current-name="selectedDb?.name" @save="handleSaveName" />
 
   <SyncDialog
     v-model="syncDialog"
@@ -388,7 +369,8 @@ function onDatabaseUnlocked(result, password) {
 
 <style>
 /* Global style to prevent pull-to-refresh on this page */
-html, body {
+html,
+body {
   overscroll-behavior-y: contain;
 }
 .cursor-pointer {
@@ -423,7 +405,9 @@ html, body {
 }
 
 .db-card-simple {
-  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    transform 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
   border-radius: 12px;
 }
 

@@ -37,7 +37,9 @@ export interface VaultSummary {
 
 export interface VaultLifecycleHooks<T = unknown> {
   /** Called after decryption upon unlocking */
-  onUnlock?: (data: T) => Promise<{ data: T; metadata?: Record<string, any> }> | { data: T; metadata?: Record<string, any> };
+  onUnlock?: (
+    data: T
+  ) => Promise<{ data: T; metadata?: Record<string, any> }> | { data: T; metadata?: Record<string, any> };
   /** Extracts metadata to store alongside encrypted blob on save */
   extractMetadata?: (data: T) => Record<string, any>;
   /** Called before saving to modify or validate data */

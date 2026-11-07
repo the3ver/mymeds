@@ -1,11 +1,6 @@
 import * as crypto from '../crypto/cryptoService';
 import { VaultStorage } from '../storage/indexedDbStorage';
-import type {
-  VaultRecord,
-  VaultSummary,
-  VaultLifecycleHooks,
-  EncryptionStrategy
-} from '../types/vault';
+import type { VaultRecord, VaultSummary, VaultLifecycleHooks, EncryptionStrategy } from '../types/vault';
 
 export interface UnlockResult<T> {
   success: boolean;
@@ -74,7 +69,7 @@ export class VaultManager {
       encryptionStrategy: 'password' as EncryptionStrategy,
       passwordData: { salt, iv },
       encryptedData,
-      metadata,
+      metadata
     };
 
     return this.storage.createVault(newEntry);
@@ -111,7 +106,7 @@ export class VaultManager {
           success: true,
           data,
           key,
-          metadata: { ...(dbEntry.metadata || {}), ...hookMeta },
+          metadata: { ...(dbEntry.metadata || {}), ...hookMeta }
         };
       } catch (err) {
         console.error('[VaultManager] Decryption failed:', err);
@@ -172,12 +167,12 @@ export class VaultManager {
     dbEntry.encryptedData = encryptedData;
     dbEntry.passwordData = {
       ...dbEntry.passwordData,
-      iv,
+      iv
     };
     dbEntry.modifiedAt = new Date();
     dbEntry.metadata = {
       ...(dbEntry.metadata || {}),
-      ...extraMetadata,
+      ...extraMetadata
     };
 
     // Propagate legacy fields if metadata contains them (for backwards compatibility)

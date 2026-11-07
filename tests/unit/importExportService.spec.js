@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { prepareExport, processImport } from '../../src/modules/common/utils/importExportService'
+import { describe, it, expect } from 'vitest';
+import { prepareExport, processImport } from '../../src/modules/common/utils/importExportService';
 
 // --- Test Data ---
 const fullMedData = {
@@ -14,7 +14,7 @@ const fullMedData = {
 const minimalMedData = {
   name: 'Ibuprofen',
   count: '50',
-  dose: '1',
+  dose: '1'
 };
 
 const fullCalendarData = {
@@ -34,11 +34,10 @@ const minimalCalendarData = {
 const mockDataToExport = {
   meds: [fullMedData, minimalMedData],
   calendar: [fullCalendarData, minimalCalendarData],
-  lastDoseUpdate: new Date().toDateString(),
+  lastDoseUpdate: new Date().toDateString()
 };
 
 describe('importExportService', () => {
-
   // --- EXPORT TESTS ---
   describe('prepareExport', () => {
     it('should take data and return formatted content and filename', () => {

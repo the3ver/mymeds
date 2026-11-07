@@ -30,7 +30,7 @@ describe('biometricSessionService', () => {
         wrappedPassword: 'mock-pw',
         iv: 'mock-iv',
         createdAt: Date.now(),
-        expiresAt: Date.now() + 100000,
+        expiresAt: Date.now() + 100000
       };
       await dbAdapter.saveBiometricSession(session);
 
@@ -46,7 +46,7 @@ describe('biometricSessionService', () => {
         wrappedPassword: 'mock-pw',
         iv: 'mock-iv',
         createdAt: Date.now() - 200000,
-        expiresAt: Date.now() - 5000, // expired 5s ago
+        expiresAt: Date.now() - 5000 // expired 5s ago
       };
       await dbAdapter.saveBiometricSession(session);
 
@@ -66,14 +66,14 @@ describe('biometricSessionService', () => {
         credentialId: 'test-cred-id',
         rawId: new Uint8Array([1, 2, 3]),
         prfEnabled: true,
-        initialPrfKey: mockKey,
+        initialPrfKey: mockKey
       });
 
       vi.spyOn(webAuthnPrf, 'getPrfKey').mockResolvedValue(mockKey);
       vi.spyOn(dataService, 'unlockDatabase').mockResolvedValue({
         success: true,
         data: { meds: [], calendar: [] },
-        deductions: {},
+        deductions: {}
       });
 
       // 1. Enroll
@@ -98,7 +98,7 @@ describe('biometricSessionService', () => {
         credentialId: 'test-named-cred',
         rawId: new Uint8Array([1, 2, 3]),
         prfEnabled: true,
-        initialPrfKey: mockKey,
+        initialPrfKey: mockKey
       });
 
       await biometricService.enrollBiometrics(43, 'secret-pw', 'Hausapotheke');
@@ -111,7 +111,7 @@ describe('biometricSessionService', () => {
         credentialId: 'test-ttl-cred',
         rawId: new Uint8Array([1, 2, 3]),
         prfEnabled: true,
-        initialPrfKey: mockKey,
+        initialPrfKey: mockKey
       });
 
       const before = Date.now();
@@ -131,7 +131,7 @@ describe('biometricSessionService', () => {
         wrappedPassword: bufferToBase64(new Uint8Array([4, 5, 6])),
         iv: bufferToBase64(generateSalt(12)),
         createdAt: Date.now(),
-        expiresAt: Date.now() + 100000,
+        expiresAt: Date.now() + 100000
       };
       await dbAdapter.saveBiometricSession(session);
 
@@ -150,13 +150,13 @@ describe('biometricSessionService', () => {
         credentialId: 'test-cred-id',
         rawId: new Uint8Array([1, 2, 3]),
         prfEnabled: true,
-        initialPrfKey: mockKey,
+        initialPrfKey: mockKey
       });
       vi.spyOn(webAuthnPrf, 'getPrfKey').mockResolvedValue(mockKey);
       vi.spyOn(dataService, 'unlockDatabase').mockResolvedValue({
         success: false,
         data: null,
-        deductions: {},
+        deductions: {}
       });
 
       await biometricService.enrollBiometrics(77, 'old-password');
@@ -177,13 +177,13 @@ describe('biometricSessionService', () => {
         vaultId: 1,
         credentialId: 'c1',
         createdAt: Date.now(),
-        expiresAt: Date.now() + 100000,
+        expiresAt: Date.now() + 100000
       });
       await dbAdapter.saveBiometricSession({
         vaultId: 2,
         credentialId: 'c2',
         createdAt: Date.now(),
-        expiresAt: Date.now() + 100000,
+        expiresAt: Date.now() + 100000
       });
 
       let active = await biometricService.getActiveBiometricVaultIds();

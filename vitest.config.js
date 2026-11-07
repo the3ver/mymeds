@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
-import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vitest/config';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url';
 
 // Fixed user timezone (UTC+1/+2) so local-vs-UTC date bugs show up in CI, which runs in UTC
-process.env.TZ = 'Europe/Berlin'
+process.env.TZ = 'Europe/Berlin';
 
 export default defineConfig({
   plugins: [vue()],
@@ -14,21 +14,21 @@ export default defineConfig({
     // This is the key change: force Vuetify to be transformed by Vite during tests
     server: {
       deps: {
-        inline: [/vuetify/],
-      },
-    },
+        inline: [/vuetify/]
+      }
+    }
   },
   resolve: {
     alias: [
-      { 
-        find: '@', 
-        replacement: fileURLToPath(new URL('./src', import.meta.url)) 
+      {
+        find: '@',
+        replacement: fileURLToPath(new URL('./src', import.meta.url))
       },
       // This alias is still needed to handle the CSS files once they are inlined
-      { 
-        find: /.*\.css$/, 
+      {
+        find: /.*\.css$/,
         replacement: fileURLToPath(new URL('./tests/mocks/style.js', import.meta.url))
       }
     ]
   }
-})
+});

@@ -23,28 +23,28 @@ vi.mock('../../src/modules/meds/utils/bmpScannerService', async (importOriginal)
 // finish after teardown (EnvironmentTeardownError on slower CI runners).
 vi.mock('../../src/modules/meds/components/BmpScanDialog.vue', () => ({
   __esModule: true,
-  default: { name: 'BmpScanDialog', template: '<div class="bmp-scan-stub"></div>' },
+  default: { name: 'BmpScanDialog', template: '<div class="bmp-scan-stub"></div>' }
 }));
 vi.mock('../../src/modules/meds/components/BmpExportDialog.vue', () => ({
   __esModule: true,
-  default: { name: 'BmpExportDialog', template: '<div class="bmp-export-stub"></div>' },
+  default: { name: 'BmpExportDialog', template: '<div class="bmp-export-stub"></div>' }
 }));
 vi.mock('../../src/modules/common/components/DataDialog.vue', () => ({
   __esModule: true,
-  default: { name: 'DataDialog', template: '<div class="data-dialog-stub"></div>' },
+  default: { name: 'DataDialog', template: '<div class="data-dialog-stub"></div>' }
 }));
 
 vi.mock('../../src/modules/common/utils/shortcutService', () => ({
-  consumeShortcutIntent: vi.fn().mockReturnValue({ tab: null, action: null }),
+  consumeShortcutIntent: vi.fn().mockReturnValue({ tab: null, action: null })
 }));
 
 vi.mock('../../src/modules/common/utils/badgingService', () => ({
   updateCriticalMedsBadge: vi.fn().mockResolvedValue(0),
-  clearBadge: vi.fn().mockResolvedValue(undefined),
+  clearBadge: vi.fn().mockResolvedValue(undefined)
 }));
 
 vi.mock('../../src/modules/common/utils/dataService', () => ({
-  getSettings: vi.fn().mockResolvedValue({ redLimit: 7 }),
+  getSettings: vi.fn().mockResolvedValue({ redLimit: 7 })
 }));
 
 const vuetify = createVuetify({ components, directives });
@@ -65,21 +65,24 @@ describe('MainPage.vue', () => {
   });
 
   const mountMainPage = () => {
-    return mount({
-      template: `
+    return mount(
+      {
+        template: `
         <v-layout>
           <MainPage ref="page" />
         </v-layout>
       `,
-      components: { MainPage }
-    }, {
-      global: {
-        plugins: [vuetify, i18n],
-        stubs: {
-          CalendarPage: { template: '<div class="calendar-stub"></div>' }
+        components: { MainPage }
+      },
+      {
+        global: {
+          plugins: [vuetify, i18n],
+          stubs: {
+            CalendarPage: { template: '<div class="calendar-stub"></div>' }
+          }
         }
       }
-    });
+    );
   };
 
   it('renders BMP scan and BMP export buttons in meds tab', async () => {
@@ -115,7 +118,7 @@ describe('MainPage.vue', () => {
 
     mountMainPage();
     // Give a lazy import time to resolve; it would otherwise finish after teardown
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
 
     expect(loaded.scanner).toBe(false);
   });
@@ -124,7 +127,7 @@ describe('MainPage.vue', () => {
     shortcutService.consumeShortcutIntent.mockReturnValue({ tab: null, action: null });
 
     mountMainPage();
-    await new Promise(r => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 20));
 
     expect(badgingService.updateCriticalMedsBadge).toHaveBeenCalled();
   });

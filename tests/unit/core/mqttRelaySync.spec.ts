@@ -15,19 +15,19 @@ describe('core/sync/mqttRelaySync', () => {
     encryptionStrategy: 'password',
     passwordData: {
       salt: new Uint8Array([10, 20, 30, 40]),
-      iv: new Uint8Array([50, 60, 70, 80]),
+      iv: new Uint8Array([50, 60, 70, 80])
     },
     encryptedData: new Uint8Array([90, 100, 110, 120]).buffer as ArrayBuffer,
     metadata: {
       recordsCount: 42,
-      category: 'secure-notes',
-    },
+      category: 'secure-notes'
+    }
   };
 
   it('exports vault with custom payloadType and metadata', () => {
     const payload = exportVaultForSync(mockVault, {
       payloadType: 'custom-pwa-sync',
-      extractExtraMetadata: (v) => ({ exportedBy: 'test' }),
+      extractExtraMetadata: (v) => ({ exportedBy: 'test' })
     });
 
     expect(payload.type).toBe('custom-pwa-sync');

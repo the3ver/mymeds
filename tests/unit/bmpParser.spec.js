@@ -126,9 +126,7 @@ describe('bmpParser', () => {
 
   it('should parse JSON medication list as a flexible fallback', () => {
     const jsonStr = JSON.stringify({
-      meds: [
-        { name: 'Ibuprofen 400mg', dose: '1-0-1', count: 20, ingredient: 'Ibuprofen' }
-      ]
+      meds: [{ name: 'Ibuprofen 400mg', dose: '1-0-1', count: 20, ingredient: 'Ibuprofen' }]
     });
 
     const result = parseBmpData(jsonStr);

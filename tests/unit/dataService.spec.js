@@ -10,7 +10,6 @@ vi.mock('../../src/modules/common/utils/cryptoService');
 vi.mock('../../src/modules/meds/utils/medUtils');
 
 describe('dataService.unlockDatabase', () => {
-
   beforeEach(() => {
     // Clear all mocks before each test
     vi.clearAllMocks();
@@ -27,14 +26,14 @@ describe('dataService.unlockDatabase', () => {
       id: dbId,
       encryptionStrategy: 'password',
       passwordData: { salt: 'mockSalt', iv: 'mockIv' },
-      encryptedData: 'mockEncryptedData',
+      encryptedData: 'mockEncryptedData'
     };
-    
+
     // This is the state of the data BEFORE the update function is called
     const originalMeds = [{ name: 'Aspirin', count: 10, dose: '1' }];
     const mockDecryptedData = {
       meds: originalMeds,
-      lastDoseUpdate: lastUpdateDate,
+      lastDoseUpdate: lastUpdateDate
     };
 
     const mockDeductions = { Aspirin: 2 };
@@ -42,7 +41,7 @@ describe('dataService.unlockDatabase', () => {
       updated: true,
       updatedItems: [{ name: 'Aspirin', count: 8, dose: '1' }],
       newDate: newDate,
-      deductions: mockDeductions,
+      deductions: mockDeductions
     };
 
     // Mock the functions that will be called
@@ -59,10 +58,10 @@ describe('dataService.unlockDatabase', () => {
     expect(dbAdapter.getFullDatabase).toHaveBeenCalledWith(dbId);
     expect(crypto.deriveKeyFromPassword).toHaveBeenCalledWith(password, mockDbEntry.passwordData.salt);
     expect(crypto.decryptData).toHaveBeenCalledWith(mockDbEntry.encryptedData, mockDbEntry.passwordData.iv, 'mockKey');
-    
+
     // Assert that the check function was called with the ORIGINAL data
     expect(checkAndUpdateDailyDose).toHaveBeenCalledWith(originalMeds, lastUpdateDate);
-    
+
     expect(result.success).toBe(true);
     expect(result.data.meds).toEqual(mockUpdateResult.updatedItems); // Ensure data is updated
     expect(result.deductions).toEqual(mockDeductions); // Crucial check for deductions
@@ -78,17 +77,17 @@ describe('dataService.unlockDatabase', () => {
       id: dbId,
       encryptionStrategy: 'password',
       passwordData: { salt: 'mockSalt', iv: 'mockIv' },
-      encryptedData: 'mockEncryptedData',
+      encryptedData: 'mockEncryptedData'
     };
     const mockDecryptedData = {
       meds: [{ name: 'Aspirin', count: 10, dose: '1' }],
-      lastDoseUpdate: lastUpdateDate,
+      lastDoseUpdate: lastUpdateDate
     };
     const mockUpdateResult = {
       updated: false, // No update occurred
       updatedItems: mockDecryptedData.meds,
       newDate: lastUpdateDate,
-      deductions: {}, // No deductions
+      deductions: {} // No deductions
     };
 
     dbAdapter.getFullDatabase.mockResolvedValue(mockDbEntry);
@@ -113,7 +112,7 @@ describe('dataService.unlockDatabase', () => {
       id: dbId,
       encryptionStrategy: 'password',
       passwordData: { salt: 'mockSalt', iv: 'mockIv' },
-      encryptedData: 'mockEncryptedData',
+      encryptedData: 'mockEncryptedData'
     };
 
     dbAdapter.getFullDatabase.mockResolvedValue(mockDbEntry);
@@ -151,7 +150,7 @@ describe('dataService.createDatabaseWithPassword', () => {
       expect.objectContaining({
         meds: [],
         calendar: [],
-        lastDoseUpdate: expect.any(String),
+        lastDoseUpdate: expect.any(String)
       }),
       'mockKey'
     );
@@ -162,7 +161,7 @@ describe('dataService.createDatabaseWithPassword', () => {
         calendarCount: 0,
         encryptionStrategy: 'password',
         passwordData: { salt: 'mockSalt', iv: 'mockIv' },
-        encryptedData: 'mockEncrypted',
+        encryptedData: 'mockEncrypted'
       })
     );
     expect(result).toBe(123);
@@ -182,7 +181,7 @@ describe('dataService.saveAndLockDatabase', () => {
       passwordData: { salt: 'salt123', iv: 'oldIv' },
       encryptedData: 'oldEncrypted',
       medsCount: 0,
-      calendarCount: 0,
+      calendarCount: 0
     };
 
     dbAdapter.getFullDatabase.mockResolvedValue(existingDb);
@@ -193,7 +192,7 @@ describe('dataService.saveAndLockDatabase', () => {
     const payload = {
       meds: [{ name: 'Aspirin' }, { name: 'Ibuprofen' }],
       calendar: [{ title: 'Arzt' }],
-      version: 2,
+      version: 2
     };
 
     await dataService.saveAndLockDatabase(1, 'password', payload);
@@ -208,7 +207,7 @@ describe('dataService.saveAndLockDatabase', () => {
         encryptedData: 'newEncrypted',
         medsCount: 2,
         calendarCount: 1,
-        modifiedAt: expect.any(Date),
+        modifiedAt: expect.any(Date)
       })
     );
   });
@@ -216,9 +215,9 @@ describe('dataService.saveAndLockDatabase', () => {
   it('should throw an error when database to save is not found', async () => {
     dbAdapter.getFullDatabase.mockResolvedValue(null);
 
-    await expect(
-      dataService.saveAndLockDatabase(999, 'password', { meds: [] })
-    ).rejects.toThrow('Database not found for saving.');
+    await expect(dataService.saveAndLockDatabase(999, 'password', { meds: [] })).rejects.toThrow(
+      'Database not found for saving.'
+    );
   });
 });
 
@@ -241,5 +240,3 @@ describe('dataService.saveDisclaimerAccepted', () => {
     expect(dbAdapter.saveVaultDisplayMode).toHaveBeenCalledWith('simple');
   });
 });
-
-

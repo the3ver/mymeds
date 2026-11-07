@@ -46,17 +46,17 @@ describe('WhatsNewDialog.vue', () => {
     expect(latest.version).toBe('1.10.15');
     expect(latest.title.de).toContain('nur noch einmal');
     expect(latest.title.en).toContain('Only Once');
-    expect(latest.highlights.de.some(h => h.includes('jedem Start'))).toBe(true);
-    expect(latest.highlights.en.some(h => h.includes('every app start'))).toBe(true);
+    expect(latest.highlights.de.some((h) => h.includes('jedem Start'))).toBe(true);
+    expect(latest.highlights.en.some((h) => h.includes('every app start'))).toBe(true);
   });
 
   it('toggles older versions when button is clicked', async () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
-    const toggleBtn = wrapper.findAllComponents(components.VBtn).find(btn =>
-      btn.text().includes('Ältere Versionen anzeigen')
-    );
+    const toggleBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.text().includes('Ältere Versionen anzeigen'));
     expect(toggleBtn).toBeDefined();
 
     await toggleBtn.trigger('click');
@@ -72,9 +72,9 @@ describe('WhatsNewDialog.vue', () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
-    const closeBtn = wrapper.findAllComponents(components.VBtn).find(btn =>
-      btn.text().includes('Verstanden') || btn.text().includes('Got it')
-    );
+    const closeBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.text().includes('Verstanden') || btn.text().includes('Got it'));
     expect(closeBtn).toBeDefined();
 
     await closeBtn.trigger('click');

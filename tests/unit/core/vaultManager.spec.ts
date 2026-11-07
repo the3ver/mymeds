@@ -8,7 +8,7 @@ describe('core/manager/VaultManager', () => {
   beforeEach(async () => {
     const storage = createVaultStorage({
       dbName: 'TestManagerDB_' + Math.random().toString(36).substring(2, 8),
-      dbVersion: 1,
+      dbVersion: 1
     });
     await storage.clearAll();
     manager = new VaultManager(storage);
@@ -22,18 +22,13 @@ describe('core/manager/VaultManager', () => {
 
     const initialData: TestData = {
       notes: ['buy milk', 'feed cat'],
-      lastUpdate: '2026-01-01',
+      lastUpdate: '2026-01-01'
     };
 
     // 1. Create vault with metadata extraction hook
-    const vaultId = await manager.createVaultWithPassword(
-      'Daily Notes',
-      'secret123',
-      initialData,
-      {
-        extractMetadata: (d) => ({ noteCount: d.notes.length }),
-      }
-    );
+    const vaultId = await manager.createVaultWithPassword('Daily Notes', 'secret123', initialData, {
+      extractMetadata: (d) => ({ noteCount: d.notes.length })
+    });
 
     expect(vaultId).toBeDefined();
 
@@ -55,11 +50,11 @@ describe('core/manager/VaultManager', () => {
         return {
           data: {
             ...data,
-            lastUpdate: '2026-09-05', // simulated migration or update
+            lastUpdate: '2026-09-05' // simulated migration or update
           },
-          metadata: { sessionChecked: true },
+          metadata: { sessionChecked: true }
         };
-      },
+      }
     });
 
     expect(unlockResult.success).toBe(true);
@@ -69,14 +64,9 @@ describe('core/manager/VaultManager', () => {
 
     // 4. Save modified data with derived key in memory
     unlockResult.data!.notes.push('call doctor');
-    await manager.saveVaultData(
-      vaultId,
-      unlockResult.key!,
-      unlockResult.data!,
-      {
-        extractMetadata: (d) => ({ noteCount: d.notes.length }),
-      }
-    );
+    await manager.saveVaultData(vaultId, unlockResult.key!, unlockResult.data!, {
+      extractMetadata: (d) => ({ noteCount: d.notes.length })
+    });
 
     // 5. Unlock again and verify changes persisted
     const secondUnlock = await manager.unlockVault<TestData>(vaultId, 'secret123');

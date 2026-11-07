@@ -1,14 +1,23 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import DoseInput from './DoseInput.vue'
-import PillAvatar from './PillAvatar.vue'
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import DoseInput from './DoseInput.vue';
+import PillAvatar from './PillAvatar.vue';
 
 const props = defineProps({
   modelValue: Boolean,
   med: {
     type: Object,
-    default: () => ({ name: '', ingredient: '', count: '', packageSize: '', dose: '', color: '', shape: 'letter', pillSize: 'medium' })
+    default: () => ({
+      name: '',
+      ingredient: '',
+      count: '',
+      packageSize: '',
+      dose: '',
+      color: '',
+      shape: 'letter',
+      pillSize: 'medium'
+    })
   },
   title: {
     type: String,
@@ -18,15 +27,17 @@ const props = defineProps({
     type: String,
     default: 'Save'
   }
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'confirm'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'confirm']);
+const { t } = useI18n();
 
-const localMed = ref({ ...props.med })
-const scheduleType = ref(props.med?.schedule?.type || 'daily')
-const weeklyDays = ref(Array.isArray(props.med?.schedule?.days) && props.med.schedule.days.length > 0 ? [...props.med.schedule.days] : ['mo'])
-const intervalDays = ref(props.med?.schedule?.intervalDays || 2)
+const localMed = ref({ ...props.med });
+const scheduleType = ref(props.med?.schedule?.type || 'daily');
+const weeklyDays = ref(
+  Array.isArray(props.med?.schedule?.days) && props.med.schedule.days.length > 0 ? [...props.med.schedule.days] : ['mo']
+);
+const intervalDays = ref(props.med?.schedule?.intervalDays || 2);
 
 const availableWeekdays = [
   { id: 'mo', labelKey: 'med.dayMo' },
@@ -35,24 +46,35 @@ const availableWeekdays = [
   { id: 'do', labelKey: 'med.dayDo' },
   { id: 'fr', labelKey: 'med.dayFr' },
   { id: 'sa', labelKey: 'med.daySa' },
-  { id: 'so', labelKey: 'med.daySo' },
-]
+  { id: 'so', labelKey: 'med.daySo' }
+];
 
 function toggleDay(dayId) {
   if (weeklyDays.value.includes(dayId)) {
     if (weeklyDays.value.length > 1) {
-      weeklyDays.value = weeklyDays.value.filter(d => d !== dayId)
+      weeklyDays.value = weeklyDays.value.filter((d) => d !== dayId);
     }
   } else {
-    weeklyDays.value.push(dayId)
+    weeklyDays.value.push(dayId);
   }
 }
 
 // Expanded palette with white, deep-orange, amber
 const colors = [
-  'white', 'deep-orange', 'orange', 'amber', 'red', 'pink',
-  'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'blue-grey'
-]
+  'white',
+  'deep-orange',
+  'orange',
+  'amber',
+  'red',
+  'pink',
+  'purple',
+  'indigo',
+  'blue',
+  'cyan',
+  'teal',
+  'green',
+  'blue-grey'
+];
 
 const availableShapes = [
   { id: 'letter', labelKey: 'med.shapes.letter' },
@@ -72,38 +94,45 @@ const availableShapes = [
   { id: 'syringe', labelKey: 'med.shapes.syringe' },
   { id: 'inhaler', labelKey: 'med.shapes.inhaler' },
   { id: 'tube', labelKey: 'med.shapes.tube' },
-  { id: 'patch', labelKey: 'med.shapes.patch' },
-]
+  { id: 'patch', labelKey: 'med.shapes.patch' }
+];
 
 // Watch for dialog opening to reset/set values
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    localMed.value = { ...props.med }
-    if (props.med?.schedule) {
-      scheduleType.value = props.med.schedule.type || 'daily'
-      weeklyDays.value = Array.isArray(props.med.schedule.days) && props.med.schedule.days.length > 0 ? [...props.med.schedule.days] : ['mo']
-      intervalDays.value = props.med.schedule.intervalDays || 2
-    } else {
-      scheduleType.value = 'daily'
-      weeklyDays.value = ['mo']
-      intervalDays.value = 2
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      localMed.value = { ...props.med };
+      if (props.med?.schedule) {
+        scheduleType.value = props.med.schedule.type || 'daily';
+        weeklyDays.value =
+          Array.isArray(props.med.schedule.days) && props.med.schedule.days.length > 0
+            ? [...props.med.schedule.days]
+            : ['mo'];
+        intervalDays.value = props.med.schedule.intervalDays || 2;
+      } else {
+        scheduleType.value = 'daily';
+        weeklyDays.value = ['mo'];
+        intervalDays.value = 2;
+      }
+      // Set default color if none exists
+      if (!localMed.value.color) {
+        localMed.value.color = colors[0];
+      }
+      if (!localMed.value.shape) {
+        localMed.value.shape = 'letter';
+      }
+      if (!localMed.value.pillSize) {
+        localMed.value.pillSize = 'medium';
+      }
     }
-    // Set default color if none exists
-    if (!localMed.value.color) {
-      localMed.value.color = colors[0]
-    }
-    if (!localMed.value.shape) {
-      localMed.value.shape = 'letter'
-    }
-    if (!localMed.value.pillSize) {
-      localMed.value.pillSize = 'medium'
-    }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+);
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 
 const save = () => {
   if (localMed.value.name && localMed.value.count && localMed.value.dose) {
@@ -111,28 +140,28 @@ const save = () => {
       localMed.value.schedule = {
         type: 'weekly',
         days: weeklyDays.value
-      }
+      };
     } else if (scheduleType.value === 'interval') {
       localMed.value.schedule = {
         type: 'interval',
         intervalDays: Math.max(1, parseInt(intervalDays.value, 10) || 1)
-      }
+      };
     } else {
-      delete localMed.value.schedule
+      delete localMed.value.schedule;
     }
-    emit('confirm', localMed.value)
-    close()
+    emit('confirm', localMed.value);
+    close();
   }
-}
+};
 
 const setPackageSize = (size) => {
-  localMed.value.packageSize = size
-}
+  localMed.value.packageSize = size;
+};
 
 const addPackageSize = (size) => {
-  const currentCount = parseFloat(localMed.value.count) || 0
-  localMed.value.count = currentCount + size
-}
+  const currentCount = parseFloat(localMed.value.count) || 0;
+  localMed.value.count = currentCount + size;
+};
 
 defineExpose({
   scheduleType,
@@ -143,7 +172,7 @@ defineExpose({
   localMed,
   colors,
   availableShapes
-})
+});
 </script>
 
 <template>
@@ -166,11 +195,7 @@ defineExpose({
           variant="underlined"
           autofocus
         ></v-text-field>
-        <v-text-field
-          v-model="localMed.ingredient"
-          :label="t('med.ingredient')"
-          variant="underlined"
-        ></v-text-field>
+        <v-text-field v-model="localMed.ingredient" :label="t('med.ingredient')" variant="underlined"></v-text-field>
 
         <v-text-field
           v-model="localMed.packageSize"
@@ -261,7 +286,9 @@ defineExpose({
             :class="{ 'color-btn--white': color === 'white' }"
             @click="localMed.color = color"
           >
-            <v-icon v-if="localMed.color === color" :color="color === 'white' ? 'grey-darken-4' : 'white'" size="16">mdi-check</v-icon>
+            <v-icon v-if="localMed.color === color" :color="color === 'white' ? 'grey-darken-4' : 'white'" size="16"
+              >mdi-check</v-icon
+            >
             <span v-else></span>
           </v-btn>
         </div>

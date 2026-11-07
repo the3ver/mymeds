@@ -3,19 +3,22 @@ import { ref, watch } from 'vue';
 
 const props = defineProps({
   modelValue: Boolean,
-  currentName: String,
+  currentName: String
 });
 const emit = defineEmits(['update:modelValue', 'save']);
 
 const newName = ref('');
 const error = ref(null);
 
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    newName.value = props.currentName;
-    error.value = null;
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      newName.value = props.currentName;
+      error.value = null;
+    }
   }
-});
+);
 
 const close = () => {
   emit('update:modelValue', false);

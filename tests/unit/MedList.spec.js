@@ -12,8 +12,8 @@ vi.mock('../../src/modules/common/utils/dataService', () => ({
   getSettings: vi.fn().mockResolvedValue({
     sortMode: 'added',
     yellowLimit: 21,
-    redLimit: 7,
-  }),
+    redLimit: 7
+  })
 }));
 
 const vuetify = createVuetify({ components, directives });
@@ -22,8 +22,8 @@ const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', mes
 describe('MedList.vue', () => {
   const sampleMeds = [
     { name: 'Z-Medikament', count: 30, dose: '1', packageSize: 30 }, // 30 days
-    { name: 'A-Medikament', count: 6, dose: '1', packageSize: 10 },  // 6 days (red limit)
-    { name: 'M-Medikament', count: 14, dose: '1', packageSize: 20 }, // 14 days (yellow limit)
+    { name: 'A-Medikament', count: 6, dose: '1', packageSize: 10 }, // 6 days (red limit)
+    { name: 'M-Medikament', count: 14, dose: '1', packageSize: 20 } // 14 days (yellow limit)
   ];
 
   const mountComponent = (props = {}) => {
@@ -31,11 +31,11 @@ describe('MedList.vue', () => {
       props: {
         items: sampleMeds,
         deductions: {},
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 
@@ -43,7 +43,7 @@ describe('MedList.vue', () => {
     dataService.getSettings.mockResolvedValue({
       sortMode: 'added',
       yellowLimit: 21,
-      redLimit: 7,
+      redLimit: 7
     });
   });
 
@@ -69,14 +69,14 @@ describe('MedList.vue', () => {
     dataService.getSettings.mockResolvedValue({
       sortMode: 'name',
       yellowLimit: 21,
-      redLimit: 7,
+      redLimit: 7
     });
 
     const wrapper = mountComponent();
-    await new Promise(resolve => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     await wrapper.vm.$nextTick();
 
-    const titles = wrapper.findAll('.v-card-title').map(el => el.text());
+    const titles = wrapper.findAll('.v-card-title').map((el) => el.text());
     expect(titles[0]).toContain('A-Medikament');
     expect(titles[1]).toContain('M-Medikament');
     expect(titles[2]).toContain('Z-Medikament');
@@ -86,14 +86,14 @@ describe('MedList.vue', () => {
     dataService.getSettings.mockResolvedValue({
       sortMode: 'days',
       yellowLimit: 21,
-      redLimit: 7,
+      redLimit: 7
     });
 
     const wrapper = mountComponent();
-    await new Promise(resolve => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     await wrapper.vm.$nextTick();
 
-    const titles = wrapper.findAll('.v-card-title').map(el => el.text());
+    const titles = wrapper.findAll('.v-card-title').map((el) => el.text());
     // Days order: A (6 days), M (14 days), Z (30 days)
     expect(titles[0]).toContain('A-Medikament');
     expect(titles[1]).toContain('M-Medikament');

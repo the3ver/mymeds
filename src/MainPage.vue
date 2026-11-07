@@ -1,32 +1,32 @@
 <script setup>
-import { ref, onMounted, watch, defineAsyncComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { state as appState } from './app-state'
-import MedDialog from './modules/meds/components/MedDialog.vue'
-import MedList from './modules/meds/components/MedList.vue'
-import CalendarPage from './modules/calendar/components/CalendarPage.vue'
-import { consumeShortcutIntent } from './modules/common/utils/shortcutService'
-import { updateCriticalMedsBadge } from './modules/common/utils/badgingService'
-import { getSettings } from './modules/common/utils/dataService'
+import { ref, onMounted, watch, defineAsyncComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { state as appState } from './app-state';
+import MedDialog from './modules/meds/components/MedDialog.vue';
+import MedList from './modules/meds/components/MedList.vue';
+import CalendarPage from './modules/calendar/components/CalendarPage.vue';
+import { consumeShortcutIntent } from './modules/common/utils/shortcutService';
+import { updateCriticalMedsBadge } from './modules/common/utils/badgingService';
+import { getSettings } from './modules/common/utils/dataService';
 
-const BmpScanDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpScanDialog.vue'))
-const BmpExportDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpExportDialog.vue'))
-const DataDialog = defineAsyncComponent(() => import('./modules/common/components/DataDialog.vue'))
+const BmpScanDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpScanDialog.vue'));
+const BmpExportDialog = defineAsyncComponent(() => import('./modules/meds/components/BmpExportDialog.vue'));
+const DataDialog = defineAsyncComponent(() => import('./modules/common/components/DataDialog.vue'));
 
 defineProps({
-  dataDialogOpen: Boolean,
+  dataDialogOpen: Boolean
 });
 const emit = defineEmits(['update:dataDialogOpen', 'update:activeTab']);
 
-const { t } = useI18n()
-const medDialog = ref(false)
-const bmpScanDialog = ref(false)
-const bmpExportDialog = ref(false)
-const editDialog = ref(false)
-const editingIndex = ref(-1)
-const currentEditMed = ref({})
-const activeTab = ref('meds')
-const calendarPageRef = ref(null)
+const { t } = useI18n();
+const medDialog = ref(false);
+const bmpScanDialog = ref(false);
+const bmpExportDialog = ref(false);
+const editDialog = ref(false);
+const editingIndex = ref(-1);
+const currentEditMed = ref({});
+const activeTab = ref('meds');
+const calendarPageRef = ref(null);
 
 watch(activeTab, (newTab) => {
   emit('update:activeTab', newTab);
@@ -71,44 +71,44 @@ onMounted(async () => {
 
 // --- Component Logic ---
 const openMedDialog = () => {
-  medDialog.value = true
-}
+  medDialog.value = true;
+};
 
 const addItem = (med) => {
-  appState.decryptedData.meds.unshift(med)
-}
+  appState.decryptedData.meds.unshift(med);
+};
 
 const deleteItem = (index) => {
-  appState.decryptedData.meds.splice(index, 1)
-}
+  appState.decryptedData.meds.splice(index, 1);
+};
 
 const openEditDialog = (index) => {
-  editingIndex.value = index
-  currentEditMed.value = { ...appState.decryptedData.meds[index] }
-  editDialog.value = true
-}
+  editingIndex.value = index;
+  currentEditMed.value = { ...appState.decryptedData.meds[index] };
+  editDialog.value = true;
+};
 
 const saveEdit = (med) => {
   if (editingIndex.value > -1) {
-    appState.decryptedData.meds[editingIndex.value] = med
-    editingIndex.value = -1
+    appState.decryptedData.meds[editingIndex.value] = med;
+    editingIndex.value = -1;
   }
-}
+};
 
 const openCalendarFilter = () => {
   if (calendarPageRef.value) {
-    calendarPageRef.value.openFilterDialog()
+    calendarPageRef.value.openFilterDialog();
   }
-}
+};
 
 const openCalendarAddDialog = () => {
   if (calendarPageRef.value) {
-    calendarPageRef.value.openTypeDialog()
+    calendarPageRef.value.openTypeDialog();
   }
-}
+};
 
 defineExpose({
-  openCalendarFilter,
+  openCalendarFilter
 });
 </script>
 
@@ -129,7 +129,7 @@ defineExpose({
             variant="outlined"
             color="grey"
             @click="openMedDialog"
-            style="border-style: dashed !important; border-width: 2px;"
+            style="border-style: dashed !important; border-width: 2px"
           >
             <v-card-text class="d-flex align-center justify-center py-3">
               <v-icon start size="large">mdi-plus</v-icon>
@@ -165,7 +165,7 @@ defineExpose({
       <v-window-item value="calendar">
         <CalendarPage
           :initial-entries="appState.decryptedData.calendar"
-          @update:entries="newEntries => appState.decryptedData.calendar = newEntries"
+          @update:entries="(newEntries) => (appState.decryptedData.calendar = newEntries)"
           ref="calendarPageRef"
         />
       </v-window-item>
@@ -194,12 +194,7 @@ defineExpose({
       </v-btn>
     </v-bottom-navigation>
 
-    <MedDialog
-      v-model="medDialog"
-      :title="t('dialog.addTitle')"
-      :confirm-text="t('dialog.add')"
-      @confirm="addItem"
-    />
+    <MedDialog v-model="medDialog" :title="t('dialog.addTitle')" :confirm-text="t('dialog.add')" @confirm="addItem" />
 
     <MedDialog
       v-model="editDialog"
@@ -213,13 +208,18 @@ defineExpose({
 
     <BmpExportDialog v-if="bmpExportDialog" v-model="bmpExportDialog" />
 
-    <DataDialog v-if="dataDialogOpen" :model-value="dataDialogOpen" @update:model-value="val => emit('update:dataDialogOpen', val)" />
+    <DataDialog
+      v-if="dataDialogOpen"
+      :model-value="dataDialogOpen"
+      @update:model-value="(val) => emit('update:dataDialogOpen', val)"
+    />
   </div>
 </template>
 
 <style>
 /* Global style to prevent pull-to-refresh on this page */
-html, body {
+html,
+body {
   overscroll-behavior-y: contain;
 }
 </style>

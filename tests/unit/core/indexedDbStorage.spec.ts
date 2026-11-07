@@ -10,7 +10,7 @@ describe('core/storage/indexedDbStorage', () => {
       dbName: 'TestVaultDB_' + Math.random().toString(36).substring(2, 8),
       dbVersion: 1,
       vaultStoreName: 'vaults',
-      settingsStoreName: 'settings',
+      settingsStoreName: 'settings'
     });
     await storage.clearAll();
   });
@@ -24,7 +24,7 @@ describe('core/storage/indexedDbStorage', () => {
       encryptionStrategy: 'password',
       passwordData: { salt: new Uint8Array([1, 2, 3]), iv: new Uint8Array([4, 5, 6]) },
       encryptedData: new ArrayBuffer(16),
-      metadata: { itemCount: 10, category: 'finance' },
+      metadata: { itemCount: 10, category: 'finance' }
     };
 
     const id = await storage.createVault(newEntry);
@@ -51,7 +51,7 @@ describe('core/storage/indexedDbStorage', () => {
       modifiedAt: new Date(),
       encryptionStrategy: 'password',
       passwordData: { salt: new Uint8Array(16), iv: new Uint8Array(12) },
-      encryptedData: new ArrayBuffer(8),
+      encryptedData: new ArrayBuffer(8)
     });
 
     await storage.renameVault(id, 'New Name');

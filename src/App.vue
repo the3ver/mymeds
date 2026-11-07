@@ -33,8 +33,14 @@ function handleVaultImported() {
 
 function isNewerVersion(current, previous) {
   if (!previous) return true;
-  const c = String(current || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
-  const p = String(previous || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const c = String(current || '')
+    .replace(/^v/, '')
+    .split('.')
+    .map((n) => parseInt(n, 10) || 0);
+  const p = String(previous || '')
+    .replace(/^v/, '')
+    .split('.')
+    .map((n) => parseInt(n, 10) || 0);
   for (let i = 0; i < Math.max(c.length, p.length); i++) {
     const cNum = c[i] || 0;
     const pNum = p[i] || 0;
@@ -48,10 +54,7 @@ onMounted(async () => {
   // Compare against the version the dialog stores on close, not the app version:
   // a release without its own changelog entry has nothing new to show.
   const latestChangelogVersion = getLatestChangelog().version;
-  const [settings, dbs] = await Promise.all([
-    dataService.getSettings(),
-    dataService.getDatabaseList()
-  ]);
+  const [settings, dbs] = await Promise.all([dataService.getSettings(), dataService.getDatabaseList()]);
   isExistingUser.value = Array.isArray(dbs) && dbs.length > 0;
 
   if (!settings?.disclaimerAccepted) {
@@ -66,33 +69,36 @@ onMounted(async () => {
     }
   }
 
-  onServiceWorkerUpdate(reg => {
+  onServiceWorkerUpdate((reg) => {
     pendingRegistration.value = reg;
     updateAvailableSnackbar.value = true;
   });
 
   // Reminders check & periodic sync registration
   if (reminderService.isReminderSupported()) {
-    dataService.getReminderSettings().then(async (reminders) => {
-      if (reminders?.enabled) {
-        await reminderService.registerPeriodicSync();
-        const { hasChanges, updatedLastNotified } = reminderService.evaluateDueReminders(reminders);
-        if (hasChanges) {
-          await dataService.saveReminderSettings({
-            ...reminders,
-            lastNotified: updatedLastNotified
-          });
-          await reminderService.sendTestNotification(
-            t('reminders.notificationTitle'),
-            t('reminders.notificationBody')
-          );
+    dataService
+      .getReminderSettings()
+      .then(async (reminders) => {
+        if (reminders?.enabled) {
+          await reminderService.registerPeriodicSync();
+          const { hasChanges, updatedLastNotified } = reminderService.evaluateDueReminders(reminders);
+          if (hasChanges) {
+            await dataService.saveReminderSettings({
+              ...reminders,
+              lastNotified: updatedLastNotified
+            });
+            await reminderService.sendTestNotification(
+              t('reminders.notificationTitle'),
+              t('reminders.notificationBody')
+            );
+          }
         }
-      }
-    }).catch(err => console.warn('[App] Reminders init error:', err));
+      })
+      .catch((err) => console.warn('[App] Reminders init error:', err));
   }
 
   // Auto-request storage persistence in the background
-  autoRequestPersistence().catch(err => console.warn('[App] Storage persistence error:', err));
+  autoRequestPersistence().catch((err) => console.warn('[App] Storage persistence error:', err));
 });
 
 function reloadApp() {
@@ -158,12 +164,7 @@ function openCalendarFilter() {
     <WhatsNewDialog v-model="whatsNewDialog" />
 
     <!-- Background Update Available Banner/Snackbar -->
-    <v-snackbar
-      v-model="updateAvailableSnackbar"
-      color="primary"
-      :timeout="-1"
-      location="bottom center"
-    >
+    <v-snackbar v-model="updateAvailableSnackbar" color="primary" :timeout="-1" location="bottom center">
       {{ t('updates.updateReady') }}
       <template v-slot:actions>
         <v-btn
@@ -175,14 +176,10 @@ function openCalendarFilter() {
         >
           {{ t('updates.reloadNow') }}
         </v-btn>
-        <v-btn
-          variant="text"
-          @click="updateAvailableSnackbar = false"
-        >
+        <v-btn variant="text" @click="updateAvailableSnackbar = false">
           {{ t('about.close') }}
         </v-btn>
       </template>
     </v-snackbar>
   </v-app>
 </template>
-

@@ -9,7 +9,7 @@ export interface SyncPayload {
     encryptionStrategy: string;
     passwordData: {
       salt: string; // Base64
-      iv: string;   // Base64
+      iv: string; // Base64
       credentialId?: string;
     };
     encryptedData: string; // Base64

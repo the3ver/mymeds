@@ -2,11 +2,10 @@ import {
   checkAndUpdateDailyDose,
   parseDose,
   calculateDaysRemaining,
-  getStatusColor,
+  getStatusColor
 } from '../../src/modules/meds/utils/medUtils';
 
 describe('checkAndUpdateDailyDose', () => {
-
   const today = new Date('2023-10-27T10:00:00.000Z');
   const yesterday = new Date('2023-10-26T10:00:00.000Z');
   const twoDaysAgo = new Date('2023-10-25T10:00:00.000Z');
@@ -15,7 +14,7 @@ describe('checkAndUpdateDailyDose', () => {
     { name: 'Aspirin', count: 10, dose: '1' },
     { name: 'Ibuprofen', count: 20, dose: '2-0-2' }, // Total dose: 4
     { name: 'Vitamin C', count: 5, dose: '0' },
-    { name: 'Paracetamol', count: 1, dose: '1' },
+    { name: 'Paracetamol', count: 1, dose: '1' }
   ];
 
   it('should not update items if last update was today', () => {
@@ -43,16 +42,16 @@ describe('checkAndUpdateDailyDose', () => {
 
     // Check deductions
     expect(deductions).toEqual({
-      'Aspirin': 1,
-      'Ibuprofen': 4,
-      'Paracetamol': 1,
+      Aspirin: 1,
+      Ibuprofen: 4,
+      Paracetamol: 1
     });
 
     // Check updated counts
-    expect(updatedItems.find(m => m.name === 'Aspirin').count).toBe(9); // 10 - 1
-    expect(updatedItems.find(m => m.name === 'Ibuprofen').count).toBe(16); // 20 - 4
-    expect(updatedItems.find(m => m.name === 'Vitamin C').count).toBe(5); // No change
-    expect(updatedItems.find(m => m.name === 'Paracetamol').count).toBe(0); // 1 - 1
+    expect(updatedItems.find((m) => m.name === 'Aspirin').count).toBe(9); // 10 - 1
+    expect(updatedItems.find((m) => m.name === 'Ibuprofen').count).toBe(16); // 20 - 4
+    expect(updatedItems.find((m) => m.name === 'Vitamin C').count).toBe(5); // No change
+    expect(updatedItems.find((m) => m.name === 'Paracetamol').count).toBe(0); // 1 - 1
   });
 
   it('should update items and calculate deductions for multiple days', () => {
@@ -68,51 +67,39 @@ describe('checkAndUpdateDailyDose', () => {
 
     // Check deductions
     expect(deductions).toEqual({
-      'Aspirin': 1 * diffDays,
-      'Ibuprofen': 4 * diffDays,
-      'Paracetamol': 1 * diffDays,
+      Aspirin: 1 * diffDays,
+      Ibuprofen: 4 * diffDays,
+      Paracetamol: 1 * diffDays
     });
 
     // Check updated counts
-    expect(updatedItems.find(m => m.name === 'Aspirin').count).toBe(10 - (1 * diffDays));
-    expect(updatedItems.find(m => m.name === 'Ibuprofen').count).toBe(20 - (4 * diffDays));
-    expect(updatedItems.find(m => m.name === 'Vitamin C').count).toBe(5);
+    expect(updatedItems.find((m) => m.name === 'Aspirin').count).toBe(10 - 1 * diffDays);
+    expect(updatedItems.find((m) => m.name === 'Ibuprofen').count).toBe(20 - 4 * diffDays);
+    expect(updatedItems.find((m) => m.name === 'Vitamin C').count).toBe(5);
   });
 
   it('should not let count go below zero', () => {
     const lowStockMeds = [{ name: 'Aspirin', count: 1, dose: '2' }];
-    const { updatedItems, deductions } = checkAndUpdateDailyDose(
-      lowStockMeds,
-      yesterday.toDateString(),
-      today
-    );
+    const { updatedItems, deductions } = checkAndUpdateDailyDose(lowStockMeds, yesterday.toDateString(), today);
 
     expect(deductions['Aspirin']).toBe(2);
-    expect(updatedItems.find(m => m.name === 'Aspirin').count).toBe(0);
+    expect(updatedItems.find((m) => m.name === 'Aspirin').count).toBe(0);
   });
 
   it('should handle empty items array', () => {
-    const { updated, updatedItems, deductions } = checkAndUpdateDailyDose(
-      [],
-      yesterday.toDateString(),
-      today
-    );
+    const { updated, updatedItems, deductions } = checkAndUpdateDailyDose([], yesterday.toDateString(), today);
 
     expect(updated).toBe(true);
     expect(updatedItems).toEqual([]);
     expect(deductions).toEqual({});
   });
-  
+
   it('should handle floating point doses and counts correctly', () => {
     const floatMeds = [{ name: 'TestMed', count: 5.5, dose: '0.5-0-0.5' }]; // dose = 1
-    const { updatedItems, deductions } = checkAndUpdateDailyDose(
-      floatMeds,
-      yesterday.toDateString(),
-      today
-    );
+    const { updatedItems, deductions } = checkAndUpdateDailyDose(floatMeds, yesterday.toDateString(), today);
 
     expect(deductions['TestMed']).toBe(1);
-    expect(updatedItems.find(m => m.name === 'TestMed').count).toBe(4.5);
+    expect(updatedItems.find((m) => m.name === 'TestMed').count).toBe(4.5);
   });
 
   it('should calculate deductions according to weekly schedule', () => {
@@ -132,8 +119,8 @@ describe('checkAndUpdateDailyDose', () => {
     const res1 = checkAndUpdateDailyDose(weeklyMeds, monday.toDateString(), tuesday);
     expect(res1.deductions['MondayInjection']).toBeUndefined();
     expect(res1.deductions['TuesdayPill']).toBe(1);
-    expect(res1.updatedItems.find(m => m.name === 'MondayInjection').count).toBe(4);
-    expect(res1.updatedItems.find(m => m.name === 'TuesdayPill').count).toBe(9);
+    expect(res1.updatedItems.find((m) => m.name === 'MondayInjection').count).toBe(4);
+    expect(res1.updatedItems.find((m) => m.name === 'TuesdayPill').count).toBe(9);
 
     // From Monday to next Monday (7 days later): both should deduct 1 each
     const res2 = checkAndUpdateDailyDose(weeklyMeds, monday.toDateString(), nextMonday);
@@ -143,9 +130,7 @@ describe('checkAndUpdateDailyDose', () => {
 
   it('should calculate deductions according to interval schedule', () => {
     // 2 days difference with interval = 2 days -> deduct 1
-    const meds = [
-      { name: 'AltDayMed', count: 10, dose: '1', schedule: { type: 'interval', intervalDays: 2 } }
-    ];
+    const meds = [{ name: 'AltDayMed', count: 10, dose: '1', schedule: { type: 'interval', intervalDays: 2 } }];
 
     // 1 day passed: 0 deducted
     const res1 = checkAndUpdateDailyDose(meds, yesterday.toDateString(), today); // 1 day diff
@@ -161,8 +146,18 @@ describe('checkAndUpdateDailyDose', () => {
   it('should count interval occurrences relative to startDate', () => {
     const now = new Date(2026, 2, 10, 12, 0, 0);
     const meds = [
-      { name: 'Every3', count: 10, dose: '2', schedule: { type: 'interval', intervalDays: 3, startDate: '2026-03-01' } },
-      { name: 'FutureStart', count: 10, dose: '1', schedule: { type: 'interval', intervalDays: 2, startDate: '2026-03-09' } }
+      {
+        name: 'Every3',
+        count: 10,
+        dose: '2',
+        schedule: { type: 'interval', intervalDays: 3, startDate: '2026-03-01' }
+      },
+      {
+        name: 'FutureStart',
+        count: 10,
+        dose: '1',
+        schedule: { type: 'interval', intervalDays: 2, startDate: '2026-03-09' }
+      }
     ];
 
     // Days 03-04 .. 03-10: occurrences on 03-04, 03-07, 03-10 -> 3 * 2
@@ -181,9 +176,9 @@ describe('checkAndUpdateDailyDose', () => {
     );
 
     // It should mark as "updated" because the date is being fixed
-    expect(updated).toBe(true); 
+    expect(updated).toBe(true);
     // The items themselves should not be changed
-    expect(updatedItems).toEqual(mockMeds); 
+    expect(updatedItems).toEqual(mockMeds);
     // The new date should be set to today
     expect(newDate).toBe(today.toDateString());
     // No deductions should be calculated
@@ -246,34 +241,42 @@ describe('calculateDaysRemaining', () => {
 
   it('should calculate days remaining for weekly schedule', () => {
     // 1 injection per week, 4 remaining -> 28 days
-    expect(calculateDaysRemaining({
-      count: 4,
-      dose: '1',
-      schedule: { type: 'weekly', days: ['mo'] }
-    })).toBe(28);
+    expect(
+      calculateDaysRemaining({
+        count: 4,
+        dose: '1',
+        schedule: { type: 'weekly', days: ['mo'] }
+      })
+    ).toBe(28);
 
     // 1 tablet twice a week (Mo, Fr), 4 remaining -> 14 days
-    expect(calculateDaysRemaining({
-      count: 4,
-      dose: '1',
-      schedule: { type: 'weekly', days: ['mo', 'fr'] }
-    })).toBe(14);
+    expect(
+      calculateDaysRemaining({
+        count: 4,
+        dose: '1',
+        schedule: { type: 'weekly', days: ['mo', 'fr'] }
+      })
+    ).toBe(14);
   });
 
   it('should calculate days remaining for interval schedule', () => {
     // 1 tablet every 2 days, 10 remaining -> 20 days
-    expect(calculateDaysRemaining({
-      count: 10,
-      dose: '1',
-      schedule: { type: 'interval', intervalDays: 2 }
-    })).toBe(20);
+    expect(
+      calculateDaysRemaining({
+        count: 10,
+        dose: '1',
+        schedule: { type: 'interval', intervalDays: 2 }
+      })
+    ).toBe(20);
 
     // 2 tablets every 3 days, 10 remaining -> floor(10 * 3 / 2) = 15 days
-    expect(calculateDaysRemaining({
-      count: 10,
-      dose: '2',
-      schedule: { type: 'interval', intervalDays: 3 }
-    })).toBe(15);
+    expect(
+      calculateDaysRemaining({
+        count: 10,
+        dose: '2',
+        schedule: { type: 'interval', intervalDays: 3 }
+      })
+    ).toBe(15);
   });
 });
 
@@ -302,4 +305,3 @@ describe('getStatusColor', () => {
     expect(getStatusColor(60, yellowLimit, redLimit)).toBeNull();
   });
 });
-

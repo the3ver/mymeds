@@ -55,20 +55,14 @@ export async function deriveAesKeyFromPrfOutput(
   const keyBytes = prfOutput instanceof Uint8Array ? prfOutput : new Uint8Array(prfOutput);
   const saltBytes = salt instanceof Uint8Array ? salt : new Uint8Array(salt);
 
-  const hkdfKey = await subtle.importKey(
-    'raw',
-    keyBytes as BufferSource,
-    { name: 'HKDF' },
-    false,
-    ['deriveKey']
-  );
+  const hkdfKey = await subtle.importKey('raw', keyBytes as BufferSource, { name: 'HKDF' }, false, ['deriveKey']);
 
   return subtle.deriveKey(
     {
       name: 'HKDF',
       hash: 'SHA-256',
       salt: saltBytes as BufferSource,
-      info: encoder.encode('MyMeds-Biometric-Session-SWK'),
+      info: encoder.encode('MyMeds-Biometric-Session-SWK')
     },
     hkdfKey,
     { name: 'AES-GCM', length: 256 },
@@ -90,7 +84,7 @@ export async function wrapPassword(
   const wrappedPassword = await subtle.encrypt(
     {
       name: 'AES-GCM',
-      iv: iv as BufferSource,
+      iv: iv as BufferSource
     },
     key,
     encoder.encode(password)
@@ -115,7 +109,7 @@ export async function unwrapPassword(
   const decryptedBuffer = await subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: ivBytes as BufferSource,
+      iv: ivBytes as BufferSource
     },
     key,
     wrappedBytes as BufferSource
@@ -145,37 +139,35 @@ export async function createPrfCredential(
 
   const challenge = generateSalt(32);
   const userId = generateSalt(16);
-  const rpId = (typeof window !== 'undefined' && window.location?.hostname)
-    ? window.location.hostname
-    : 'localhost';
+  const rpId = typeof window !== 'undefined' && window.location?.hostname ? window.location.hostname : 'localhost';
 
   const extensions: any = {
     prf: prfSalt ? { eval: { first: prfSalt } } : {}
   };
 
-  const credential = await navigator.credentials.create({
+  const credential = (await navigator.credentials.create({
     publicKey: {
       challenge: challenge as BufferSource,
       rp: { name: rpName, id: rpId },
       user: {
         id: userId as BufferSource,
         name: userName,
-        displayName: userName,
+        displayName: userName
       },
       pubKeyCredParams: [
-        { alg: -7, type: 'public-key' },  // ES256
+        { alg: -7, type: 'public-key' }, // ES256
         { alg: -257, type: 'public-key' } // RS256
       ],
       authenticatorSelection: {
         authenticatorAttachment: 'platform',
         userVerification: 'required',
-        residentKey: 'preferred',
+        residentKey: 'preferred'
       },
       timeout: 60000,
       attestation: 'none',
-      extensions,
-    },
-  }) as PublicKeyCredential | null;
+      extensions
+    }
+  })) as PublicKeyCredential | null;
 
   if (!credential) {
     throw new Error('Biometric registration was cancelled or failed.');
@@ -197,7 +189,7 @@ export async function createPrfCredential(
     credentialId,
     rawId,
     prfEnabled,
-    initialPrfKey,
+    initialPrfKey
   };
 }
 
@@ -205,10 +197,7 @@ export async function createPrfCredential(
  * Prompts user for biometrics via navigator.credentials.get and evaluates PRF.
  * Returns the derived AES-GCM session key.
  */
-export async function getPrfKey(
-  credentialId: string | Uint8Array,
-  prfSalt: Uint8Array
-): Promise<CryptoKey> {
+export async function getPrfKey(credentialId: string | Uint8Array, prfSalt: Uint8Array): Promise<CryptoKey> {
   if (!isWebAuthnAvailable()) {
     throw new Error('WebAuthn is not supported on this platform.');
   }
@@ -216,27 +205,27 @@ export async function getPrfKey(
   const challenge = generateSalt(32);
   const rawCredId = typeof credentialId === 'string' ? base64ToBuffer(credentialId) : credentialId;
 
-  const assertion = await navigator.credentials.get({
+  const assertion = (await navigator.credentials.get({
     publicKey: {
       challenge: challenge as BufferSource,
       allowCredentials: [
         {
           id: rawCredId as BufferSource,
           type: 'public-key',
-          transports: ['internal'],
-        },
+          transports: ['internal']
+        }
       ],
       userVerification: 'required',
       timeout: 60000,
       extensions: {
         prf: {
           eval: {
-            first: prfSalt as BufferSource,
-          },
-        },
-      },
-    },
-  }) as PublicKeyCredential | null;
+            first: prfSalt as BufferSource
+          }
+        }
+      }
+    }
+  })) as PublicKeyCredential | null;
 
   if (!assertion) {
     throw new Error('Biometric authentication was cancelled or failed.');

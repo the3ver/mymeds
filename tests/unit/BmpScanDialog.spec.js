@@ -67,9 +67,7 @@ describe('BmpScanDialog.vue', () => {
   });
 
   it('imports selected medications into appState in append mode', async () => {
-    appState.decryptedData.meds = [
-      { name: 'Existing Med', dose: '1-0-0', count: 10, color: 'blue' }
-    ];
+    appState.decryptedData.meds = [{ name: 'Existing Med', dose: '1-0-0', count: 10, color: 'blue' }];
 
     const wrapper = mount(BmpScanDialog, {
       props: {

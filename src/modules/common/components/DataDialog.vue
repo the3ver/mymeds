@@ -1,81 +1,83 @@
 <script setup>
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { state as appState } from '../../../app-state'
-import * as importExportService from '../utils/importExportService'
-import ConfirmDialog from './ConfirmDialog.vue'
-import ExportDialog from './ExportDialog.vue'
-import ImportDialog from './ImportDialog.vue'
-import BmpScanDialog from '../../meds/components/BmpScanDialog.vue'
-import BmpExportDialog from '../../meds/components/BmpExportDialog.vue'
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { state as appState } from '../../../app-state';
+import * as importExportService from '../utils/importExportService';
+import ConfirmDialog from './ConfirmDialog.vue';
+import ExportDialog from './ExportDialog.vue';
+import ImportDialog from './ImportDialog.vue';
+import BmpScanDialog from '../../meds/components/BmpScanDialog.vue';
+import BmpExportDialog from '../../meds/components/BmpExportDialog.vue';
 
 defineProps({
   modelValue: Boolean
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 
-const confirmClearDialog = ref(false)
-const exportDialog = ref(false)
-const importDialog = ref(false)
-const bmpScanDialog = ref(false)
-const bmpExportDialog = ref(false)
-const importStats = ref(null)
-const fileInput = ref(null)
-const exportDataContent = ref('')
-const exportFileName = ref('')
+const confirmClearDialog = ref(false);
+const exportDialog = ref(false);
+const importDialog = ref(false);
+const bmpScanDialog = ref(false);
+const bmpExportDialog = ref(false);
+const importStats = ref(null);
+const fileInput = ref(null);
+const exportDataContent = ref('');
+const exportFileName = ref('');
 
 const handleExport = () => {
-  const { exportDataContent: content, exportFileName: name } = importExportService.prepareExport(appState.decryptedData)
-  exportDataContent.value = content
-  exportFileName.value = name
-  exportDialog.value = true
-}
+  const { exportDataContent: content, exportFileName: name } = importExportService.prepareExport(
+    appState.decryptedData
+  );
+  exportDataContent.value = content;
+  exportFileName.value = name;
+  exportDialog.value = true;
+};
 
 const triggerImport = () => {
-  fileInput.value.click()
-}
+  fileInput.value.click();
+};
 
 const onFileSelected = (event) => {
-  const file = event.target.files[0]
+  const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader()
+  const reader = new FileReader();
   reader.onload = (e) => {
-    const result = importExportService.processImport(e.target.result)
+    const result = importExportService.processImport(e.target.result);
     if (result.success) {
       result.stats.currentMedsCount = appState.decryptedData.meds.length;
       result.stats.currentCalendarCount = appState.decryptedData.calendar.length;
-      importStats.value = result.stats
-      importDialog.value = true
+      importStats.value = result.stats;
+      importDialog.value = true;
     } else {
-      alert(t('app.importError') + (result.error ? `\n${result.error}` : ''))
+      alert(t('app.importError') + (result.error ? `\n${result.error}` : ''));
     }
-    event.target.value = ''
-  }
-  reader.readAsText(file)
-}
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+};
 
 const handleConfirmImport = () => {
-  appState.decryptedData.meds = importStats.value.data.meds
-  appState.decryptedData.calendar = importStats.value.data.calendar
+  appState.decryptedData.meds = importStats.value.data.meds;
+  appState.decryptedData.calendar = importStats.value.data.calendar;
   appState.decryptedData.version += 1;
 
-  alert(t('app.importSuccess'))
-  importDialog.value = false
-}
+  alert(t('app.importSuccess'));
+  importDialog.value = false;
+};
 
 const handleClearEntries = () => {
   appState.decryptedData.meds = [];
   appState.decryptedData.calendar = [];
   appState.decryptedData.version += 1;
   confirmClearDialog.value = false;
-}
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -91,45 +93,19 @@ const close = () => {
           <!-- Import / Export -->
           <div class="text-h6 mb-4">Import / Export</div>
           <div class="d-flex flex-column gap-2 mb-6">
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-export"
-              @click="handleExport"
-            >
+            <v-btn color="primary" variant="outlined" prepend-icon="mdi-export" @click="handleExport">
               {{ t('app.exportData') }}
             </v-btn>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-import"
-              @click="triggerImport"
-            >
+            <v-btn color="primary" variant="outlined" prepend-icon="mdi-import" @click="triggerImport">
               {{ t('app.importData') }}
             </v-btn>
-            <v-btn
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-qrcode-scan"
-              @click="bmpScanDialog = true"
-            >
+            <v-btn color="primary" variant="tonal" prepend-icon="mdi-qrcode-scan" @click="bmpScanDialog = true">
               {{ t('app.scanBmp') }}
             </v-btn>
-            <v-btn
-              color="secondary"
-              variant="tonal"
-              prepend-icon="mdi-barcode-scan"
-              @click="bmpExportDialog = true"
-            >
+            <v-btn color="secondary" variant="tonal" prepend-icon="mdi-barcode-scan" @click="bmpExportDialog = true">
               {{ t('app.showBmp') }}
             </v-btn>
-            <input
-              type="file"
-              ref="fileInput"
-              style="display: none"
-              accept=".json"
-              @change="onFileSelected"
-            >
+            <input type="file" ref="fileInput" style="display: none" accept=".json" @change="onFileSelected" />
           </div>
 
           <v-divider class="mb-6"></v-divider>
@@ -137,12 +113,7 @@ const close = () => {
           <!-- Delete Actions -->
           <div class="text-h6 mb-4">{{ t('dialog.delete') }}</div>
           <div class="d-flex flex-column gap-2 mb-6">
-            <v-btn
-              color="error"
-              variant="elevated"
-              prepend-icon="mdi-delete-sweep"
-              @click="confirmClearDialog = true"
-            >
+            <v-btn color="error" variant="elevated" prepend-icon="mdi-delete-sweep" @click="confirmClearDialog = true">
               {{ t('app.clearEntries') }}
             </v-btn>
           </div>
@@ -150,25 +121,13 @@ const close = () => {
       </v-card-text>
     </v-card>
 
-    <ExportDialog
-      v-model="exportDialog"
-      :data-content="exportDataContent"
-      :file-name="exportFileName"
-    />
+    <ExportDialog v-model="exportDialog" :data-content="exportDataContent" :file-name="exportFileName" />
 
-    <ImportDialog
-      v-model="importDialog"
-      :stats="importStats"
-      @confirm="handleConfirmImport"
-    />
+    <ImportDialog v-model="importDialog" :stats="importStats" @confirm="handleConfirmImport" />
 
-    <BmpScanDialog
-      v-model="bmpScanDialog"
-    />
+    <BmpScanDialog v-model="bmpScanDialog" />
 
-    <BmpExportDialog
-      v-model="bmpExportDialog"
-    />
+    <BmpExportDialog v-model="bmpExportDialog" />
 
     <ConfirmDialog
       v-model="confirmClearDialog"

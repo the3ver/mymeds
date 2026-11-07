@@ -35,14 +35,12 @@ describe('SyncDialog.vue', () => {
     return mount(SyncDialog, {
       props: {
         modelValue: true,
-        databases: [
-          { id: 1, name: 'Tresor 1', medsCount: 3, calendarCount: 1 }
-        ],
-        ...props,
+        databases: [{ id: 1, name: 'Tresor 1', medsCount: 3, calendarCount: 1 }],
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 
@@ -72,7 +70,7 @@ describe('SyncDialog.vue', () => {
     mountComponent({ initialVaultId: 1 });
 
     // Allow async session initialization
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     expect(document.body.textContent).toContain('987 654');
   });
@@ -89,9 +87,9 @@ describe('SyncDialog.vue', () => {
         encryptionStrategy: 'password',
         passwordData: {
           salt: 'AQID',
-          iv: 'BAUG',
+          iv: 'BAUG'
         },
-        encryptedData: 'BwgJ',
+        encryptedData: 'BwgJ'
       }
     };
 
@@ -111,7 +109,7 @@ describe('SyncDialog.vue', () => {
     await wrapper.vm.handleConnectAndReceive();
 
     // Wait for payload reception
-    await new Promise(r => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 60));
 
     expect(wrapper.vm.receivedVault).toBeDefined();
     expect(wrapper.vm.receivedVault.name).toBe('Urlaub Tresor');

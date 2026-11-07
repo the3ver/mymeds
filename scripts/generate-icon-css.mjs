@@ -51,7 +51,7 @@ const ICON_ALIASES = {
 };
 
 function walk(dir) {
-  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) return walk(full);
     return /\.(vue|js|ts)$/.test(entry.name) ? [full] : [];
@@ -68,7 +68,7 @@ export function collectUsedIcons() {
 }
 
 export function definedIcons(css = fs.readFileSync(ICONS_CSS, 'utf8')) {
-  return new Set([...css.matchAll(/\.(mdi-[a-z0-9-]+)::before/g)].map(m => m[1]));
+  return new Set([...css.matchAll(/\.(mdi-[a-z0-9-]+)::before/g)].map((m) => m[1]));
 }
 
 function generate() {
@@ -114,7 +114,9 @@ ${iconRules.join('\n')}
 `;
 
   fs.writeFileSync(ICONS_CSS, optimizedCss, 'utf8');
-  console.log(`Generated src/styles/icons.css with ${iconRules.length} icons (Size: ${(optimizedCss.length / 1024).toFixed(1)} kB)`);
+  console.log(
+    `Generated src/styles/icons.css with ${iconRules.length} icons (Size: ${(optimizedCss.length / 1024).toFixed(1)} kB)`
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

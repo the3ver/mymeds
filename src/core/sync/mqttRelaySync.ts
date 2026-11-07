@@ -1,17 +1,10 @@
 import mqtt, { type MqttClient } from 'mqtt';
 import { bufferToBase64, base64ToBuffer } from '../crypto/base64';
 import { generateSyncCode, normalizeSyncCode } from './syncCodes';
-import type {
-  SyncPayload,
-  SyncValidationResult,
-  SyncSessionController
-} from '../types/sync';
+import type { SyncPayload, SyncValidationResult, SyncSessionController } from '../types/sync';
 import type { VaultRecord } from '../types/vault';
 
-export const DEFAULT_MQTT_BROKERS = [
-  'wss://broker.emqx.io:8084/mqtt',
-  'wss://broker.hivemq.com:8884/mqtt',
-];
+export const DEFAULT_MQTT_BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
 
 export interface ExportSyncOptions {
   payloadType?: string;
@@ -22,10 +15,7 @@ export interface ExportSyncOptions {
  * Prepares an encrypted vault record for P2P synchronization over an untrusted relay.
  * The payload is already encrypted with AES-GCM; the broker sees zero plaintext.
  */
-export function exportVaultForSync(
-  vault: VaultRecord,
-  options: ExportSyncOptions = {}
-): SyncPayload {
+export function exportVaultForSync(vault: VaultRecord, options: ExportSyncOptions = {}): SyncPayload {
   if (!vault || !vault.name || !vault.encryptedData) {
     throw new Error('Invalid vault entry for sync export.');
   }
@@ -57,24 +47,21 @@ export function exportVaultForSync(
       passwordData: {
         salt: saltBase64,
         iv: ivBase64,
-        credentialId: vault.passwordData?.credentialId,
+        credentialId: vault.passwordData?.credentialId
       },
       encryptedData: encryptedDataBase64,
       metadata: {
         ...(vault.metadata || {}),
-        ...extraMeta,
-      },
-    },
+        ...extraMeta
+      }
+    }
   };
 }
 
 /**
  * Validates an incoming sync payload.
  */
-export function validateSyncPayload(
-  payload: any,
-  expectedType = 'pwa-vault-sync'
-): SyncValidationResult {
+export function validateSyncPayload(payload: any, expectedType = 'pwa-vault-sync'): SyncValidationResult {
   if (!payload || typeof payload !== 'object') {
     return { isValid: false, error: 'Empty or invalid payload' };
   }
@@ -95,18 +82,15 @@ export function validateSyncPayload(
       createdAt: vault.createdAt || new Date().toISOString(),
       modifiedAt: vault.modifiedAt || payload.exportTimestamp || new Date().toISOString(),
       metadata: vault.metadata || {},
-      ...vault,
-    },
+      ...vault
+    }
   };
 }
 
 /**
  * Converts a validated sync payload back into a VaultRecord ready for IndexedDB.
  */
-export function syncPayloadToVaultRecord(
-  payload: SyncPayload,
-  newName?: string
-): Omit<VaultRecord, 'id'> {
+export function syncPayloadToVaultRecord(payload: SyncPayload, newName?: string): Omit<VaultRecord, 'id'> {
   // Deep-clone to plain vanilla object to strip any Vue reactive proxies / getters
   // which would otherwise cause IndexedDB structuredClone to throw DataCloneError
   const cleanPayload: SyncPayload = JSON.parse(JSON.stringify(payload));
@@ -121,7 +105,11 @@ export function syncPayloadToVaultRecord(
   // Extract non-standard properties to preserve backwards compatibility (e.g. medsCount)
   const extraProps: Record<string, any> = {};
   for (const [key, value] of Object.entries(vault)) {
-    if (!['name', 'createdAt', 'modifiedAt', 'encryptionStrategy', 'passwordData', 'encryptedData', 'metadata'].includes(key)) {
+    if (
+      !['name', 'createdAt', 'modifiedAt', 'encryptionStrategy', 'passwordData', 'encryptedData', 'metadata'].includes(
+        key
+      )
+    ) {
       extraProps[key] = value;
     }
   }
@@ -141,10 +129,10 @@ export function syncPayloadToVaultRecord(
     passwordData: {
       salt: new Uint8Array(salt.buffer, salt.byteOffset, salt.byteLength),
       iv: new Uint8Array(iv.buffer, iv.byteOffset, iv.byteLength),
-      credentialId: vault.passwordData?.credentialId,
+      credentialId: vault.passwordData?.credentialId
     },
     encryptedData: cleanEncryptedBuffer,
-    metadata: vault.metadata || {},
+    metadata: vault.metadata || {}
   };
 }
 
@@ -177,7 +165,7 @@ export function startSenderSession(config: SenderSessionConfig): SyncSessionCont
     client = mqtt.connect(brokers[0], {
       clientId: `pwa-snd-${syncCode}-${Math.random().toString(36).substring(2, 6)}`,
       clean: true,
-      connectTimeout: 10000,
+      connectTimeout: 10000
     });
 
     client.on('connect', () => {
@@ -216,9 +204,13 @@ export function startSenderSession(config: SenderSessionConfig): SyncSessionCont
     close: () => {
       isClosed = true;
       if (client) {
-        try { client.end(true); } catch (e) { /* ignore */ }
+        try {
+          client.end(true);
+        } catch (e) {
+          /* ignore */
+        }
       }
-    },
+    }
   };
 }
 
@@ -248,7 +240,7 @@ export function startReceiverSession(config: ReceiverSessionConfig): SyncSession
     client = mqtt.connect(brokers[0], {
       clientId: `pwa-rcv-${normalized}-${Math.random().toString(36).substring(2, 6)}`,
       clean: true,
-      connectTimeout: 10000,
+      connectTimeout: 10000
     });
 
     client.on('connect', () => {
@@ -290,8 +282,12 @@ export function startReceiverSession(config: ReceiverSessionConfig): SyncSession
     close: () => {
       isClosed = true;
       if (client) {
-        try { client.end(true); } catch (e) { /* ignore */ }
+        try {
+          client.end(true);
+        } catch (e) {
+          /* ignore */
+        }
       }
-    },
+    }
   };
 }

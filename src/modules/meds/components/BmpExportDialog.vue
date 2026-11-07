@@ -1,10 +1,5 @@
 <template>
-  <v-dialog
-    :model-value="modelValue"
-    max-width="600px"
-    scrollable
-    @update:model-value="handleClose"
-  >
+  <v-dialog :model-value="modelValue" max-width="600px" scrollable @update:model-value="handleClose">
     <v-card class="bmp-export-dialog">
       <!-- Toolbar Header -->
       <v-toolbar color="primary" density="comfortable">
@@ -149,40 +144,19 @@
               {{ t('bmp.selectMedsToInclude') }}
             </span>
             <div>
-              <v-btn
-                variant="text"
-                density="compact"
-                size="x-small"
-                color="primary"
-                class="mr-1"
-                @click="selectAll"
-              >
+              <v-btn variant="text" density="compact" size="x-small" color="primary" class="mr-1" @click="selectAll">
                 {{ t('bmp.selectAll') }}
               </v-btn>
-              <v-btn
-                variant="text"
-                density="compact"
-                size="x-small"
-                @click="deselectAll"
-              >
+              <v-btn variant="text" density="compact" size="x-small" @click="deselectAll">
                 {{ t('bmp.deselectAll') }}
               </v-btn>
             </div>
           </div>
 
           <v-list density="compact" class="border rounded pa-0">
-            <v-list-item
-              v-for="(med, idx) in availableMeds"
-              :key="med.id || med.name + idx"
-              class="px-2"
-            >
+            <v-list-item v-for="(med, idx) in availableMeds" :key="med.id || med.name + idx" class="px-2">
               <template #prepend>
-                <v-checkbox-btn
-                  v-model="selectedIndices"
-                  :value="idx"
-                  color="primary"
-                  density="compact"
-                />
+                <v-checkbox-btn v-model="selectedIndices" :value="idx" color="primary" density="compact" />
               </template>
               <v-list-item-title class="text-body-2 font-weight-medium">
                 {{ med.name }}
@@ -278,11 +252,14 @@ function deselectAll() {
 
 const bmpXml = computed(() => {
   if (activeMeds.value.length === 0) return '';
-  const p = (patient.firstName || patient.lastName || patient.birthDate) ? {
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    birthDate: patient.birthDate
-  } : null;
+  const p =
+    patient.firstName || patient.lastName || patient.birthDate
+      ? {
+          firstName: patient.firstName,
+          lastName: patient.lastName,
+          birthDate: patient.birthDate
+        }
+      : null;
 
   return generateBmpXml({
     meds: activeMeds.value,
@@ -301,9 +278,11 @@ function attempt(fn) {
 
 const payloadResult = computed(() => {
   if (!bmpXml.value) return { value: '', error: '' };
-  return attempt(() => generateBmpPayload(bmpXml.value, {
-    compress: format.value === 'standard'
-  }));
+  return attempt(() =>
+    generateBmpPayload(bmpXml.value, {
+      compress: format.value === 'standard'
+    })
+  );
 });
 const bmpPayload = computed(() => payloadResult.value.value);
 
@@ -315,11 +294,11 @@ const svgMarkup = computed(() => svgResult.value.value);
 
 // Errors from download, share and copy; a new payload clears them
 const actionError = ref('');
-watch(payloadResult, () => { actionError.value = ''; });
+watch(payloadResult, () => {
+  actionError.value = '';
+});
 
-const generationError = computed(() =>
-  actionError.value || payloadResult.value.error || svgResult.value.error
-);
+const generationError = computed(() => actionError.value || payloadResult.value.error || svgResult.value.error);
 
 async function downloadPng() {
   if (!bmpPayload.value) return;

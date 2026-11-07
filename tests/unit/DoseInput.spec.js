@@ -12,8 +12,8 @@ describe('DoseInput.vue', () => {
     return mount(DoseInput, {
       props,
       global: {
-        plugins: [vuetify],
-      },
+        plugins: [vuetify]
+      }
     });
   };
 

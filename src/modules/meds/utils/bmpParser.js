@@ -1,9 +1,6 @@
 import { inflateSync, strFromU8 } from 'fflate';
 
-const DEFAULT_COLORS = [
-  'red', 'pink', 'purple', 'indigo', 'blue',
-  'cyan', 'teal', 'green', 'orange', 'blue-grey'
-];
+const DEFAULT_COLORS = ['red', 'pink', 'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'orange', 'blue-grey'];
 
 /**
  * Normalizes birthdate string from YYYYMMDD to YYYY-MM-DD
@@ -146,7 +143,7 @@ export function parseBmpData(rawData) {
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
     try {
       const parsedJson = JSON.parse(trimmed);
-      const rawMeds = Array.isArray(parsedJson) ? parsedJson : (parsedJson.meds || []);
+      const rawMeds = Array.isArray(parsedJson) ? parsedJson : parsedJson.meds || [];
       if (Array.isArray(rawMeds) && rawMeds.length > 0) {
         const meds = rawMeds.map((item, idx) => ({
           name: item.name || 'Unbekannt',
@@ -244,9 +241,8 @@ export function parseBmpData(rawData) {
   let colorIndex = 0;
 
   const processMedicationElement = (mEl, sectionTitle = '') => {
-    const name = mEl.getAttribute('a') ||
-      ([mEl.getAttribute('w'), mEl.getAttribute('s')].filter(Boolean).join(' ')) ||
-      'Unbekannt';
+    const name =
+      mEl.getAttribute('a') || [mEl.getAttribute('w'), mEl.getAttribute('s')].filter(Boolean).join(' ') || 'Unbekannt';
 
     // Collect ingredients: attribute 'w' and any child <W> tags
     const ingredients = [];

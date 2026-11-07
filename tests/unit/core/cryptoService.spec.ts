@@ -31,7 +31,7 @@ describe('core/crypto/cryptoService', () => {
       user: 'Alice',
       items: [1, 2, 3],
       nested: { active: true, notes: 'Zero-Knowledge PWA core test' },
-      count: 42,
+      count: 42
     };
 
     const { iv, encryptedData } = await crypto.encryptData(originalData, key);

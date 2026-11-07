@@ -14,14 +14,14 @@ describe('CalendarPage.vue', () => {
   const sampleEntries = [
     { title: 'Zukunftstermin', date: '2026-11-20', type: 'doctor', doctor: 'Dr. Z' },
     { title: 'Vergangener Termin', date: '2026-01-10', type: 'vaccination', agent: 'BioNTech' },
-    { title: 'Notiz', date: '2026-05-15', type: 'note', notes: 'Blutdruck gut' },
+    { title: 'Notiz', date: '2026-05-15', type: 'note', notes: 'Blutdruck gut' }
   ];
 
   const mountComponent = (props = {}) => {
     return mount(CalendarPage, {
       props: {
         initialEntries: sampleEntries,
-        ...props,
+        ...props
       },
       global: {
         plugins: [vuetify, i18n],
@@ -29,9 +29,9 @@ describe('CalendarPage.vue', () => {
           EntryTypeDialog: true,
           CalendarEntryDialog: true,
           ConfirmDialog: true,
-          FilterDialog: true,
-        },
-      },
+          FilterDialog: true
+        }
+      }
     });
   };
 
@@ -45,7 +45,7 @@ describe('CalendarPage.vue', () => {
 
   it('should show the time after the date in the entry subtitle', () => {
     const wrapper = mountComponent({
-      initialEntries: [{ title: 'Kardiologe', date: '2026-11-20', time: '09:30', type: 'doctor' }],
+      initialEntries: [{ title: 'Kardiologe', date: '2026-11-20', time: '09:30', type: 'doctor' }]
     });
     expect(wrapper.text()).toMatch(/20\.11\.2026, 09:30/);
   });
@@ -69,8 +69,8 @@ describe('CalendarPage.vue', () => {
     const wrapper = mountComponent();
 
     const quarterDates = wrapper.vm.groupedEntries
-      .filter(item => item.type === 'quarter')
-      .map(item => item.data.date);
+      .filter((item) => item.type === 'quarter')
+      .map((item) => item.data.date);
 
     expect(quarterDates).toContain('2026-07-01');
     expect(quarterDates).not.toContain('2026-06-30');
@@ -239,27 +239,27 @@ describe('CalendarPage.vue', () => {
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       },
       {
         title: 'Anstehend mit Überweisung',
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'present',
+        referralStatus: 'present'
       },
       {
         title: 'Vergangen ohne Überweisung',
         date: pastDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       },
       {
         title: 'Anstehende Impfung',
         date: futureDateStr,
-        type: 'vaccination',
-      },
+        type: 'vaccination'
+      }
     ];
 
     const wrapper = mountComponent({ initialEntries: entries });
@@ -299,7 +299,7 @@ describe('CalendarPage.vue', () => {
         type: 'doctor',
         location: 'Gemeinschaftspraxis',
         needsReferral: true,
-        referralStatus: 'submitted',
+        referralStatus: 'submitted'
       },
       {
         title: 'Praxisbesuch 2',
@@ -307,8 +307,8 @@ describe('CalendarPage.vue', () => {
         type: 'doctor',
         location: 'Gemeinschaftspraxis',
         needsReferral: true,
-        referralStatus: 'needed',
-      },
+        referralStatus: 'needed'
+      }
     ];
 
     const wrapper = mountComponent({ initialEntries: entries });
@@ -334,22 +334,22 @@ describe('CalendarPage.vue', () => {
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       },
       {
         title: 'Arzttermin mit vorhandener Überweisung',
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'present',
+        referralStatus: 'present'
       },
       {
         title: 'Vergangener Arzttermin',
         date: pastDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
-      },
+        referralStatus: 'needed'
+      }
     ];
 
     const wrapper = mountComponent({ initialEntries: entries });
@@ -382,14 +382,14 @@ describe('CalendarPage.vue', () => {
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'present',
+        referralStatus: 'present'
       },
       {
         title: 'Anstehend ohne Überweisung',
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       }
     ];
 
@@ -419,19 +419,19 @@ describe('CalendarPage.vue', () => {
         title: 'Entry 0 - Regular Doctor',
         date: futureDateStr,
         type: 'doctor',
-        needsReferral: false,
+        needsReferral: false
       },
       {
         title: 'Entry 1 - Open Referral',
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       },
       {
         title: 'Entry 2 - Regular Note',
         date: futureDateStr,
-        type: 'note',
+        type: 'note'
       }
     ];
 
@@ -449,10 +449,7 @@ describe('CalendarPage.vue', () => {
     await wrapper.vm.$nextTick();
 
     // Verify Entry 1 was deleted, and Entry 0 and Entry 2 are retained in entries
-    expect(wrapper.vm.entries.map(e => e.title)).toEqual([
-      'Entry 0 - Regular Doctor',
-      'Entry 2 - Regular Note'
-    ]);
+    expect(wrapper.vm.entries.map((e) => e.title)).toEqual(['Entry 0 - Regular Doctor', 'Entry 2 - Regular Note']);
   });
 
   it('should combine open_referrals with type filters as union: show entries matching either condition', async () => {
@@ -466,12 +463,12 @@ describe('CalendarPage.vue', () => {
         date: futureDateStr,
         type: 'doctor',
         needsReferral: true,
-        referralStatus: 'needed',
+        referralStatus: 'needed'
       },
       {
         title: 'Impfung Zukunft',
         date: futureDateStr,
-        type: 'vaccination',
+        type: 'vaccination'
       }
     ];
 

@@ -13,12 +13,12 @@ describe('badgingService', () => {
     Object.defineProperty(navigator, 'setAppBadge', {
       value: originalSetAppBadge,
       configurable: true,
-      writable: true,
+      writable: true
     });
     Object.defineProperty(navigator, 'clearAppBadge', {
       value: originalClearAppBadge,
       configurable: true,
-      writable: true,
+      writable: true
     });
   });
 
@@ -27,12 +27,12 @@ describe('badgingService', () => {
       Object.defineProperty(navigator, 'setAppBadge', {
         value: vi.fn(),
         configurable: true,
-        writable: true,
+        writable: true
       });
       Object.defineProperty(navigator, 'clearAppBadge', {
         value: vi.fn(),
         configurable: true,
-        writable: true,
+        writable: true
       });
 
       expect(badgingService.isBadgingSupported()).toBe(true);
@@ -40,7 +40,7 @@ describe('badgingService', () => {
       Object.defineProperty(navigator, 'setAppBadge', {
         value: undefined,
         configurable: true,
-        writable: true,
+        writable: true
       });
       expect(badgingService.isBadgingSupported()).toBe(false);
     });
@@ -87,7 +87,7 @@ describe('badgingService', () => {
         { name: 'Med A', dose: '1', count: 3 }, // 3 days remaining (<= 7) -> CRITICAL
         { name: 'Med B', dose: '2', count: 4 }, // 2 days remaining (<= 7) -> CRITICAL
         { name: 'Med C', dose: '1', count: 30 }, // 30 days remaining (> 7) -> OK
-        { name: 'Med D', dose: '0', count: 10 }, // dose 0 (null days) -> IGNORED
+        { name: 'Med D', dose: '0', count: 10 } // dose 0 (null days) -> IGNORED
       ];
 
       const count = await badgingService.updateCriticalMedsBadge(meds, 7);
@@ -96,9 +96,7 @@ describe('badgingService', () => {
 
       // When no meds are critical
       setSpy.mockClear();
-      const okMeds = [
-        { name: 'Med C', dose: '1', count: 30 },
-      ];
+      const okMeds = [{ name: 'Med C', dose: '1', count: 30 }];
       const countOk = await badgingService.updateCriticalMedsBadge(okMeds, 7);
       expect(countOk).toBe(0);
       expect(clearSpy).toHaveBeenCalled();

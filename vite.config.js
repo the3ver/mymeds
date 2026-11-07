@@ -1,13 +1,13 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vuetify from 'vite-plugin-vuetify';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/mymeds/',
   define: {
-    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
   },
   plugins: [
     vue(),
@@ -17,7 +17,13 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'maskable-icon-512x512.png'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'pwa-192x192.png',
+        'pwa-512x512.png',
+        'maskable-icon-512x512.png'
+      ],
       manifest: {
         name: 'MyMeds',
         short_name: 'MyMeds',
@@ -96,23 +102,23 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (id.includes('@zxing')) {
-              return 'vendor-zxing'
+              return 'vendor-zxing';
             }
             if (id.includes('mqtt') || id.includes('peerjs')) {
-              return 'vendor-sync'
+              return 'vendor-sync';
             }
             if (id.includes('qrcode')) {
-              return 'vendor-qrcode'
+              return 'vendor-qrcode';
             }
             if (id.includes('vuetify')) {
-              return 'vendor-vuetify'
+              return 'vendor-vuetify';
             }
             if (id.includes('vue') || id.includes('vue-i18n')) {
-              return 'vendor-vue'
+              return 'vendor-vue';
             }
           }
         }
       }
     }
   }
-})
+});

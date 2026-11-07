@@ -12,7 +12,7 @@ describe('hapticService', () => {
     Object.defineProperty(navigator, 'vibrate', {
       value: originalVibrate,
       configurable: true,
-      writable: true,
+      writable: true
     });
   });
 
@@ -21,14 +21,14 @@ describe('hapticService', () => {
       Object.defineProperty(navigator, 'vibrate', {
         value: vi.fn(),
         configurable: true,
-        writable: true,
+        writable: true
       });
       expect(hapticService.isHapticsSupported()).toBe(true);
 
       Object.defineProperty(navigator, 'vibrate', {
         value: undefined,
         configurable: true,
-        writable: true,
+        writable: true
       });
       expect(hapticService.isHapticsSupported()).toBe(false);
     });
@@ -40,7 +40,7 @@ describe('hapticService', () => {
       Object.defineProperty(navigator, 'vibrate', {
         value: vibrateSpy,
         configurable: true,
-        writable: true,
+        writable: true
       });
 
       hapticService.vibrate(50);
@@ -63,7 +63,7 @@ describe('hapticService', () => {
       Object.defineProperty(navigator, 'vibrate', {
         value: throwingVibrate,
         configurable: true,
-        writable: true,
+        writable: true
       });
 
       expect(() => hapticService.vibrate(40)).not.toThrow();
@@ -76,7 +76,7 @@ describe('hapticService', () => {
       Object.defineProperty(navigator, 'vibrate', {
         value: vibrateSpy,
         configurable: true,
-        writable: true,
+        writable: true
       });
 
       hapticService.setHapticsEnabled(false);

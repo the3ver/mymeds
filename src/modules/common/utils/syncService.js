@@ -32,8 +32,8 @@ export function validateSyncPayload(payload) {
 
 /**
  * Imports a validated sync payload into IndexedDB.
- * @param {object} payload 
- * @param {{ mode: 'create' | 'overwrite', targetId?: number, newName?: string }} options 
+ * @param {object} payload
+ * @param {{ mode: 'create' | 'overwrite', targetId?: number, newName?: string }} options
  * @returns {Promise<number>} Saved database ID
  */
 export async function importVaultFromSync(payload, options = { mode: 'create' }) {
@@ -53,7 +53,7 @@ export async function importVaultFromSync(payload, options = { mode: 'create' })
         ...existing,
         ...restored,
         id: options.targetId,
-        modifiedAt: now,
+        modifiedAt: now
       };
       await dbAdapter.updateDatabase(updatedEntry);
       return options.targetId;
@@ -75,7 +75,7 @@ export function startSenderSession({ vaultId, onCodeReady, onConnected, onTransf
     onCodeReady,
     onConnected,
     onTransferred,
-    onError,
+    onError
   });
 }
 
@@ -90,6 +90,6 @@ export function startReceiverSession({ syncCode, onConnected, onPayloadReceived,
     brokers: BROKERS,
     onConnected,
     onPayloadReceived,
-    onError,
+    onError
   });
 }

@@ -16,11 +16,11 @@ describe('FilterDialog.vue', () => {
       props: {
         modelValue: true,
         selectedFilters: [],
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 

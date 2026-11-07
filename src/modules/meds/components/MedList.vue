@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import * as dataService from '../../common/utils/dataService'
-import MedCard from './MedCard.vue'
-import CalendarDialog from '../../common/components/CalendarDialog.vue'
-import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils'
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import * as dataService from '../../common/utils/dataService';
+import MedCard from './MedCard.vue';
+import CalendarDialog from '../../common/components/CalendarDialog.vue';
+import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils';
 
 const props = defineProps({
   items: {
@@ -15,86 +15,86 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   }
-})
+});
 
-const emit = defineEmits(['edit', 'delete'])
-const { t, locale } = useI18n()
+const emit = defineEmits(['edit', 'delete']);
+const { t, locale } = useI18n();
 
-const sortMode = ref('added')
-const yellowLimit = ref(21)
-const redLimit = ref(7)
-const calendarDialog = ref(false)
+const sortMode = ref('added');
+const yellowLimit = ref(21);
+const redLimit = ref(7);
+const calendarDialog = ref(false);
 
 async function updateSettings() {
-  const settings = await dataService.getSettings()
-  sortMode.value = settings.sortMode
-  yellowLimit.value = settings.yellowLimit
-  redLimit.value = settings.redLimit
+  const settings = await dataService.getSettings();
+  sortMode.value = settings.sortMode;
+  yellowLimit.value = settings.yellowLimit;
+  redLimit.value = settings.redLimit;
 }
 
 onMounted(() => {
-  updateSettings()
-  window.addEventListener('storage-sort-mode-changed', updateSettings)
-  window.addEventListener('storage-limits-changed', updateSettings)
-})
+  updateSettings();
+  window.addEventListener('storage-sort-mode-changed', updateSettings);
+  window.addEventListener('storage-limits-changed', updateSettings);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('storage-sort-mode-changed', updateSettings)
-  window.removeEventListener('storage-limits-changed', updateSettings)
-})
+  window.removeEventListener('storage-sort-mode-changed', updateSettings);
+  window.removeEventListener('storage-limits-changed', updateSettings);
+});
 
 const sortedItems = computed(() => {
   // Create a copy to sort, but we need to keep track of original indices for editing/deleting
-  const itemsWithIndex = props.items.map((item, index) => ({ ...item, originalIndex: index }))
+  const itemsWithIndex = props.items.map((item, index) => ({ ...item, originalIndex: index }));
 
   if (sortMode.value === 'name') {
-    return itemsWithIndex.sort((a, b) => a.name.localeCompare(b.name))
+    return itemsWithIndex.sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortMode.value === 'days') {
     return itemsWithIndex.sort((a, b) => {
-      const doseA = parseDose(a.dose)
-      const doseB = parseDose(b.dose)
+      const doseA = parseDose(a.dose);
+      const doseB = parseDose(b.dose);
 
       // Handle cases with 0 dose (infinite days) -> put at end
-      if (doseA <= 0 && doseB <= 0) return 0
-      if (doseA <= 0) return 1
-      if (doseB <= 0) return -1
+      if (doseA <= 0 && doseB <= 0) return 0;
+      if (doseA <= 0) return 1;
+      if (doseB <= 0) return -1;
 
-      const daysA = a.count / doseA
-      const daysB = b.count / doseB
-      return daysA - daysB
-    })
+      const daysA = a.count / doseA;
+      const daysB = b.count / doseB;
+      return daysA - daysB;
+    });
   }
 
   // Default: 'added' (no sort, just original order)
-  return itemsWithIndex
-})
+  return itemsWithIndex;
+});
 
 const overviewData = computed(() => {
-  if (props.items.length === 0) return null
+  if (props.items.length === 0) return null;
 
-  let minDays = Infinity
-  let hasValidMeds = false
+  let minDays = Infinity;
+  let hasValidMeds = false;
 
   for (const item of props.items) {
-    const days = calculateDaysRemaining(item)
+    const days = calculateDaysRemaining(item);
     if (days !== null) {
-      hasValidMeds = true
+      hasValidMeds = true;
       if (days < minDays) {
-        minDays = days
+        minDays = days;
       }
     }
   }
 
-  if (!hasValidMeds || minDays === Infinity) return null
+  if (!hasValidMeds || minDays === Infinity) return null;
 
-  const date = new Date()
-  date.setDate(date.getDate() + minDays)
+  const date = new Date();
+  date.setDate(date.getDate() + minDays);
 
   // Format date with weekday
-  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
-  const formattedDate = date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
+  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formattedDate = date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options);
 
-  const status = getStatusColor(minDays, yellowLimit.value, redLimit.value)
+  const status = getStatusColor(minDays, yellowLimit.value, redLimit.value);
 
   return {
     date: formattedDate,
@@ -102,11 +102,11 @@ const overviewData = computed(() => {
     status: status,
     isCritical: status !== null,
     rawDate: date
-  }
-})
+  };
+});
 
 const calendarDate = computed(() => {
-  if (!overviewData.value) return null
+  if (!overviewData.value) return null;
 
   // Calculate date for yellow limit warning
   // If we are already below yellow limit, use tomorrow
@@ -119,27 +119,27 @@ const calendarDate = computed(() => {
   // Let's set it to (Empty Date - Yellow Limit Days)
   // But if that date is in the past, set it to tomorrow.
 
-  const emptyDate = new Date(overviewData.value.rawDate)
-  const reminderDate = new Date(emptyDate)
-  reminderDate.setDate(reminderDate.getDate() - yellowLimit.value)
+  const emptyDate = new Date(overviewData.value.rawDate);
+  const reminderDate = new Date(emptyDate);
+  reminderDate.setDate(reminderDate.getDate() - yellowLimit.value);
 
-  const now = new Date()
+  const now = new Date();
   if (reminderDate < now) {
     // If reminder would be in the past, set it to tomorrow 9:00 AM
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    tomorrow.setHours(9, 0, 0, 0)
-    return tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(9, 0, 0, 0);
+    return tomorrow;
   }
 
-  return reminderDate
-})
+  return reminderDate;
+});
 
 const calendarDateFormatted = computed(() => {
-  if (!calendarDate.value) return ''
-  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }
-  return calendarDate.value.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options)
-})
+  if (!calendarDate.value) return '';
+  const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' };
+  return calendarDate.value.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options);
+});
 </script>
 
 <template>
@@ -153,14 +153,13 @@ const calendarDateFormatted = computed(() => {
     >
       <v-card-text class="d-flex align-center justify-space-between py-1 pr-1">
         <div class="text-center font-weight-bold flex-grow-1 text-body-1">
-          {{ overviewData.isCritical ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }) : t('app.overviewText', { date: overviewData.date }) }}
+          {{
+            overviewData.isCritical
+              ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days })
+              : t('app.overviewText', { date: overviewData.date })
+          }}
         </div>
-        <v-btn
-          icon="mdi-calendar-plus"
-          variant="text"
-          density="compact"
-          @click="calendarDialog = true"
-        ></v-btn>
+        <v-btn icon="mdi-calendar-plus" variant="text" density="compact" @click="calendarDialog = true"></v-btn>
       </v-card-text>
     </v-card>
 
@@ -185,5 +184,4 @@ const calendarDateFormatted = computed(() => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

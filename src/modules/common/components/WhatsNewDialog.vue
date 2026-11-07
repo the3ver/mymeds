@@ -42,7 +42,11 @@ async function handleClose() {
 <template>
   <v-dialog
     :model-value="modelValue"
-    @update:model-value="val => { if (!val) handleClose(); }"
+    @update:model-value="
+      (val) => {
+        if (!val) handleClose();
+      }
+    "
     max-width="520px"
     scrollable
   >
@@ -54,7 +58,7 @@ async function handleClose() {
 
       <v-divider></v-divider>
 
-      <v-card-text class="px-5 py-4" style="max-height: 480px;">
+      <v-card-text class="px-5 py-4" style="max-height: 480px">
         <div v-if="latestEntry" class="mb-4">
           <div class="d-flex align-center justify-space-between mb-2">
             <v-chip color="primary" variant="flat" size="small" class="font-weight-bold">
@@ -71,7 +75,7 @@ async function handleClose() {
 
           <v-list density="compact" class="bg-transparent pa-0">
             <v-list-item
-              v-for="(item, idx) in (latestEntry.highlights[currentLang] || latestEntry.highlights.de)"
+              v-for="(item, idx) in latestEntry.highlights[currentLang] || latestEntry.highlights.de"
               :key="idx"
               class="px-0 py-1"
             >
@@ -107,9 +111,7 @@ async function handleClose() {
                 class="mb-3 pa-3 rounded"
               >
                 <div class="d-flex align-center justify-space-between mb-1">
-                  <span class="font-weight-bold text-caption text-primary">
-                    v{{ entry.version }}
-                  </span>
+                  <span class="font-weight-bold text-caption text-primary"> v{{ entry.version }} </span>
                   <span class="text-caption text-medium-emphasis">
                     {{ entry.date }}
                   </span>
@@ -119,7 +121,7 @@ async function handleClose() {
                 </div>
                 <ul class="text-caption pl-4 mb-0 text-medium-emphasis">
                   <li
-                    v-for="(item, idx) in (entry.highlights[currentLang] || entry.highlights.de)"
+                    v-for="(item, idx) in entry.highlights[currentLang] || entry.highlights.de"
                     :key="idx"
                     class="mb-1"
                   >
@@ -136,13 +138,7 @@ async function handleClose() {
 
       <v-card-actions class="px-5 py-3">
         <v-spacer></v-spacer>
-        <v-btn
-          color="primary"
-          variant="elevated"
-          class="px-6"
-          @click="handleClose"
-          data-testid="whats-new-close-btn"
-        >
+        <v-btn color="primary" variant="elevated" class="px-6" @click="handleClose" data-testid="whats-new-close-btn">
           {{ t('whatsNew.close') }}
         </v-btn>
       </v-card-actions>

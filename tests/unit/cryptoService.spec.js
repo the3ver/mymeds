@@ -3,7 +3,7 @@ import {
   generateSalt,
   deriveKeyFromPassword,
   encryptData,
-  decryptData,
+  decryptData
 } from '../../src/modules/common/utils/cryptoService';
 
 describe('cryptoService', () => {
@@ -70,9 +70,7 @@ describe('cryptoService', () => {
           { name: 'Ibuprofen 400mg', count: 20, dose: '1-0-1' },
           { name: 'Pantoprazol', count: 14, dose: '1/2' }
         ],
-        calendar: [
-          { title: 'Zahnarzt Kontrolltermin', date: '2026-09-15', type: 'doctor' }
-        ],
+        calendar: [{ title: 'Zahnarzt Kontrolltermin', date: '2026-09-15', type: 'doctor' }],
         specialChars: 'Äpfel, Überraschung, Groß & Klein, € 12,50',
         nested: { a: 1, b: [true, false, null] }
       };
@@ -107,7 +105,7 @@ describe('cryptoService', () => {
       const { iv, encryptedData } = await encryptData(testPayload, key);
 
       const corruptedIv = new Uint8Array(iv);
-      corruptedIv[0] ^= 0xFF; // Invert first byte
+      corruptedIv[0] ^= 0xff; // Invert first byte
 
       await expect(decryptData(encryptedData, corruptedIv, key)).rejects.toThrow();
     });
@@ -121,7 +119,7 @@ describe('cryptoService', () => {
 
       const tamperedBuffer = encryptedData.slice(0);
       const view = new Uint8Array(tamperedBuffer);
-      view[0] ^= 0xFF; // Invert first byte of ciphertext/tag
+      view[0] ^= 0xff; // Invert first byte of ciphertext/tag
 
       await expect(decryptData(tamperedBuffer, iv, key)).rejects.toThrow();
     });

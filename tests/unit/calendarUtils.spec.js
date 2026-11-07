@@ -89,7 +89,7 @@ describe('calendarUtils & calendar', () => {
       expect(shareMock).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Meds reminder',
-          text: 'Check stock',
+          text: 'Check stock'
         })
       );
       // Download fallback should NOT be triggered on successful share
@@ -107,7 +107,7 @@ describe('calendarUtils & calendar', () => {
       createCalendarEvent('Meds reminder', 'Check stock', testDate);
 
       // Wait a tick for catch block to run
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(shareMock).toHaveBeenCalled();
       expect(clickedElements.length).toBe(1);
@@ -245,7 +245,7 @@ describe('calendarUtils & calendar', () => {
   describe('compareEntries', () => {
     it('should sort by date descending', () => {
       const list = [{ date: '2026-01-01' }, { date: '2026-03-01' }].sort(compareEntries);
-      expect(list.map(e => e.date)).toEqual(['2026-03-01', '2026-01-01']);
+      expect(list.map((e) => e.date)).toEqual(['2026-03-01', '2026-01-01']);
     });
 
     it('should order same-day entries: all-day, later time, earlier time, quarter marker', () => {
@@ -253,9 +253,9 @@ describe('calendarUtils & calendar', () => {
         { id: 'early', date: '2026-10-01', time: '08:00' },
         { id: 'quarter', date: '2026-10-01', type: 'quarter' },
         { id: 'late', date: '2026-10-01', time: '15:00' },
-        { id: 'allday', date: '2026-10-01', time: '' },
+        { id: 'allday', date: '2026-10-01', time: '' }
       ].sort(compareEntries);
-      expect(list.map(e => e.id)).toEqual(['allday', 'late', 'early', 'quarter']);
+      expect(list.map((e) => e.id)).toEqual(['allday', 'late', 'early', 'quarter']);
     });
   });
 

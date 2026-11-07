@@ -1,11 +1,5 @@
 <template>
-  <v-dialog
-    :model-value="modelValue"
-    max-width="640px"
-    scrollable
-    persistent
-    @update:model-value="handleClose"
-  >
+  <v-dialog :model-value="modelValue" max-width="640px" scrollable persistent @update:model-value="handleClose">
     <v-card class="bmp-scan-dialog">
       <!-- Toolbar Header -->
       <v-toolbar color="primary" density="comfortable">
@@ -44,14 +38,8 @@
 
           <!-- Camera Viewfinder -->
           <div class="viewfinder-wrapper mb-4">
-            <video
-              ref="videoEl"
-              class="camera-video"
-              autoplay
-              playsinline
-              muted
-            ></video>
-            
+            <video ref="videoEl" class="camera-video" autoplay playsinline muted></video>
+
             <div class="viewfinder-overlay">
               <div class="target-box">
                 <div class="target-corner top-left"></div>
@@ -155,7 +143,10 @@
             </div>
             <div v-if="metadata.doctor?.name" class="d-flex align-center text-caption text-medium-emphasis">
               <v-icon icon="mdi-hospital-building" size="small" class="mr-1" />
-              <span>{{ t('bmp.doctor') }}: {{ metadata.doctor.name }} {{ metadata.doctor.city ? `(${metadata.doctor.city})` : '' }}</span>
+              <span
+                >{{ t('bmp.doctor') }}: {{ metadata.doctor.name }}
+                {{ metadata.doctor.city ? `(${metadata.doctor.city})` : '' }}</span
+              >
             </div>
           </v-card>
 
@@ -205,8 +196,12 @@
                   </div>
 
                   <div v-if="med.reason || med.instructions" class="text-caption text-grey mt-1">
-                    <span v-if="med.reason"><strong>{{ t('med.reason') || 'Grund' }}:</strong> {{ med.reason }} </span>
-                    <span v-if="med.instructions"><strong>{{ t('med.instructions') || 'Hinweis' }}:</strong> {{ med.instructions }}</span>
+                    <span v-if="med.reason"
+                      ><strong>{{ t('med.reason') || 'Grund' }}:</strong> {{ med.reason }}
+                    </span>
+                    <span v-if="med.instructions"
+                      ><strong>{{ t('med.instructions') || 'Hinweis' }}:</strong> {{ med.instructions }}</span
+                    >
                   </div>
 
                   <!-- Count & Package size setup -->
@@ -218,7 +213,7 @@
                       density="compact"
                       variant="outlined"
                       hide-details
-                      style="max-width: 120px;"
+                      style="max-width: 120px"
                     />
                     <v-btn size="x-small" variant="tonal" @click="med.count = (med.count || 0) + 20">+20</v-btn>
                     <v-btn size="x-small" variant="tonal" @click="med.count = (med.count || 0) + 50">+50</v-btn>
@@ -235,16 +230,8 @@
               {{ t('bmp.importMode') }}
             </div>
             <v-radio-group v-model="importMode" density="compact" hide-details>
-              <v-radio
-                value="append"
-                :label="t('bmp.modeAppend')"
-                color="primary"
-              />
-              <v-radio
-                value="replace"
-                :label="t('bmp.modeReplace')"
-                color="error"
-              />
+              <v-radio value="append" :label="t('bmp.modeAppend')" color="primary" />
+              <v-radio value="replace" :label="t('bmp.modeReplace')" color="error" />
             </v-radio-group>
           </div>
         </div>
@@ -448,9 +435,7 @@ function handleClose() {
 }
 
 async function confirmImport() {
-  const selectedMeds = detectedMeds.value
-    .filter((m) => m.selected)
-    .map(({ selected, ...medData }) => medData);
+  const selectedMeds = detectedMeds.value.filter((m) => m.selected).map(({ selected, ...medData }) => medData);
 
   if (selectedMeds.length === 0) {
     errorMessage.value = t('bmp.noMedsSelected');

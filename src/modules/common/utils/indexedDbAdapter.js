@@ -16,8 +16,10 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, {
     }
   },
   blocked() {
-    console.error("IndexedDB blocked. Please close other tabs with this app open.");
-    alert("The database needs to update, but other tabs are blocking it. Please close all other tabs with this app open and reload.");
+    console.error('IndexedDB blocked. Please close other tabs with this app open.');
+    alert(
+      'The database needs to update, but other tabs are blocking it. Please close all other tabs with this app open and reload.'
+    );
   }
 });
 
@@ -34,7 +36,7 @@ export async function getDatabaseList() {
     modifiedAt,
     encryptionStrategy,
     medsCount: medsCount || 0,
-    calendarCount: calendarCount || 0,
+    calendarCount: calendarCount || 0
   }));
 }
 
@@ -100,7 +102,7 @@ export async function getSettings() {
     vaultDisplayMode: await getSetting('vaultDisplayMode', 'simple'),
     disclaimerVersion,
     disclaimerAccepted: disclaimerVersion >= CURRENT_DISCLAIMER_VERSION,
-    lastSeenChangelogVersion: await getSetting('lastSeenChangelogVersion', ''),
+    lastSeenChangelogVersion: await getSetting('lastSeenChangelogVersion', '')
   };
   return settings;
 }
@@ -111,7 +113,7 @@ export const DEFAULT_REMINDER_SETTINGS = {
     { id: 'morning', labelKey: 'reminders.morning', time: '08:00', enabled: true },
     { id: 'noon', labelKey: 'reminders.noon', time: '12:00', enabled: true },
     { id: 'evening', labelKey: 'reminders.evening', time: '18:00', enabled: true },
-    { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false },
+    { id: 'night', labelKey: 'reminders.night', time: '22:00', enabled: false }
   ],
   lastNotified: {}
 };
@@ -157,7 +159,7 @@ export const getBiometricSession = async (vaultId) => {
 
 export const saveBiometricSession = async (sessionData) => {
   if (!sessionData || sessionData.vaultId === undefined) {
-    throw new Error("Invalid biometric session: vaultId is required.");
+    throw new Error('Invalid biometric session: vaultId is required.');
   }
   return setSetting(`biometric_session_${sessionData.vaultId}`, sessionData);
 };

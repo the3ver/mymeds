@@ -46,7 +46,9 @@ describe('BmpExportDialog.vue', () => {
   });
 
   it('shows a payload generation error and clears it once generation succeeds again', async () => {
-    generateBmpPayload.mockImplementationOnce(() => { throw new Error('payload too large'); });
+    generateBmpPayload.mockImplementationOnce(() => {
+      throw new Error('payload too large');
+    });
     const wrapper = mount(BmpExportDialog, {
       props: { modelValue: true, meds: appState.decryptedData.meds },
       global: { plugins: [vuetify, i18n] }

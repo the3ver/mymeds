@@ -4,24 +4,24 @@ import { computed } from 'vue';
 const props = defineProps({
   shape: {
     type: String,
-    default: 'letter',
+    default: 'letter'
   },
   pillSize: {
     type: String,
-    default: 'medium', // 'small', 'medium', 'large'
+    default: 'medium' // 'small', 'medium', 'large'
   },
   color: {
     type: String,
-    default: 'blue',
+    default: 'blue'
   },
   name: {
     type: String,
-    default: '',
+    default: ''
   },
   size: {
     type: [Number, String],
-    default: 40,
-  },
+    default: 40
+  }
 });
 
 const colorMap = {
@@ -37,7 +37,7 @@ const colorMap = {
   orange: '#FB8C00',
   'deep-orange': '#F4511E',
   'blue-grey': '#546E7A',
-  white: '#FFFFFF',
+  white: '#FFFFFF'
 };
 
 const resolvedColor = computed(() => {
@@ -66,7 +66,7 @@ const scaleStyle = computed(() => {
   else if (props.pillSize === 'large') scale = 1.0;
   return {
     transform: `scale(${scale})`,
-    transformOrigin: 'center center',
+    transformOrigin: 'center center'
   };
 });
 
@@ -85,12 +85,12 @@ const isPill = computed(() => {
     :class="{
       'pill-avatar--pill': isPill,
       'pill-avatar--letter': !isPill,
-      'pill-avatar--white': isWhite,
+      'pill-avatar--white': isWhite
     }"
     :style="{
       width: `${size}px`,
       height: `${size}px`,
-      backgroundColor: !isPill ? resolvedColor : undefined,
+      backgroundColor: !isPill ? resolvedColor : undefined
     }"
   >
     <!-- Letter Mode -->
@@ -104,12 +104,7 @@ const isPill = computed(() => {
     </span>
 
     <!-- Pill Shape SVG Mode -->
-    <svg
-      v-else
-      class="pill-avatar-svg"
-      viewBox="0 0 40 40"
-      :style="{ width: `${size}px`, height: `${size}px` }"
-    >
+    <svg v-else class="pill-avatar-svg" viewBox="0 0 40 40" :style="{ width: `${size}px`, height: `${size}px` }">
       <g class="pill-graphic-scaled" :style="scaleStyle">
         <!-- 1. Round -->
         <g v-if="shape === 'round'" data-shape="round">
@@ -120,15 +115,42 @@ const isPill = computed(() => {
         <!-- 2. Round with Score -->
         <g v-else-if="shape === 'round-score'" data-shape="round-score">
           <circle cx="20" cy="20" r="14" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
-          <line class="pill-score-line" x1="20" y1="7" x2="20" y2="33" :stroke="scoreColor" stroke-width="1.8" stroke-linecap="round" />
+          <line
+            class="pill-score-line"
+            x1="20"
+            y1="7"
+            x2="20"
+            y2="33"
+            :stroke="scoreColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
           <ellipse cx="16" cy="13" rx="5" ry="2.5" fill="white" fill-opacity="0.3" />
         </g>
 
         <!-- 3. Round with Cross Score -->
         <g v-else-if="shape === 'round-cross'" data-shape="round-cross">
           <circle cx="20" cy="20" r="14" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
-          <line class="pill-score-line" x1="20" y1="7" x2="20" y2="33" :stroke="scoreColor" stroke-width="1.8" stroke-linecap="round" />
-          <line class="pill-score-line" x1="7" y1="20" x2="33" y2="20" :stroke="scoreColor" stroke-width="1.8" stroke-linecap="round" />
+          <line
+            class="pill-score-line"
+            x1="20"
+            y1="7"
+            x2="20"
+            y2="33"
+            :stroke="scoreColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <line
+            class="pill-score-line"
+            x1="7"
+            y1="20"
+            x2="33"
+            y2="20"
+            :stroke="scoreColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
         </g>
 
         <!-- 4. Capsule (Dual Color Smart-Default) -->
@@ -157,14 +179,41 @@ const isPill = computed(() => {
 
         <!-- 5. Oblong -->
         <g v-else-if="shape === 'oblong'" data-shape="oblong">
-          <rect x="7" y="13" width="26" height="14" rx="7" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
+          <rect
+            x="7"
+            y="13"
+            width="26"
+            height="14"
+            rx="7"
+            :fill="resolvedColor"
+            :stroke="strokeColor"
+            stroke-width="1.5"
+          />
           <ellipse cx="20" cy="16" rx="9" ry="2" fill="white" fill-opacity="0.3" />
         </g>
 
         <!-- 6. Oblong with Score -->
         <g v-else-if="shape === 'oblong-score'" data-shape="oblong-score">
-          <rect x="7" y="13" width="26" height="14" rx="7" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
-          <line class="pill-score-line" x1="20" y1="13.5" x2="20" y2="26.5" :stroke="scoreColor" stroke-width="1.8" stroke-linecap="round" />
+          <rect
+            x="7"
+            y="13"
+            width="26"
+            height="14"
+            rx="7"
+            :fill="resolvedColor"
+            :stroke="strokeColor"
+            stroke-width="1.5"
+          />
+          <line
+            class="pill-score-line"
+            x1="20"
+            y1="13.5"
+            x2="20"
+            y2="26.5"
+            :stroke="scoreColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
         </g>
 
         <!-- 7. Oval -->
@@ -219,7 +268,16 @@ const isPill = computed(() => {
 
         <!-- 12. Square -->
         <g v-else-if="shape === 'square'" data-shape="square">
-          <rect x="8" y="8" width="24" height="24" rx="4" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
+          <rect
+            x="8"
+            y="8"
+            width="24"
+            height="24"
+            rx="4"
+            :fill="resolvedColor"
+            :stroke="strokeColor"
+            stroke-width="1.5"
+          />
         </g>
 
         <!-- 13. Drop -->
@@ -235,7 +293,16 @@ const isPill = computed(() => {
 
         <!-- 14. Syringe / Pen -->
         <g v-else-if="shape === 'syringe'" data-shape="syringe">
-          <rect x="16" y="11" width="8" height="18" rx="1.5" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1.2" />
+          <rect
+            x="16"
+            y="11"
+            width="8"
+            height="18"
+            rx="1.5"
+            :fill="resolvedColor"
+            :stroke="strokeColor"
+            stroke-width="1.2"
+          />
           <line x1="20" y1="5" x2="20" y2="11" :stroke="strokeColor" stroke-width="1.5" />
           <line x1="14" y1="29" x2="26" y2="29" :stroke="strokeColor" stroke-width="2" />
           <rect x="18" y="29" width="4" height="6" :fill="resolvedColor" :stroke="strokeColor" stroke-width="1" />
@@ -263,14 +330,43 @@ const isPill = computed(() => {
             stroke-width="1.5"
             stroke-linejoin="round"
           />
-          <rect x="17" y="28" width="6" height="5" rx="1" :fill="isWhite ? '#CBD5E1' : '#FFFFFF'" :stroke="strokeColor" stroke-width="1.2" />
+          <rect
+            x="17"
+            y="28"
+            width="6"
+            height="5"
+            rx="1"
+            :fill="isWhite ? '#CBD5E1' : '#FFFFFF'"
+            :stroke="strokeColor"
+            stroke-width="1.2"
+          />
           <line x1="13" y1="8" x2="27" y2="8" :stroke="strokeColor" stroke-width="2" stroke-linecap="round" />
         </g>
 
         <!-- 17. Patch -->
         <g v-else-if="shape === 'patch'" data-shape="patch">
-          <rect x="7" y="7" width="26" height="26" rx="5" :fill="isWhite ? '#F8FAFC' : resolvedColor" :stroke="strokeColor" stroke-width="1.5" />
-          <rect x="12" y="12" width="16" height="16" rx="2" fill="white" fill-opacity="0.5" stroke="rgba(0,0,0,0.2)" stroke-width="1" stroke-dasharray="2,2" />
+          <rect
+            x="7"
+            y="7"
+            width="26"
+            height="26"
+            rx="5"
+            :fill="isWhite ? '#F8FAFC' : resolvedColor"
+            :stroke="strokeColor"
+            stroke-width="1.5"
+          />
+          <rect
+            x="12"
+            y="12"
+            width="16"
+            height="16"
+            rx="2"
+            fill="white"
+            fill-opacity="0.5"
+            stroke="rgba(0,0,0,0.2)"
+            stroke-width="1"
+            stroke-dasharray="2,2"
+          />
         </g>
 
         <!-- Fallback if unknown shape -->

@@ -46,20 +46,14 @@ export async function deriveKeyFromPassword(
 ): Promise<CryptoKey> {
   const subtle = getSubtleCrypto();
 
-  const importedKey = await subtle.importKey(
-    'raw',
-    encoder.encode(password),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveKey']
-  );
+  const importedKey = await subtle.importKey('raw', encoder.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
 
   return subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt as BufferSource,
       iterations,
-      hash: 'SHA-256',
+      hash: 'SHA-256'
     },
     importedKey,
     { name: 'AES-GCM', length: 256 },
@@ -83,7 +77,7 @@ export async function encryptData<T = unknown>(
   const encryptedData = await subtle.encrypt(
     {
       name: 'AES-GCM',
-      iv: iv as BufferSource,
+      iv: iv as BufferSource
     },
     key,
     encoder.encode(jsonString)
@@ -105,7 +99,7 @@ export async function decryptData<T = unknown>(
   const decryptedBuffer = await subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: iv as BufferSource,
+      iv: iv as BufferSource
     },
     key,
     encryptedData as BufferSource

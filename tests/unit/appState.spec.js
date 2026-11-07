@@ -3,11 +3,11 @@ import { state, unlock, lock } from '../../src/app-state';
 import * as dataService from '../../src/modules/common/utils/dataService';
 
 vi.mock('../../src/modules/common/utils/dataService', () => ({
-  saveAndLockDatabase: vi.fn().mockResolvedValue(true),
+  saveAndLockDatabase: vi.fn().mockResolvedValue(true)
 }));
 
 vi.mock('../../src/modules/common/utils/badgingService', () => ({
-  clearBadge: vi.fn().mockResolvedValue(undefined),
+  clearBadge: vi.fn().mockResolvedValue(undefined)
 }));
 
 describe('app-state', () => {
@@ -27,7 +27,7 @@ describe('app-state', () => {
       const mockData = {
         meds: [{ name: 'Aspirin', count: 10, dose: '1' }],
         calendar: [{ title: 'Termin', date: '2026-10-01' }],
-        lastDoseUpdate: '2026-08-27',
+        lastDoseUpdate: '2026-08-27'
       };
       const deductions = { Aspirin: 1 };
       const initialVersion = state.decryptedData.version;
@@ -59,7 +59,7 @@ describe('app-state', () => {
       unlock(1, 'password', {
         meds: [{ name: 'Med 1' }],
         calendar: [{ title: 'Event 1' }],
-        lastDoseUpdate: '2026-08-27',
+        lastDoseUpdate: '2026-08-27'
       });
 
       await lock();
@@ -117,7 +117,7 @@ describe('app-state', () => {
         1,
         'password',
         expect.objectContaining({
-          meds: expect.arrayContaining([expect.objectContaining({ name: 'Neues Medikament' })]),
+          meds: expect.arrayContaining([expect.objectContaining({ name: 'Neues Medikament' })])
         })
       );
     });

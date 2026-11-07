@@ -1,28 +1,28 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 
 defineProps({
   modelValue: Boolean
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'select'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue', 'select']);
+const { t } = useI18n();
 
 const types = [
   { value: 'doctor', icon: 'mdi-doctor', color: 'primary' },
   { value: 'vaccination', icon: 'mdi-needle', color: 'teal' },
   { value: 'illness', icon: 'mdi-emoticon-sick', color: 'orange' },
   { value: 'note', icon: 'mdi-note-text', color: 'blue-grey' }
-]
+];
 
 const select = (type) => {
-  emit('select', type)
-  emit('update:modelValue', false)
-}
+  emit('select', type);
+  emit('update:modelValue', false);
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -58,5 +58,4 @@ const close = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

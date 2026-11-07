@@ -93,15 +93,17 @@ export function applyUpdateAndReload(registration) {
     });
   } else {
     // If no worker waiting or installing, check current registration or trigger reload
-    Promise.resolve(navigator.serviceWorker.getRegistration?.()).then((reg) => {
-      if (reg?.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      } else if (!reg?.installing) {
+    Promise.resolve(navigator.serviceWorker.getRegistration?.())
+      .then((reg) => {
+        if (reg?.waiting) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        } else if (!reg?.installing) {
+          reloadOnce();
+        }
+      })
+      .catch(() => {
         reloadOnce();
-      }
-    }).catch(() => {
-      reloadOnce();
-    });
+      });
   }
 }
 
@@ -127,33 +129,35 @@ export function onServiceWorkerUpdate(callback) {
   navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
   // Check if an update is already waiting or installing in background
-  Promise.resolve(navigator.serviceWorker.getRegistration?.()).then((registration) => {
-    if (!registration) return;
+  Promise.resolve(navigator.serviceWorker.getRegistration?.())
+    .then((registration) => {
+      if (!registration) return;
 
-    if (registration.waiting) {
-      callback(registration);
-      return;
-    }
+      if (registration.waiting) {
+        callback(registration);
+        return;
+      }
 
-    const handleUpdateFound = () => {
-      const installing = registration.installing;
-      if (!installing) return;
-      installing.addEventListener('statechange', () => {
-        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-          callback(registration);
-        }
-      });
-    };
-
-    if (registration.addEventListener) {
-      registration.addEventListener('updatefound', handleUpdateFound);
-      cleanupUpdateFound = () => {
-        if (registration.removeEventListener) {
-          registration.removeEventListener('updatefound', handleUpdateFound);
-        }
+      const handleUpdateFound = () => {
+        const installing = registration.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+            callback(registration);
+          }
+        });
       };
-    }
-  }).catch(() => {});
+
+      if (registration.addEventListener) {
+        registration.addEventListener('updatefound', handleUpdateFound);
+        cleanupUpdateFound = () => {
+          if (registration.removeEventListener) {
+            registration.removeEventListener('updatefound', handleUpdateFound);
+          }
+        };
+      }
+    })
+    .catch(() => {});
 
   return () => {
     navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);

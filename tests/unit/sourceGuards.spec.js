@@ -7,7 +7,7 @@ const ROOT = join(__dirname, '../..');
 const SRC = join(ROOT, 'src');
 
 function sourceFiles(dir = SRC) {
-  return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) return sourceFiles(path);
     return /\.(js|ts|vue)$/.test(entry.name) ? [path] : [];
@@ -15,7 +15,7 @@ function sourceFiles(dir = SRC) {
 }
 
 function findMatches(pattern) {
-  return sourceFiles().flatMap(file =>
+  return sourceFiles().flatMap((file) =>
     readFileSync(file, 'utf8')
       .split('\n')
       .map((line, i) => (pattern.test(line) ? `${relative(ROOT, file)}:${i + 1}` : null))
@@ -38,7 +38,7 @@ describe('source guards', () => {
 
   it('has a rule in the icon subset for every mdi icon the app uses (run npm run icons)', () => {
     const defined = definedIcons();
-    const missing = [...collectUsedIcons()].filter(icon => !defined.has(icon)).sort();
+    const missing = [...collectUsedIcons()].filter((icon) => !defined.has(icon)).sort();
     expect(missing).toEqual([]);
   });
 });

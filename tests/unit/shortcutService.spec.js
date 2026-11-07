@@ -10,27 +10,27 @@ describe('shortcutService', () => {
     it('correctly parses tab and action from query string', () => {
       expect(shortcutService.parseShortcutIntent('?tab=calendar')).toEqual({
         tab: 'calendar',
-        action: null,
+        action: null
       });
 
       expect(shortcutService.parseShortcutIntent('?action=scan')).toEqual({
         tab: null,
-        action: 'scan',
+        action: 'scan'
       });
 
       expect(shortcutService.parseShortcutIntent('?tab=meds&action=scan')).toEqual({
         tab: 'meds',
-        action: 'scan',
+        action: 'scan'
       });
 
       expect(shortcutService.parseShortcutIntent('')).toEqual({
         tab: null,
-        action: null,
+        action: null
       });
 
       expect(shortcutService.parseShortcutIntent('?foo=bar')).toEqual({
         tab: null,
-        action: null,
+        action: null
       });
     });
   });
@@ -44,7 +44,7 @@ describe('shortcutService', () => {
       const intent = shortcutService.consumeShortcutIntent();
       expect(intent).toEqual({
         tab: 'calendar',
-        action: 'scan',
+        action: 'scan'
       });
 
       // replaceState should have been called removing tab and action but keeping other params
@@ -63,7 +63,7 @@ describe('shortcutService', () => {
       const intent = shortcutService.consumeShortcutIntent();
       expect(intent).toEqual({
         tab: null,
-        action: null,
+        action: null
       });
       expect(replaceSpy).not.toHaveBeenCalled();
     });

@@ -15,11 +15,11 @@ describe('MedDialog.vue', () => {
     return mount(MedDialog, {
       props: {
         modelValue: true,
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 

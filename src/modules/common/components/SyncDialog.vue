@@ -12,22 +12,11 @@
           <v-icon icon="mdi-sync" color="primary" class="mr-2" />
           {{ t('sync.title') }}
         </div>
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          density="comfortable"
-          class="close-sync-btn"
-          @click="handleClose"
-        />
+        <v-btn icon="mdi-close" variant="text" density="comfortable" class="close-sync-btn" @click="handleClose" />
       </v-card-title>
 
       <!-- Tabs (Send / Receive) -->
-      <v-tabs
-        v-model="activeTab"
-        color="primary"
-        grow
-        class="border-b mb-4"
-      >
+      <v-tabs v-model="activeTab" color="primary" grow class="border-b mb-4">
         <v-tab value="send">
           <v-icon icon="mdi-upload" class="mr-1" />
           {{ t('sync.tabSend') }}
@@ -52,12 +41,7 @@
         </v-alert>
 
         <!-- Success Toast Alert -->
-        <v-alert
-          v-if="successMessage"
-          type="success"
-          variant="tonal"
-          class="mb-4"
-        >
+        <v-alert v-if="successMessage" type="success" variant="tonal" class="mb-4">
           {{ successMessage }}
         </v-alert>
 
@@ -143,12 +127,7 @@
                 color="primary"
                 class="mr-2"
               />
-              <v-icon
-                v-else-if="senderStatus === 'success'"
-                icon="mdi-check-circle"
-                color="success"
-                class="mr-1"
-              />
+              <v-icon v-else-if="senderStatus === 'success'" icon="mdi-check-circle" color="success" class="mr-1" />
               <span>
                 {{ senderStatusText }}
               </span>
@@ -188,7 +167,10 @@
               {{ t('sync.connectAndReceive') }}
             </v-btn>
 
-            <div v-if="receiverStatus !== 'idle'" class="d-flex align-center justify-center text-caption text-medium-emphasis pt-3">
+            <div
+              v-if="receiverStatus !== 'idle'"
+              class="d-flex align-center justify-center text-caption text-medium-emphasis pt-3"
+            >
               <v-progress-circular
                 v-if="receiverStatus === 'connecting' || receiverStatus === 'receiving'"
                 indeterminate
@@ -235,8 +217,12 @@
                 {{ t('sync.previewTitle') }}: {{ receivedVault.name }}
               </div>
               <div class="text-caption text-medium-emphasis">
-                <div>{{ t('app.db.meds') }}: <strong>{{ receivedVault.medsCount }}</strong></div>
-                <div>{{ t('app.db.entries') }}: <strong>{{ receivedVault.calendarCount }}</strong></div>
+                <div>
+                  {{ t('app.db.meds') }}: <strong>{{ receivedVault.medsCount }}</strong>
+                </div>
+                <div>
+                  {{ t('app.db.entries') }}: <strong>{{ receivedVault.calendarCount }}</strong>
+                </div>
                 <div v-if="receivedVault.modifiedAt">
                   {{ t('app.db.modified') }}: {{ formatTimestamp(receivedVault.modifiedAt) }}
                 </div>
@@ -254,27 +240,13 @@
               </p>
 
               <v-radio-group v-model="conflictMode" density="compact" hide-details>
-                <v-radio
-                  value="overwrite"
-                  :label="t('sync.modeOverwrite')"
-                  color="warning"
-                />
-                <v-radio
-                  value="copy"
-                  :label="t('sync.modeCopy')"
-                  color="primary"
-                />
+                <v-radio value="overwrite" :label="t('sync.modeOverwrite')" color="warning" />
+                <v-radio value="copy" :label="t('sync.modeCopy')" color="primary" />
               </v-radio-group>
             </div>
 
             <!-- Save Action Button -->
-            <v-btn
-              block
-              color="primary"
-              size="large"
-              prepend-icon="mdi-content-save"
-              @click="handleSaveReceivedVault"
-            >
+            <v-btn block color="primary" size="large" prepend-icon="mdi-content-save" @click="handleSaveReceivedVault">
               {{ t('sync.saveVault') }}
             </v-btn>
           </div>
@@ -293,20 +265,20 @@ import * as dbAdapter from '../utils/indexedDbAdapter';
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false,
+    default: false
   },
   initialVaultId: {
     type: Number,
-    default: null,
+    default: null
   },
   initialTab: {
     type: String,
-    default: null, // 'send' | 'receive'
+    default: null // 'send' | 'receive'
   },
   databases: {
     type: Array,
-    default: () => [],
-  },
+    default: () => []
+  }
 });
 
 const emit = defineEmits(['update:modelValue', 'vault-imported']);
@@ -355,7 +327,7 @@ const senderStatusText = computed(() => {
   if (senderStatus.value === 'waiting') return t('sync.waitingForReceiver');
   if (senderStatus.value === 'connecting') return t('sync.connected');
   if (senderStatus.value === 'success') {
-    const db = props.databases.find(d => d.id === selectedVaultId.value);
+    const db = props.databases.find((d) => d.id === selectedVaultId.value);
     return t('sync.sendSuccess', { name: db?.name || '' });
   }
   return '';
@@ -369,7 +341,7 @@ const receiverStatusText = computed(() => {
 
 const existingConflictDb = computed(() => {
   if (!receivedVault.value) return null;
-  return props.databases.find(db => db.name.toLowerCase() === receivedVault.value.name.toLowerCase());
+  return props.databases.find((db) => db.name.toLowerCase() === receivedVault.value.name.toLowerCase());
 });
 
 // Format timestamp helper
@@ -440,7 +412,7 @@ async function initSenderSession() {
       },
       onTransferred: () => {
         senderStatus.value = 'success';
-        const db = props.databases.find(d => d.id === selectedVaultId.value);
+        const db = props.databases.find((d) => d.id === selectedVaultId.value);
         successMessage.value = t('sync.sendSuccess', { name: db?.name || '' });
       },
       onError: (err) => {
@@ -557,12 +529,12 @@ async function handleSaveReceivedVault() {
     if (isConflict && conflictMode.value === 'overwrite') {
       importOptions = {
         mode: 'overwrite',
-        targetId: existingConflictDb.value.id,
+        targetId: existingConflictDb.value.id
       };
     } else if (isConflict && conflictMode.value === 'copy') {
       importOptions = {
         mode: 'create',
-        newName: `${receivedVault.value.name} (${t('dialog.copy') || 'Kopie'})`,
+        newName: `${receivedVault.value.name} (${t('dialog.copy') || 'Kopie'})`
       };
     }
 
@@ -571,7 +543,7 @@ async function handleSaveReceivedVault() {
     const savedId = await syncService.importVaultFromSync(rawPayload, importOptions);
     emit('vault-imported', savedId);
     successMessage.value = t('sync.importSuccess', { name: receivedVault.value.name });
-    
+
     // Close after short feedback
     setTimeout(() => {
       handleClose();
@@ -582,37 +554,41 @@ async function handleSaveReceivedVault() {
 }
 
 // Watch dialog open to setup tab and auto-init sender if appropriate
-watch(() => props.modelValue, (isOpen) => {
-  if (isOpen) {
-    resetState();
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen) {
+      resetState();
 
-    // Determine default tab
-    if (props.initialTab) {
-      activeTab.value = props.initialTab;
-    } else if (props.initialVaultId) {
-      activeTab.value = 'send';
-    } else if (props.databases.length === 0) {
-      activeTab.value = 'receive';
+      // Determine default tab
+      if (props.initialTab) {
+        activeTab.value = props.initialTab;
+      } else if (props.initialVaultId) {
+        activeTab.value = 'send';
+      } else if (props.databases.length === 0) {
+        activeTab.value = 'receive';
+      } else {
+        activeTab.value = 'send';
+      }
+
+      // Determine selected vault
+      if (props.initialVaultId) {
+        selectedVaultId.value = props.initialVaultId;
+      } else if (props.databases.length > 0) {
+        selectedVaultId.value = props.databases[0].id;
+      } else {
+        selectedVaultId.value = null;
+      }
+
+      if (activeTab.value === 'send' && selectedVaultId.value) {
+        initSenderSession();
+      }
     } else {
-      activeTab.value = 'send';
+      resetState();
     }
-
-    // Determine selected vault
-    if (props.initialVaultId) {
-      selectedVaultId.value = props.initialVaultId;
-    } else if (props.databases.length > 0) {
-      selectedVaultId.value = props.databases[0].id;
-    } else {
-      selectedVaultId.value = null;
-    }
-
-    if (activeTab.value === 'send' && selectedVaultId.value) {
-      initSenderSession();
-    }
-  } else {
-    resetState();
-  }
-}, { immediate: true });
+  },
+  { immediate: true }
+);
 
 // Watch tab change by user
 watch(activeTab, (tab) => {
@@ -626,15 +602,18 @@ watch(activeTab, (tab) => {
 });
 
 // Watch initialVaultId prop update
-watch(() => props.initialVaultId, (newId) => {
-  if (newId) {
-    selectedVaultId.value = newId;
-    activeTab.value = 'send';
-    if (props.modelValue) {
-      initSenderSession();
+watch(
+  () => props.initialVaultId,
+  (newId) => {
+    if (newId) {
+      selectedVaultId.value = newId;
+      activeTab.value = 'send';
+      if (props.modelValue) {
+        initSenderSession();
+      }
     }
   }
-});
+);
 
 onUnmounted(() => {
   cleanupSessions();

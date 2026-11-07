@@ -11,7 +11,7 @@ import * as dataService from '../../src/modules/common/utils/dataService';
 vi.mock('../../src/modules/common/utils/dataService', () => ({
   saveTheme: vi.fn(),
   saveLocale: vi.fn(),
-  saveDisclaimerAccepted: vi.fn(),
+  saveDisclaimerAccepted: vi.fn()
 }));
 
 const vuetify = createVuetify({ components, directives });
@@ -27,16 +27,15 @@ describe('WelcomeDialog.vue', () => {
     document.body.innerHTML = '';
   });
 
-
   const mountComponent = (props = {}) => {
     return mount(WelcomeDialog, {
       props: {
         modelValue: true,
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
-      },
+        plugins: [vuetify, i18n]
+      }
     });
   };
 
@@ -58,7 +57,9 @@ describe('WelcomeDialog.vue', () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
-    const getStartedBtn = wrapper.findAllComponents(components.VBtn).find(btn => btn.text().includes('Loslegen') || btn.text().includes('Get Started'));
+    const getStartedBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.text().includes('Loslegen') || btn.text().includes('Get Started'));
     expect(getStartedBtn).toBeDefined();
     expect(getStartedBtn.props('disabled')).toBe(true);
   });
@@ -74,7 +75,9 @@ describe('WelcomeDialog.vue', () => {
     await checkbox.setValue(true);
     await wrapper.vm.$nextTick();
 
-    const getStartedBtn = wrapper.findAllComponents(components.VBtn).find(btn => btn.text().includes('Loslegen') || btn.text().includes('Get Started'));
+    const getStartedBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.text().includes('Loslegen') || btn.text().includes('Get Started'));
     expect(getStartedBtn.props('disabled')).toBe(false);
 
     await getStartedBtn.trigger('click');

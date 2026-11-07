@@ -22,12 +22,12 @@ describe('DatabaseUnlockDialog.vue', () => {
       props: {
         modelValue: true,
         database: { id: 1, name: 'Mein Medikamenten-Tresor' },
-        ...props,
+        ...props
       },
       global: {
-        plugins: [vuetify, i18n],
+        plugins: [vuetify, i18n]
       },
-      attachTo: document.body,
+      attachTo: document.body
     });
   };
 
@@ -66,9 +66,9 @@ describe('DatabaseUnlockDialog.vue', () => {
     await wrapper.vm.$nextTick();
     await new Promise((r) => setTimeout(r, 20));
 
-    const switchBtn = wrapper.findAllComponents(components.VBtn).find((b) =>
-      b.text().includes('Stattdessen Passwort eingeben')
-    );
+    const switchBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((b) => b.text().includes('Stattdessen Passwort eingeben'));
     expect(switchBtn).toBeDefined();
 
     await switchBtn.trigger('click');
@@ -85,16 +85,16 @@ describe('DatabaseUnlockDialog.vue', () => {
       success: true,
       data: { meds: [], calendar: [] },
       deductions: {},
-      password: 'unwrapped-pw',
+      password: 'unwrapped-pw'
     });
 
     const wrapper = mountDialog();
     await wrapper.vm.$nextTick();
     await new Promise((r) => setTimeout(r, 20));
 
-    const unlockBtn = wrapper.findAllComponents(components.VBtn).find((b) =>
-      b.text().includes('Mit Biometrie entsperren')
-    );
+    const unlockBtn = wrapper
+      .findAllComponents(components.VBtn)
+      .find((b) => b.text().includes('Mit Biometrie entsperren'));
     expect(unlockBtn).toBeDefined();
 
     await unlockBtn.trigger('click');
@@ -111,7 +111,7 @@ describe('DatabaseUnlockDialog.vue', () => {
     vi.spyOn(dataService, 'unlockDatabase').mockResolvedValue({
       success: true,
       data: { meds: [] },
-      deductions: {},
+      deductions: {}
     });
     vi.spyOn(biometricService, 'enrollBiometrics').mockResolvedValue({});
 
@@ -125,9 +125,7 @@ describe('DatabaseUnlockDialog.vue', () => {
     const checkbox = wrapper.findComponent(components.VCheckbox);
     await checkbox.setValue(true);
 
-    const unlockBtn = wrapper.findAllComponents(components.VBtn).find((b) =>
-      b.text() === 'Entsperren'
-    );
+    const unlockBtn = wrapper.findAllComponents(components.VBtn).find((b) => b.text() === 'Entsperren');
     expect(unlockBtn).toBeDefined();
 
     await unlockBtn.trigger('click');

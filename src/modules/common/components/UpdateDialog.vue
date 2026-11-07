@@ -1,18 +1,18 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import packageJson from '../../../../package.json'
+import { useI18n } from 'vue-i18n';
+import packageJson from '../../../../package.json';
 
 defineProps({
   modelValue: Boolean
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
-const appVersion = packageJson.version
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
+const appVersion = packageJson.version;
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -39,12 +39,7 @@ const close = () => {
         </v-btn>
       </v-card-text>
       <v-card-actions class="justify-center pb-4">
-        <v-btn
-          color="primary"
-          variant="elevated"
-          @click="close"
-          class="px-8"
-        >
+        <v-btn color="primary" variant="elevated" @click="close" class="px-8">
           {{ t('update.close') }}
         </v-btn>
       </v-card-actions>
@@ -52,5 +47,4 @@ const close = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

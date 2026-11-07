@@ -1,8 +1,4 @@
-import {
-  BrowserMultiFormatReader,
-  BarcodeFormat,
-  DecodeHintType
-} from '@zxing/library';
+import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 
 let zxingReaderInstance = null;
 
@@ -53,7 +49,11 @@ export async function decodeImageData(imageSource) {
   // 2. Fallback to ZXing
   try {
     const reader = getZxingReader();
-    if (imageSource instanceof HTMLImageElement || imageSource instanceof HTMLCanvasElement || imageSource instanceof HTMLVideoElement) {
+    if (
+      imageSource instanceof HTMLImageElement ||
+      imageSource instanceof HTMLCanvasElement ||
+      imageSource instanceof HTMLVideoElement
+    ) {
       const result = await reader.decode(imageSource);
       if (result && result.getText()) {
         return result.getText();
@@ -122,12 +122,7 @@ export async function scanBarcodeFromFile(file) {
 /**
  * Starts continuous live camera scanning on the provided HTMLVideoElement.
  */
-export function startCameraScanner({
-  videoElement,
-  onResult,
-  onError,
-  facingMode = 'environment'
-}) {
+export function startCameraScanner({ videoElement, onResult, onError, facingMode = 'environment' }) {
   let isStopped = false;
   let stream = null;
   let animationFrameId = null;

@@ -36,7 +36,7 @@ describe('reminderService', () => {
     afterEach(() => {
       Object.defineProperty(navigator, 'userAgent', {
         value: originalUserAgent,
-        configurable: true,
+        configurable: true
       });
       delete window.PeriodicSyncManager;
     });
@@ -56,7 +56,7 @@ describe('reminderService', () => {
 
       Object.defineProperty(navigator, 'userAgent', {
         value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-        configurable: true,
+        configurable: true
       });
 
       expect(reminderService.isTwaEnvironment()).toBe(false);
@@ -69,7 +69,7 @@ describe('reminderService', () => {
 
       Object.defineProperty(document, 'referrer', {
         value: 'android-app://org.mymeds.twa',
-        configurable: true,
+        configurable: true
       });
 
       expect(reminderService.isTwaEnvironment()).toBe(true);
@@ -82,12 +82,12 @@ describe('reminderService', () => {
 
       Object.defineProperty(navigator, 'userAgent', {
         value: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36',
-        configurable: true,
+        configurable: true
       });
 
       Object.defineProperty(navigator, 'serviceWorker', {
         value: {},
-        configurable: true,
+        configurable: true
       });
 
       window.Notification = { permission: 'default' };
@@ -95,7 +95,7 @@ describe('reminderService', () => {
       ServiceWorkerRegistration.prototype.periodicSync = {};
 
       window.matchMedia = vi.fn().mockImplementation((query) => ({
-        matches: query === '(display-mode: standalone)',
+        matches: query === '(display-mode: standalone)'
       }));
 
       expect(reminderService.isTwaEnvironment()).toBe(true);
@@ -107,7 +107,7 @@ describe('reminderService', () => {
     it('returns no due slots if reminders are disabled', () => {
       const settings = {
         enabled: false,
-        slots: [{ id: 'morning', time: '08:00', enabled: true }],
+        slots: [{ id: 'morning', time: '08:00', enabled: true }]
       };
       const result = reminderService.evaluateDueReminders(settings, new Date('2026-09-06T08:15:00'));
       expect(result.dueSlots).toHaveLength(0);
@@ -119,9 +119,9 @@ describe('reminderService', () => {
         enabled: true,
         slots: [
           { id: 'morning', time: '08:00', enabled: true },
-          { id: 'noon', time: '12:00', enabled: true },
+          { id: 'noon', time: '12:00', enabled: true }
         ],
-        lastNotified: {},
+        lastNotified: {}
       };
 
       const testDate = new Date('2026-09-06T08:15:00');
@@ -138,8 +138,8 @@ describe('reminderService', () => {
         enabled: true,
         slots: [{ id: 'morning', time: '08:00', enabled: true }],
         lastNotified: {
-          '2026-09-06_morning': 1725609600000,
-        },
+          '2026-09-06_morning': 1725609600000
+        }
       };
 
       const testDate = new Date('2026-09-06T08:15:00');
@@ -153,7 +153,7 @@ describe('reminderService', () => {
       const settings = {
         enabled: true,
         slots: [{ id: 'morning', time: '08:00', enabled: true }],
-        lastNotified: {},
+        lastNotified: {}
       };
 
       const testDate = new Date('2026-09-06T07:45:00');
@@ -167,7 +167,7 @@ describe('reminderService', () => {
       const settings = {
         enabled: true,
         slots: [{ id: 'morning', time: '08:00', enabled: true }],
-        lastNotified: {},
+        lastNotified: {}
       };
 
       // 08:00 is 180 minutes ago at 11:00
@@ -185,18 +185,18 @@ describe('reminderService', () => {
         slots: [
           { id: 'morning', time: '08:00', enabled: true },
           { id: 'noon', time: '12:00', enabled: true },
-          { id: 'custom_1', time: '12:30', enabled: true },
+          { id: 'custom_1', time: '12:30', enabled: true }
         ],
         lastNotified: {
-          '2026-08-20_morning': oldDate,
-        },
+          '2026-08-20_morning': oldDate
+        }
       };
 
       const testDate = new Date('2026-09-06T12:35:00');
       const result = reminderService.evaluateDueReminders(settings, testDate);
 
       // noon (12:00) and custom_1 (12:30) are both within 120 mins of 12:35
-      expect(result.dueSlots.map(s => s.id)).toEqual(['noon', 'custom_1']);
+      expect(result.dueSlots.map((s) => s.id)).toEqual(['noon', 'custom_1']);
       // Old date pruned
       expect(result.updatedLastNotified['2026-08-20_morning']).toBeUndefined();
       expect(result.updatedLastNotified['2026-09-06_noon']).toBeDefined();

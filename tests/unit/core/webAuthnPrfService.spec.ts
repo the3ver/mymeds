@@ -6,7 +6,7 @@ import {
   wrapPassword,
   unwrapPassword,
   createPrfCredential,
-  getPrfKey,
+  getPrfKey
 } from '../../../src/core/crypto/webAuthnPrfService';
 import { generateSalt } from '../../../src/core/crypto/cryptoService';
 import { bufferToBase64 } from '../../../src/core/crypto/base64';
@@ -20,10 +20,10 @@ describe('core/crypto/webAuthnPrfService', () => {
       Object.defineProperty(navigator, 'credentials', {
         value: {
           create: vi.fn(),
-          get: vi.fn(),
+          get: vi.fn()
         },
         configurable: true,
-        writable: true,
+        writable: true
       });
     }
   });
@@ -125,9 +125,9 @@ describe('core/crypto/webAuthnPrfService', () => {
         getClientExtensionResults: () => ({
           prf: {
             enabled: true,
-            results: { first: mockPrfSecret.buffer },
-          },
-        }),
+            results: { first: mockPrfSecret.buffer }
+          }
+        })
       };
 
       (window as any).PublicKeyCredential = function () {};
@@ -146,9 +146,9 @@ describe('core/crypto/webAuthnPrfService', () => {
       const mockAssertion: any = {
         getClientExtensionResults: () => ({
           prf: {
-            results: { first: mockPrfSecret.buffer },
-          },
-        }),
+            results: { first: mockPrfSecret.buffer }
+          }
+        })
       };
 
       (window as any).PublicKeyCredential = function () {};
@@ -165,8 +165,8 @@ describe('core/crypto/webAuthnPrfService', () => {
     it('throws error when PRF output is missing in assertion', async () => {
       const mockAssertion: any = {
         getClientExtensionResults: () => ({
-          prf: {}, // No results.first
-        }),
+          prf: {} // No results.first
+        })
       };
 
       (window as any).PublicKeyCredential = function () {};

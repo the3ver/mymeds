@@ -6,7 +6,7 @@ import * as biometricService from '../utils/biometricSessionService';
 
 const props = defineProps({
   modelValue: Boolean,
-  database: Object,
+  database: Object
 });
 const emit = defineEmits(['update:modelValue', 'unlocked', 'biometric-updated']);
 
@@ -174,12 +174,7 @@ async function unlockWithPassword() {
             {{ t('biometrics.unlockWith') }}
           </v-btn>
 
-          <v-btn
-            variant="text"
-            size="small"
-            :disabled="loading"
-            @click="showPasswordInput = true"
-          >
+          <v-btn variant="text" size="small" :disabled="loading" @click="showPasswordInput = true">
             {{ t('biometrics.usePasswordInstead') }}
           </v-btn>
         </div>
@@ -224,12 +219,7 @@ async function unlockWithPassword() {
         <v-btn variant="text" :disabled="loading" @click="close">
           {{ t('dialog.cancel') }}
         </v-btn>
-        <v-btn
-          v-if="showPasswordInput || !hasBiometric"
-          color="primary"
-          :loading="loading"
-          @click="unlockWithPassword"
-        >
+        <v-btn v-if="showPasswordInput || !hasBiometric" color="primary" :loading="loading" @click="unlockWithPassword">
           {{ t('dialog.unlock') }}
         </v-btn>
       </v-card-actions>

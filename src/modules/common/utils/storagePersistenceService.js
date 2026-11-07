@@ -7,11 +7,13 @@
  * @returns {boolean}
  */
 export function isPersistenceSupported() {
-  return typeof navigator !== 'undefined' &&
+  return (
+    typeof navigator !== 'undefined' &&
     'storage' in navigator &&
     Boolean(navigator.storage) &&
     typeof navigator.storage.persist === 'function' &&
-    typeof navigator.storage.persisted === 'function';
+    typeof navigator.storage.persisted === 'function'
+  );
 }
 
 /**
@@ -67,7 +69,8 @@ export function formatBytes(bytes) {
  * @returns {Promise<{supported: boolean, usage: number, quota: number, usageFormatted: string, quotaFormatted: string, percentUsed: number}>}
  */
 export async function getStorageEstimate() {
-  const isSupported = typeof navigator !== 'undefined' &&
+  const isSupported =
+    typeof navigator !== 'undefined' &&
     'storage' in navigator &&
     Boolean(navigator.storage) &&
     typeof navigator.storage.estimate === 'function';
@@ -79,7 +82,7 @@ export async function getStorageEstimate() {
       quota: 0,
       usageFormatted: '0 B',
       quotaFormatted: '0 B',
-      percentUsed: 0,
+      percentUsed: 0
     };
   }
 
@@ -95,7 +98,7 @@ export async function getStorageEstimate() {
       quota,
       usageFormatted: formatBytes(usage),
       quotaFormatted: formatBytes(quota),
-      percentUsed,
+      percentUsed
     };
   } catch (err) {
     console.warn('[storagePersistenceService] Error querying storage estimate:', err);
@@ -105,7 +108,7 @@ export async function getStorageEstimate() {
       quota: 0,
       usageFormatted: '0 B',
       quotaFormatted: '0 B',
-      percentUsed: 0,
+      percentUsed: 0
     };
   }
 }
@@ -125,7 +128,3 @@ export async function autoRequestPersistence() {
   }
   return await requestPersistence();
 }
-
-
-
-

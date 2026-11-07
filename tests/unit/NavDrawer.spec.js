@@ -89,7 +89,7 @@ describe('NavDrawer.vue', () => {
     expect(checkBtn.exists()).toBe(true);
 
     await checkBtn.trigger('click');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 600));
     await flushPromises();
 
     expect(checkSpy).toHaveBeenCalled();
@@ -113,12 +113,12 @@ describe('NavDrawer.vue', () => {
 
     const checkBtn = wrapper.find('[data-testid="nav-check-updates-btn"]');
     await checkBtn.trigger('click');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 600));
     await flushPromises();
 
-    const reloadBtn = navDrawer.findAllComponents(components.VBtn).find(btn =>
-      btn.text().includes('Jetzt neu laden') || btn.text().includes('Reload Now')
-    );
+    const reloadBtn = navDrawer
+      .findAllComponents(components.VBtn)
+      .find((btn) => btn.text().includes('Jetzt neu laden') || btn.text().includes('Reload Now'));
     expect(reloadBtn).toBeDefined();
 
     await reloadBtn.trigger('click');

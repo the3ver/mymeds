@@ -50,7 +50,7 @@ export class VaultStorage {
    */
   async listVaults(): Promise<VaultSummary[]> {
     const db = await this.dbPromise;
-    const records = await db.getAll(this.vaultStoreName) as VaultRecord[];
+    const records = (await db.getAll(this.vaultStoreName)) as VaultRecord[];
 
     return records.map((entry) => {
       const summary: VaultSummary = {
@@ -59,7 +59,7 @@ export class VaultStorage {
         createdAt: entry.createdAt,
         modifiedAt: entry.modifiedAt,
         encryptionStrategy: entry.encryptionStrategy,
-        metadata: entry.metadata || {},
+        metadata: entry.metadata || {}
       };
 
       // Preserve any legacy fields present on the record (e.g. medsCount, calendarCount)
@@ -105,7 +105,7 @@ export class VaultStorage {
     const db = await this.dbPromise;
     const tx = db.transaction(this.vaultStoreName, 'readwrite');
     const store = tx.objectStore(this.vaultStoreName);
-    const entry = await store.get(id) as VaultRecord | undefined;
+    const entry = (await store.get(id)) as VaultRecord | undefined;
     if (entry) {
       entry.name = newName;
       entry.modifiedAt = new Date();

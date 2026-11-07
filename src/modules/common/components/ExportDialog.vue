@@ -1,30 +1,30 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   modelValue: Boolean,
   dataContent: String,
   fileName: String
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 
 const saveFile = () => {
-  const blob = new Blob([props.dataContent], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = props.fileName
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-  close()
-}
+  const blob = new Blob([props.dataContent], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = props.fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  close();
+};
 
 const shareFile = async () => {
-  const file = new File([props.dataContent], props.fileName, { type: 'application/json' })
+  const file = new File([props.dataContent], props.fileName, { type: 'application/json' });
 
   if (navigator.canShare && navigator.share) {
     try {
@@ -32,21 +32,21 @@ const shareFile = async () => {
         files: [file],
         title: 'MyMeds Data Export',
         text: 'MyMeds Data Export'
-      })
+      });
     } catch (error) {
-      console.error('Error sharing:', error)
+      console.error('Error sharing:', error);
       // Fallback to save if sharing fails/cancelled
-      saveFile()
+      saveFile();
     }
   } else {
-    saveFile()
+    saveFile();
   }
-  close()
-}
+  close();
+};
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -71,5 +71,4 @@ const close = () => {
   </v-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

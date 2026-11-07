@@ -1,38 +1,38 @@
 <script setup>
-import { ref } from 'vue'
-import { useTheme } from 'vuetify'
-import { useI18n } from 'vue-i18n'
-import * as dataService from '../utils/dataService'
+import { ref } from 'vue';
+import { useTheme } from 'vuetify';
+import { useI18n } from 'vue-i18n';
+import * as dataService from '../utils/dataService';
 
 defineProps({
   modelValue: Boolean,
   isExistingUser: {
     type: Boolean,
-    default: false,
+    default: false
   }
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
-const theme = useTheme()
-const { t, locale } = useI18n()
-const disclaimerAccepted = ref(false)
+const theme = useTheme();
+const { t, locale } = useI18n();
+const disclaimerAccepted = ref(false);
 
 const setTheme = (mode) => {
-  theme.global.name.value = mode
-  dataService.saveTheme(mode)
-}
+  theme.global.name.value = mode;
+  dataService.saveTheme(mode);
+};
 
 const setLanguage = (lang) => {
-  locale.value = lang
-  dataService.saveLocale(lang)
-}
+  locale.value = lang;
+  dataService.saveLocale(lang);
+};
 
 const onGetStarted = async () => {
-  if (!disclaimerAccepted.value) return
-  await dataService.saveDisclaimerAccepted(true)
-  emit('update:modelValue', false)
-}
+  if (!disclaimerAccepted.value) return;
+  await dataService.saveDisclaimerAccepted(true);
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
@@ -41,7 +41,7 @@ const onGetStarted = async () => {
       <v-card-title class="text-h5 text-center pt-4">
         {{ isExistingUser ? t('welcome.existingUserTitle') : t('welcome.title') }}
       </v-card-title>
-      
+
       <v-card-text class="pt-2">
         <p v-if="!isExistingUser" class="text-center mb-2">{{ t('welcome.thankYou') }}</p>
         <p v-else class="text-center mb-2 font-weight-medium text-body-1">{{ t('welcome.existingUserIntro') }}</p>
@@ -49,18 +49,10 @@ const onGetStarted = async () => {
 
         <p class="mb-2 font-weight-bold text-center">{{ t('welcome.chooseLanguage') }}</p>
         <div class="d-flex justify-center gap-4 mb-6">
-          <v-btn
-            variant="outlined"
-            :color="locale === 'en' ? 'primary' : ''"
-            @click="setLanguage('en')"
-          >
+          <v-btn variant="outlined" :color="locale === 'en' ? 'primary' : ''" @click="setLanguage('en')">
             English
           </v-btn>
-          <v-btn
-            variant="outlined"
-            :color="locale === 'de' ? 'primary' : ''"
-            @click="setLanguage('de')"
-          >
+          <v-btn variant="outlined" :color="locale === 'de' ? 'primary' : ''" @click="setLanguage('de')">
             Deutsch
           </v-btn>
         </div>
@@ -91,12 +83,7 @@ const onGetStarted = async () => {
         </div>
 
         <!-- Medical Disclaimer Alert / Card -->
-        <v-alert
-          type="warning"
-          variant="tonal"
-          border="start"
-          class="mb-4 text-body-2 disclaimer-box"
-        >
+        <v-alert type="warning" variant="tonal" border="start" class="mb-4 text-body-2 disclaimer-box">
           <template #title>
             <span class="font-weight-bold">{{ t('welcome.disclaimer.title') }}</span>
           </template>
@@ -109,13 +96,7 @@ const onGetStarted = async () => {
           </ul>
         </v-alert>
 
-        <v-checkbox
-          v-model="disclaimerAccepted"
-          color="primary"
-          density="comfortable"
-          hide-details
-          class="mt-2"
-        >
+        <v-checkbox v-model="disclaimerAccepted" color="primary" density="comfortable" hide-details class="mt-2">
           <template #label>
             <span class="text-caption font-weight-medium">
               {{ t('welcome.disclaimer.checkbox') }}

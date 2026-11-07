@@ -19,8 +19,7 @@ const mockVisualViewport = {
   pageTop: 0,
   scale: 1,
   addEventListener: () => {},
-  removeEventListener: () => {},
+  removeEventListener: () => {}
 };
 window.visualViewport = mockVisualViewport;
 globalThis.visualViewport = mockVisualViewport;
-

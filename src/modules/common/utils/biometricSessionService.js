@@ -94,7 +94,7 @@ export async function enrollBiometrics(vaultId, password, vaultName = null, ttlD
     wrappedPassword: bufferToBase64(wrappedPassword),
     iv: bufferToBase64(iv),
     createdAt: now,
-    expiresAt: now + (ttl * 24 * 60 * 60 * 1000),
+    expiresAt: now + ttl * 24 * 60 * 60 * 1000
   };
 
   await dbAdapter.saveBiometricSession(sessionData);

@@ -142,13 +142,28 @@ export function cleanDateToBmp(dateStr) {
 }
 
 const DAY_LABELS = {
-  1: 'Mo', mo: 'Mo', mon: 'Mo',
-  2: 'Di', di: 'Di', tue: 'Di',
-  3: 'Mi', mi: 'Mi', wed: 'Mi',
-  4: 'Do', do: 'Do', thu: 'Do',
-  5: 'Fr', fr: 'Fr', fri: 'Fr',
-  6: 'Sa', sa: 'Sa', sat: 'Sa',
-  0: 'So', 7: 'So', so: 'So', sun: 'So'
+  1: 'Mo',
+  mo: 'Mo',
+  mon: 'Mo',
+  2: 'Di',
+  di: 'Di',
+  tue: 'Di',
+  3: 'Mi',
+  mi: 'Mi',
+  wed: 'Mi',
+  4: 'Do',
+  do: 'Do',
+  thu: 'Do',
+  5: 'Fr',
+  fr: 'Fr',
+  fri: 'Fr',
+  6: 'Sa',
+  sa: 'Sa',
+  sat: 'Sa',
+  0: 'So',
+  7: 'So',
+  so: 'So',
+  sun: 'So'
 };
 
 function formatDayLabel(day) {
@@ -227,13 +242,7 @@ export function generateUUID() {
 /**
  * Generates official KBV Bundesmedikationsplan (BMP) XML (Ultrakurzformat / UKF).
  */
-export function generateBmpXml({
-  meds = [],
-  patient = {},
-  doctor = {},
-  planId,
-  date
-} = {}) {
+export function generateBmpXml({ meds = [], patient = {}, doctor = {}, planId, date } = {}) {
   const uuid = planId || generateUUID();
   const timestamp = date || new Date().toISOString();
 

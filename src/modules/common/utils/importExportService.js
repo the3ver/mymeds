@@ -8,7 +8,7 @@ export function prepareExport(dataToExport) {
     exportDate: new Date().toISOString(),
     meds: dataToExport.meds,
     calendar: dataToExport.calendar,
-    lastDoseUpdate: dataToExport.lastDoseUpdate,
+    lastDoseUpdate: dataToExport.lastDoseUpdate
   };
   const exportDataContent = JSON.stringify(data, null, 2);
 
@@ -39,8 +39,8 @@ export function processImport(fileContent) {
       date: data.exportDate ? new Date(data.exportDate).toLocaleString() : 'N/A',
       medsCount: data.meds.length,
       calendarCount: data.calendar.length,
-      data: { 
-        meds: data.meds, 
+      data: {
+        meds: data.meds,
         calendar: data.calendar,
         // Ensure lastDoseUpdate is present, default to today if not
         lastDoseUpdate: data.lastDoseUpdate || new Date().toDateString()

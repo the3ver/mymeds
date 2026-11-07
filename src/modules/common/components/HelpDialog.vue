@@ -1,12 +1,12 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 
 defineProps({
   modelValue: Boolean
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 
 const sectionKeys = [
   'security',
@@ -18,11 +18,11 @@ const sectionKeys = [
   'warnings',
   'calendar',
   'exportImport'
-]
+];
 
 const close = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 </script>
 
 <template>
