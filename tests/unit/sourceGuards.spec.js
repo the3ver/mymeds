@@ -30,6 +30,12 @@ describe('source guards', () => {
     expect(matches).toEqual([]);
   });
 
+  it('keeps the Android TWA version in step with package.json (release.sh syncs it)', () => {
+    const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
+    const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));
+    expect(twa.appVersionName).toBe(pkg.version);
+  });
+
   it('has a rule in the icon subset for every mdi icon the app uses (run npm run icons)', () => {
     const defined = definedIcons();
     const missing = [...collectUsedIcons()].filter(icon => !defined.has(icon)).sort();

@@ -30,8 +30,11 @@ echo "📦 New version will be: $TAG_NAME"
 echo "⚙️  Running npm install to sync lockfile..."
 npm install
 
+# 5b. Keep the Android TWA version in step (bumps appVersionCode)
+node scripts/sync-twa-version.mjs
+
 # 6. Stage changes and commit
-git add package.json package-lock.json
+git add package.json package-lock.json twa-manifest.json
 COMMIT_MSG="${2:-chore: release $TAG_NAME}"
 echo "✍️ Commit message: $COMMIT_MSG"
 git commit -m "$COMMIT_MSG"
