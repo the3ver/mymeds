@@ -4,7 +4,6 @@ import { clearBadge } from './modules/common/utils/badgingService';
 
 export const state = reactive({
   isLocked: true,
-  isActionPending: false,
   activeDatabaseId: null,
   activeDatabasePassword: null,
   decryptedData: {
