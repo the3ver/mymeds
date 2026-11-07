@@ -40,5 +40,5 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "fullScopeUrl": "https://the3ver.github.io/mymeds/",
-  "minSdkVersion": 21
+  "minSdkVersion": 24
 }

@@ -36,6 +36,12 @@ describe('source guards', () => {
     expect(twa.appVersionName).toBe(pkg.version);
   });
 
+  it('targets at least the minSdk the TWA library requires (androidbrowserhelper 2.7.4: 24)', () => {
+    // A lower value fails the Android build in the manifest merger (v1.10.17)
+    const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));
+    expect(twa.minSdkVersion).toBeGreaterThanOrEqual(24);
+  });
+
   it('has a rule in the icon subset for every mdi icon the app uses (run npm run icons)', () => {
     const defined = definedIcons();
     const missing = [...collectUsedIcons()].filter((icon) => !defined.has(icon)).sort();

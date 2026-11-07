@@ -13,9 +13,13 @@ export const changelog = [
     },
     highlights: {
       de: [
-        'Das Zurücksetzen der Einstellungen brach beim Speichern der Erinnerungszeiten ab. Alle Einstellungen werden jetzt vollständig zurückgesetzt'
+        'Das Zurücksetzen der Einstellungen brach beim Speichern der Erinnerungszeiten ab. Alle Einstellungen werden jetzt vollständig zurückgesetzt',
+        'Die Android-App setzt jetzt Android 7.0 oder neuer voraus. Auf älteren Geräten läuft MyMeds weiter im Browser'
       ],
-      en: ['Resetting the settings failed while saving the reminder times. All settings are now reset completely']
+      en: [
+        'Resetting the settings failed while saving the reminder times. All settings are now reset completely',
+        'The Android app now requires Android 7.0 or newer. On older devices MyMeds keeps running in the browser'
+      ]
     }
   },
   {
