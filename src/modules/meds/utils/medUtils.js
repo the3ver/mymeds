@@ -115,7 +115,7 @@ const calculateItemDeduction = (item, lastDate, todayDate, diffDays) => {
     return (
       dose *
       countMatchingDays(lastDate, todayDate, (day) => {
-        const diffFromStart = Math.round((day - start) / MS_PER_DAY);
+        const diffFromStart = Math.round((day.getTime() - start.getTime()) / MS_PER_DAY);
         return diffFromStart >= 0 && diffFromStart % intervalDays === 0;
       })
     );
@@ -142,7 +142,7 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
     const todayDate = new Date(currentDate);
     todayDate.setHours(0, 0, 0, 0);
 
-    const diffTime = Math.abs(todayDate - lastDate);
+    const diffTime = Math.abs(todayDate.getTime() - lastDate.getTime());
     const diffDays = Math.ceil(diffTime / MS_PER_DAY);
 
     if (diffDays >= 1) {

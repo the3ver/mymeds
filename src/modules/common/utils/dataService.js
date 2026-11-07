@@ -41,7 +41,9 @@ export async function unlockDatabase(id, password) {
     const { salt, iv } = dbEntry.passwordData;
     try {
       const key = await crypto.deriveKeyFromPassword(password, salt);
-      let data = await crypto.decryptData(dbEntry.encryptedData, iv, key);
+      let data = /** @type {{ meds: any[], lastDoseUpdate: string }} */ (
+        await crypto.decryptData(dbEntry.encryptedData, iv, key)
+      );
 
       const updateResult = checkAndUpdateDailyDose(data.meds, data.lastDoseUpdate);
 

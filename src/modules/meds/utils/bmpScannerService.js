@@ -112,7 +112,7 @@ export async function scanBarcodeFromFile(file) {
         }
       };
       img.onerror = () => resolve(null);
-      img.src = e.target.result;
+      img.src = String(e.target.result);
     };
     reader.onerror = () => resolve(null);
     reader.readAsDataURL(file);

@@ -60,7 +60,7 @@ export async function importVaultFromSync(payload, options = { mode: 'create' })
     }
   }
 
-  return dbAdapter.createDatabase(restored);
+  return /** @type {Promise<number>} */ (dbAdapter.createDatabase(restored));
 }
 
 /**

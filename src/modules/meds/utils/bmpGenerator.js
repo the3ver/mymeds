@@ -24,7 +24,7 @@ export function generateBmpBitMatrix(payload) {
  */
 export function generateBmpSvg(payload, options = {}) {
   const margin = options.margin !== undefined ? options.margin : 2;
-  const matrix = generateBmpBitMatrix(payload, options);
+  const matrix = generateBmpBitMatrix(payload);
   const matrixWidth = matrix.getWidth();
   const matrixHeight = matrix.getHeight();
 
@@ -55,7 +55,7 @@ export function renderBmpToCanvas(canvas, payload, options = {}) {
   if (!canvas) return;
   const size = options.size || 300;
   const margin = options.margin !== undefined ? options.margin : 2;
-  const matrix = generateBmpBitMatrix(payload, options);
+  const matrix = generateBmpBitMatrix(payload);
   const matrixWidth = matrix.getWidth();
   const matrixHeight = matrix.getHeight();
 
@@ -241,6 +241,7 @@ export function generateUUID() {
 
 /**
  * Generates official KBV Bundesmedikationsplan (BMP) XML (Ultrakurzformat / UKF).
+ * @param {{ meds?: any[], patient?: Record<string, any> | null, doctor?: Record<string, any>, planId?: string, date?: string }} [plan]
  */
 export function generateBmpXml({ meds = [], patient = {}, doctor = {}, planId, date } = {}) {
   const uuid = planId || generateUUID();

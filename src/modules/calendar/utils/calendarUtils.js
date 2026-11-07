@@ -86,7 +86,7 @@ function icsStartLines(entry) {
 
 // Descending by date. Same day: quarter markers last, all-day entries first, then later times first.
 export function compareEntries(a, b) {
-  const byDate = new Date(b.date) - new Date(a.date);
+  const byDate = new Date(b.date).getTime() - new Date(a.date).getTime();
   if (byDate !== 0) return byDate;
   const rank = (e) => (e.type === 'quarter' ? 2 : e.time ? 1 : 0);
   const byRank = rank(a) - rank(b);

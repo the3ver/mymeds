@@ -203,7 +203,7 @@ export async function registerPeriodicSync() {
   try {
     const registration = await navigator.serviceWorker.ready;
     if ('periodicSync' in registration) {
-      await registration.periodicSync.register(PERIODIC_SYNC_TAG, {
+      await /** @type {any} */ (registration).periodicSync.register(PERIODIC_SYNC_TAG, {
         minInterval: 60 * 60 * 1000 // 1 hour minimum interval
       });
       return true;
@@ -226,7 +226,7 @@ export async function unregisterPeriodicSync() {
   try {
     const registration = await navigator.serviceWorker.ready;
     if ('periodicSync' in registration) {
-      await registration.periodicSync.unregister(PERIODIC_SYNC_TAG);
+      await /** @type {any} */ (registration).periodicSync.unregister(PERIODIC_SYNC_TAG);
       return true;
     }
   } catch (err) {
@@ -289,6 +289,6 @@ export function supportsNotificationTriggers() {
   return Boolean(
     window.Notification.prototype &&
     'showTrigger' in window.Notification.prototype &&
-    typeof window.TimestampTrigger !== 'undefined'
+    typeof (/** @type {any} */ (window).TimestampTrigger) !== 'undefined'
   );
 }
