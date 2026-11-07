@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Quiet project check for agents, git hooks and CI.
 # Green: one line. Red: only the failing output, exit 1.
-#   bash scripts/check.sh          run type check + tests
+#   bash scripts/check.sh          run eslint + type check + tests
 #   bash scripts/check.sh --hook   agent Stop hook (Claude Code, Antigravity): red -> stderr, exit 2
 # Unchanged inputs since the last green run return immediately.
 set -u
@@ -25,7 +25,7 @@ fingerprint() {
     git rev-parse HEAD
     git diff HEAD -- "${INPUTS[@]}"
     git ls-files --others --exclude-standard -- "${INPUTS[@]}" | while read -r f; do echo "$f"; cat "$f"; done
-  } | git hash-object --stdin
+  } 2>/dev/null | git hash-object --stdin
 }
 
 FP="$(fingerprint)"
@@ -59,6 +59,11 @@ strip_ansi() { sed -E 's/\x1b\[[0-9;]*m//g' "$1"; }
 
 START=$SECONDS
 
+if ! npx eslint . --max-warnings 0 > "$OUT" 2>&1; then
+  strip_ansi "$OUT" | grep -vE "^\s*$|problems? \(" | head -40 > "$REPORT"
+  fail "eslint"
+fi
+
 if ! npx tsc --noEmit -p . > "$OUT" 2>&1; then
   strip_ansi "$OUT" | grep -E "error TS" | head -40 > "$REPORT"
   fail "tsc"
@@ -74,5 +79,5 @@ fi
 
 TESTS="$(strip_ansi "$OUT" | grep -oE "Tests +[0-9]+ passed" | grep -oE "[0-9]+")"
 echo "$FP" > "$CACHE_DIR/green"
-[ "$MODE" = "--hook" ] || echo "CHECK OK: tsc, ${TESTS:-?} tests, $((SECONDS - START))s"
+[ "$MODE" = "--hook" ] || echo "CHECK OK: eslint, tsc, ${TESTS:-?} tests, $((SECONDS - START))s"
 exit 0
