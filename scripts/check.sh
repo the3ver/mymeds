@@ -69,7 +69,7 @@ if ! npx eslint . --max-warnings 0 > "$OUT" 2>&1; then
   fail "eslint"
 fi
 
-if ! npx tsc --noEmit -p . > "$OUT" 2>&1; then
+if ! { npx tsc --noEmit -p . && npx tsc -p tsconfig.checkjs.json; } > "$OUT" 2>&1; then
   strip_ansi "$OUT" | grep -E "error TS" | head -40 > "$REPORT"
   fail "tsc"
 fi

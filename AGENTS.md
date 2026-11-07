@@ -16,7 +16,7 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 - Icon-Subset neu erzeugen nach neuem `mdi-*`-Icon: `npm run icons` (ein Test prüft, dass kein Icon fehlt)
 - Build PWA: `npm run build`
 - Preview: `npm run preview`
-- Type Check: `npx tsc --noEmit`
+- Type Check: `npx tsc --noEmit` (TS) und `npx tsc -p tsconfig.checkjs.json` (JS in `src/`, nicht-strict; `sw.js` ausgenommen)
 
 ## Core Architecture & State Management
 1. **Zero-Knowledge / Kein Server:** Alle Medikamenten- und Kalenderdaten existieren verschlüsselt in IndexedDB (`databases` Store).

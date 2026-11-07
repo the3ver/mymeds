@@ -1,0 +1,13 @@
+{
+  // Type-checks the app's JavaScript (not tests) without strict mode.
+  // Run: npx tsc -p tsconfig.checkjs.json (part of npm run check)
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": false,
+    "noEmit": true
+  },
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts"],
+  // Service worker globals (self, clients, __WB_MANIFEST) clash with the DOM lib
+  "exclude": ["src/sw.js"]
+}
