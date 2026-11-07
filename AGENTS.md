@@ -11,7 +11,7 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 
 ## Commands
 - Dev Server: `npm run dev`
-- Check (ESLint + tsc + Tests, eine Zeile wenn grün): `npm run check`. Nur Lint: `npm run lint`. Läuft als Stop-Hook in Claude Code (`.claude/settings.json`) und Antigravity (`.agents/hooks.json`).
+- Check (Prettier + ESLint + tsc + Tests, eine Zeile wenn grün): `npm run check`. Nur Lint: `npm run lint`. Formatieren: `npm run fmt` (Claude Code formatiert bearbeitete Dateien per PostToolUse-Hook selbst). Läuft als Stop-Hook in Claude Code (`.claude/settings.json`) und Antigravity (`.agents/hooks.json`).
 - Tests ausführen: `npx vitest run` (`npm test` ohne `--run` startet den Watch-Mode und hängt)
 - Icon-Subset neu erzeugen nach neuem `mdi-*`-Icon: `npm run icons` (ein Test prüft, dass kein Icon fehlt)
 - Build PWA: `npm run build`

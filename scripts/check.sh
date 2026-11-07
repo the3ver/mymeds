@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Quiet project check for agents, git hooks and CI.
 # Green: one line. Red: only the failing output, exit 1.
-#   bash scripts/check.sh          run eslint + type check + tests
+#   bash scripts/check.sh          run prettier --check + eslint + tsc + tests
 #   bash scripts/check.sh --hook   agent Stop hook (Claude Code, Antigravity): red -> stderr, exit 2
 # Unchanged inputs since the last green run return immediately.
 set -u
@@ -59,6 +59,11 @@ strip_ansi() { sed -E 's/\x1b\[[0-9;]*m//g' "$1"; }
 
 START=$SECONDS
 
+if ! npm run -s fmt:check > "$OUT" 2>&1; then
+  { echo "Unformatted files (fix: npm run fmt):"; strip_ansi "$OUT" | grep -vE "^\s*$|Code style issues" | head -20; } > "$REPORT"
+  fail "prettier"
+fi
+
 if ! npx eslint . --max-warnings 0 > "$OUT" 2>&1; then
   strip_ansi "$OUT" | grep -vE "^\s*$|problems? \(" | head -40 > "$REPORT"
   fail "eslint"
@@ -79,5 +84,5 @@ fi
 
 TESTS="$(strip_ansi "$OUT" | grep -oE "Tests +[0-9]+ passed" | grep -oE "[0-9]+")"
 echo "$FP" > "$CACHE_DIR/green"
-[ "$MODE" = "--hook" ] || echo "CHECK OK: eslint, tsc, ${TESTS:-?} tests, $((SECONDS - START))s"
+[ "$MODE" = "--hook" ] || echo "CHECK OK: prettier, eslint, tsc, ${TESTS:-?} tests, $((SECONDS - START))s"
 exit 0
