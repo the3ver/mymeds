@@ -243,7 +243,6 @@ const patient = reactive({
 
 const snackbar = ref(false);
 const snackbarText = ref('');
-const generationError = ref('');
 
 const canShare = computed(() => typeof navigator !== 'undefined' && !!navigator.share);
 
@@ -291,28 +290,36 @@ const bmpXml = computed(() => {
   });
 });
 
-const bmpPayload = computed(() => {
-  if (!bmpXml.value) return '';
+// Runs fn and returns { value, error } instead of throwing (computeds must not write state)
+function attempt(fn) {
   try {
-    generationError.value = '';
-    return generateBmpPayload(bmpXml.value, {
-      compress: format.value === 'standard'
-    });
+    return { value: fn(), error: '' };
   } catch (err) {
-    generationError.value = err.message;
-    return '';
+    return { value: '', error: err.message };
   }
-});
+}
 
-const svgMarkup = computed(() => {
-  if (!bmpPayload.value) return '';
-  try {
-    return generateBmpSvg(bmpPayload.value, { size: 260, margin: 2 });
-  } catch (err) {
-    generationError.value = err.message;
-    return '';
-  }
+const payloadResult = computed(() => {
+  if (!bmpXml.value) return { value: '', error: '' };
+  return attempt(() => generateBmpPayload(bmpXml.value, {
+    compress: format.value === 'standard'
+  }));
 });
+const bmpPayload = computed(() => payloadResult.value.value);
+
+const svgResult = computed(() => {
+  if (!bmpPayload.value) return { value: '', error: '' };
+  return attempt(() => generateBmpSvg(bmpPayload.value, { size: 260, margin: 2 }));
+});
+const svgMarkup = computed(() => svgResult.value.value);
+
+// Errors from download, share and copy; a new payload clears them
+const actionError = ref('');
+watch(payloadResult, () => { actionError.value = ''; });
+
+const generationError = computed(() =>
+  actionError.value || payloadResult.value.error || svgResult.value.error
+);
 
 async function downloadPng() {
   if (!bmpPayload.value) return;
@@ -325,7 +332,7 @@ async function downloadPng() {
     link.click();
     document.body.removeChild(link);
   } catch (err) {
-    generationError.value = err.message;
+    actionError.value = err.message;
   }
 }
 
@@ -350,7 +357,7 @@ async function shareBmp() {
     }
   } catch (err) {
     if (err.name !== 'AbortError') {
-      generationError.value = err.message;
+      actionError.value = err.message;
     }
   }
 }
@@ -362,7 +369,7 @@ async function copyXml() {
     snackbarText.value = t('bmp.xmlCopied');
     snackbar.value = true;
   } catch (err) {
-    generationError.value = err.message;
+    actionError.value = err.message;
   }
 }
 

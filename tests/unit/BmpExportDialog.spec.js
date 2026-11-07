@@ -7,6 +7,12 @@ import * as directives from 'vuetify/directives';
 import BmpExportDialog from '../../src/modules/meds/components/BmpExportDialog.vue';
 import { messages } from '../../src/i18n';
 import { state as appState } from '../../src/app-state';
+import { generateBmpPayload } from '../../src/modules/meds/utils/bmpGenerator';
+
+vi.mock('../../src/modules/meds/utils/bmpGenerator', async (importOriginal) => {
+  const original = await importOriginal();
+  return { ...original, generateBmpPayload: vi.fn(original.generateBmpPayload) };
+});
 
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({
@@ -37,6 +43,26 @@ describe('BmpExportDialog.vue', () => {
     expect(document.body.textContent).toContain('Bundesmedikationsplan (BMP)');
     expect(document.body.querySelector('.bmp-matrix-preview')).not.toBeNull();
     expect(document.body.querySelector('.bmp-matrix-preview svg')).not.toBeNull();
+  });
+
+  it('shows a payload generation error and clears it once generation succeeds again', async () => {
+    generateBmpPayload.mockImplementationOnce(() => { throw new Error('payload too large'); });
+    const wrapper = mount(BmpExportDialog, {
+      props: { modelValue: true, meds: appState.decryptedData.meds },
+      global: { plugins: [vuetify, i18n] }
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.textContent).toContain('payload too large');
+    expect(wrapper.vm.bmpPayload).toBe('');
+
+    wrapper.vm.format = 'xml';
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.bmpPayload).not.toBe('');
+    expect(document.body.textContent).not.toContain('payload too large');
+    wrapper.unmount();
   });
 
   it('switches format between compressed and uncompressed XML', async () => {
