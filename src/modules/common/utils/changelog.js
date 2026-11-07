@@ -5,6 +5,20 @@
 
 export const changelog = [
   {
+    version: '1.10.18',
+    date: '2026-11-07',
+    title: {
+      de: 'Einstellungen zurücksetzen funktioniert wieder',
+      en: 'Resetting Settings Works Again'
+    },
+    highlights: {
+      de: [
+        'Das Zurücksetzen der Einstellungen brach beim Speichern der Erinnerungszeiten ab. Alle Einstellungen werden jetzt vollständig zurückgesetzt'
+      ],
+      en: ['Resetting the settings failed while saving the reminder times. All settings are now reset completely']
+    }
+  },
+  {
     version: '1.10.17',
     date: '2026-11-07',
     title: {
