@@ -93,7 +93,7 @@ const groupedEntries = computed(() => {
 
     while (current <= maxDate) {
       const qDate = new Date(current)
-      const qStr = qDate.toISOString().split('T')[0]
+      const qStr = getLocalDateString(qDate)
       const q = Math.floor((qDate.getMonth() + 3) / 3)
       const y = qDate.getFullYear()
 

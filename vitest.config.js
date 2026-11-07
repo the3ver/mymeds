@@ -2,6 +2,9 @@ import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
+// Fixed user timezone (UTC+1/+2) so local-vs-UTC date bugs show up in CI, which runs in UTC
+process.env.TZ = 'Europe/Berlin'
+
 export default defineConfig({
   plugins: [vue()],
   test: {

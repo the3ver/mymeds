@@ -58,6 +58,17 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.text()).toContain('Q4/2026');
   });
 
+  it('should date virtual quarter headers on the local first day of the quarter', () => {
+    const wrapper = mountComponent();
+
+    const quarterDates = wrapper.vm.groupedEntries
+      .filter(item => item.type === 'quarter')
+      .map(item => item.data.date);
+
+    expect(quarterDates).toContain('2026-07-01');
+    expect(quarterDates).not.toContain('2026-06-30');
+  });
+
   it('should expose methods to open filter and type dialogs', () => {
     const wrapper = mountComponent();
 
