@@ -2,7 +2,7 @@
 # Quiet project check for agents, git hooks and CI.
 # Green: one line. Red: only the failing output, exit 1.
 #   bash scripts/check.sh          run type check + tests
-#   bash scripts/check.sh --hook   Claude Code Stop hook: red -> stderr, exit 2
+#   bash scripts/check.sh --hook   agent Stop hook (Claude Code, Antigravity): red -> stderr, exit 2
 # Unchanged inputs since the last green run return immediately.
 set -u
 cd "$(dirname "$0")/.."
@@ -12,16 +12,19 @@ CACHE_DIR="node_modules/.cache/mymeds-check"
 mkdir -p "$CACHE_DIR"
 OUT="$CACHE_DIR/last.out"
 
-HOOK_INPUT=""
+# Hook input on stdin is not needed; drain it so the agent does not block on a full pipe
 if [ "$MODE" = "--hook" ]; then
-  HOOK_INPUT="$(cat)"
+  cat > /dev/null
 fi
+
+# Everything that can change the result; docs and Markdown do not
+INPUTS=(. ':!*.md' ':!docs')
 
 fingerprint() {
   {
     git rev-parse HEAD
-    git diff HEAD -- src tests scripts package.json package-lock.json vitest.config.js tsconfig.json vite.config.js twa-manifest.json
-    git ls-files --others --exclude-standard -- src tests scripts | while read -r f; do echo "$f"; cat "$f"; done
+    git diff HEAD -- "${INPUTS[@]}"
+    git ls-files --others --exclude-standard -- "${INPUTS[@]}" | while read -r f; do echo "$f"; cat "$f"; done
   } | git hash-object --stdin
 }
 
@@ -31,9 +34,9 @@ if [ -f "$CACHE_DIR/green" ] && [ "$(cat "$CACHE_DIR/green")" = "$FP" ]; then
   exit 0
 fi
 
-# Stop hook: the agent already got this exact red state back once; let it stop
-if [ "$MODE" = "--hook" ] && echo "$HOOK_INPUT" | grep -q '"stop_hook_active":[[:space:]]*true' \
-   && [ -f "$CACHE_DIR/red" ] && [ "$(cat "$CACHE_DIR/red")" = "$FP" ]; then
+# Stop hook: this exact red state was already reported once and the agent changed
+# nothing since; let it stop instead of looping (works for every agent)
+if [ "$MODE" = "--hook" ] && [ -f "$CACHE_DIR/red" ] && [ "$(cat "$CACHE_DIR/red")" = "$FP" ]; then
   exit 0
 fi
 
