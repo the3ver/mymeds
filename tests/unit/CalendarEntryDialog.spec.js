@@ -50,4 +50,23 @@ describe('CalendarEntryDialog.vue - Referral tracking', () => {
     const wrapper = mountComponent({ type: 'vaccination', title: 'Impfung' });
     expect(wrapper.vm.localEntry.needsReferral).toBeUndefined();
   });
+
+  it('should default time to empty string for entries without time', () => {
+    const wrapper = mountComponent();
+    expect(wrapper.vm.localEntry.time).toBe('');
+  });
+
+  it('should render a time input and emit the entered time on save', async () => {
+    const wrapper = mountComponent({ type: 'illness', title: 'Fieber' });
+    await wrapper.vm.$nextTick();
+    // v-dialog teleports its content to document.body
+    // earlier tests leave dialogs mounted, so take the latest one
+    const input = [...document.body.querySelectorAll('[data-testid="entry-time"] input')].at(-1);
+    expect(input.getAttribute('type')).toBe('time');
+    input.value = '09:30';
+    input.dispatchEvent(new Event('input'));
+    await wrapper.vm.$nextTick();
+    wrapper.vm.save();
+    expect(wrapper.emitted('confirm')[0][0].time).toBe('09:30');
+  });
 });

@@ -59,7 +59,22 @@ export function createCalendarEvent(title, description, date, url) {
   }
 }
 
+const ICS_TIMED_DURATION_MINUTES = 60
+
+function formatIcsLocalDateTime(d) {
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`
+}
+
 function icsStartLines(entry) {
+  if (entry.time) {
+    const [y, m, d] = entry.date.split('-').map(Number)
+    const [hh, mm] = entry.time.split(':').map(Number)
+    const start = new Date(y, m - 1, d, hh, mm)
+    const end = new Date(start.getTime() + ICS_TIMED_DURATION_MINUTES * 60000)
+    // Floating local time (no Z): calendar apps use the device time zone
+    return [`DTSTART:${formatIcsLocalDateTime(start)}`, `DTEND:${formatIcsLocalDateTime(end)}`]
+  }
   const date = new Date(entry.date)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -67,8 +82,24 @@ function icsStartLines(entry) {
   return [`DTSTART;VALUE=DATE:${year}${month}${day}`] // All day event
 }
 
+// Descending by date. Same day: quarter markers last, all-day entries first, then later times first.
 export function compareEntries(a, b) {
-  return new Date(b.date) - new Date(a.date)
+  const byDate = new Date(b.date) - new Date(a.date)
+  if (byDate !== 0) return byDate
+  const rank = (e) => (e.type === 'quarter' ? 2 : e.time ? 1 : 0)
+  const byRank = rank(a) - rank(b)
+  if (byRank !== 0) return byRank
+  return (b.time || '').localeCompare(a.time || '')
+}
+
+export function formatEntryTime(time, locale) {
+  if (!time) return ''
+  const [hh, mm] = time.split(':').map(Number)
+  const isDe = locale === 'de'
+  return new Date(2000, 0, 1, hh, mm).toLocaleTimeString(isDe ? 'de-DE' : 'en-US', {
+    hour: isDe ? '2-digit' : 'numeric',
+    minute: '2-digit'
+  })
 }
 
 export function createDetailedCalendarEvent(entry) {

@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   createCalendarEvent,
   createDetailedCalendarEvent,
+  compareEntries,
+  formatEntryTime,
   getQuarterKey,
   resolveEffectiveReferralStatus,
   isPendingReferral,
@@ -208,6 +210,64 @@ describe('calendarUtils & calendar', () => {
       expect(content).toContain('SUMMARY:Allergietest Ergebnisse');
       expect(content).toContain('End Date: 2026-04-12');
       expect(content).toContain('Notes:\\nPollenallergie festgestellt');
+    });
+  });
+
+  describe('createDetailedCalendarEvent with time', () => {
+    beforeEach(() => {
+      Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true });
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    });
+
+    it('should export a timed event in floating local time with 60 minutes duration', async () => {
+      createDetailedCalendarEvent({ title: 'Arzt', date: '2026-10-20', time: '09:30', type: 'doctor' });
+      const content = await createdFiles[0].text();
+      expect(content).toContain('DTSTART:20261020T093000');
+      expect(content).toContain('DTEND:20261020T103000');
+      expect(content).not.toContain('VALUE=DATE');
+      expect(content).not.toMatch(/DTSTART:\S*Z/);
+    });
+
+    it('should roll DTEND over to the next day', async () => {
+      createDetailedCalendarEvent({ title: 'Spät', date: '2026-10-20', time: '23:30', type: 'note' });
+      const content = await createdFiles[0].text();
+      expect(content).toContain('DTEND:20261021T003000');
+    });
+
+    it('should stay all-day without time', async () => {
+      createDetailedCalendarEvent({ title: 'Ganztag', date: '2026-10-20', time: '', type: 'note' });
+      const content = await createdFiles[0].text();
+      expect(content).toContain('DTSTART;VALUE=DATE:20261020');
+      expect(content).not.toContain('DTEND');
+    });
+  });
+
+  describe('compareEntries', () => {
+    it('should sort by date descending', () => {
+      const list = [{ date: '2026-01-01' }, { date: '2026-03-01' }].sort(compareEntries);
+      expect(list.map(e => e.date)).toEqual(['2026-03-01', '2026-01-01']);
+    });
+
+    it('should order same-day entries: all-day, later time, earlier time, quarter marker', () => {
+      const list = [
+        { id: 'early', date: '2026-10-01', time: '08:00' },
+        { id: 'quarter', date: '2026-10-01', type: 'quarter' },
+        { id: 'late', date: '2026-10-01', time: '15:00' },
+        { id: 'allday', date: '2026-10-01', time: '' },
+      ].sort(compareEntries);
+      expect(list.map(e => e.id)).toEqual(['allday', 'late', 'early', 'quarter']);
+    });
+  });
+
+  describe('formatEntryTime', () => {
+    it('should return empty string without time', () => {
+      expect(formatEntryTime('', 'de')).toBe('');
+      expect(formatEntryTime(undefined, 'en')).toBe('');
+    });
+
+    it('should format by locale', () => {
+      expect(formatEntryTime('09:30', 'de')).toBe('09:30');
+      expect(formatEntryTime('09:30', 'en')).toMatch(/^9:30\sAM$/);
     });
   });
 

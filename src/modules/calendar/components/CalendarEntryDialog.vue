@@ -12,6 +12,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       date: '',
+      time: '',
       title: '',
       type: 'doctor',
       doctor: '',
@@ -63,6 +64,9 @@ function normalizeEntry(entry) {
   const norm = { ...entry }
   if (!norm.date) {
     norm.date = getLocalDateString()
+  }
+  if (!norm.time) {
+    norm.time = ''
   }
   // Ensure treatments is a string (migration from array if needed)
   if (Array.isArray(norm.treatments)) {
@@ -130,13 +134,23 @@ const save = () => {
       <v-card-title>{{ title }}</v-card-title>
       <v-card-text class="text-body-1">
         <!-- Common Fields -->
-        <v-text-field
-          v-model="localEntry.date"
-          :label="t('calendar.fields.date') + ' *'"
-          type="date"
-          variant="underlined"
-          required
-        ></v-text-field>
+        <div class="d-flex gap-3">
+          <v-text-field
+            v-model="localEntry.date"
+            :label="t('calendar.fields.date') + ' *'"
+            type="date"
+            variant="underlined"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="localEntry.time"
+            :label="t('calendar.fields.time')"
+            type="time"
+            variant="underlined"
+            class="time-field"
+            data-testid="entry-time"
+          ></v-text-field>
+        </div>
 
         <v-text-field
           v-model="localEntry.title"
@@ -308,5 +322,11 @@ const save = () => {
 <style scoped>
 .gap-1 {
   gap: 4px;
+}
+.gap-3 {
+  gap: 12px;
+}
+.time-field {
+  max-width: 140px;
 }
 </style>

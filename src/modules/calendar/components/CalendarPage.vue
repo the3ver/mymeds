@@ -5,7 +5,7 @@ import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent, compareEntries, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
+import { createDetailedCalendarEvent, compareEntries, formatEntryTime, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
 import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const props = defineProps({
@@ -179,7 +179,8 @@ const getEntryColor = (type) => {
 }
 
 const getEntrySubtitle = (entry) => {
-  const dateStr = formatDate(entry.date)
+  const time = formatEntryTime(entry.time, locale.value)
+  const dateStr = time ? `${formatDate(entry.date)}, ${time}` : formatDate(entry.date)
   if (entry.type === 'illness' && entry.endDate) {
     const start = new Date(entry.date)
     const end = new Date(entry.endDate)
@@ -207,6 +208,7 @@ const onTypeSelected = (type) => {
   currentEntry.value = {
     type,
     date: getLocalDateString(),
+    time: '',
     title: '',
     doctor: '', doctorType: '', location: '',
     agent: '', method: '', bodyPart: '',

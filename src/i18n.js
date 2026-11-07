@@ -311,6 +311,7 @@ export const messages = {
       },
       fields: {
         date: 'Date',
+        time: 'Time',
         title: 'Title',
         doctor: 'Doctor',
         type: 'Type',
@@ -789,6 +790,7 @@ export const messages = {
       },
       fields: {
         date: 'Datum',
+        time: 'Uhrzeit',
         title: 'Bezeichnung',
         doctor: 'Arzt',
         type: 'Art',

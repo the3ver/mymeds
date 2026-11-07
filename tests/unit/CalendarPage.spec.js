@@ -43,6 +43,13 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.text()).toContain('Notiz');
   });
 
+  it('should show the time after the date in the entry subtitle', () => {
+    const wrapper = mountComponent({
+      initialEntries: [{ title: 'Kardiologe', date: '2026-11-20', time: '09:30', type: 'doctor' }],
+    });
+    expect(wrapper.text()).toMatch(/20\.11\.2026, 09:30/);
+  });
+
   it('should include "separator-today" in grouped entries', () => {
     const wrapper = mountComponent();
     const todaySeparator = wrapper.find('#separator-today');
