@@ -1,2 +1,5 @@
+# Store text files with LF in the repository; checkout follows core.autocrlf
+* text=auto
+
 # Shell scripts must keep LF, Bash fails on CRLF
 *.sh text eol=lf
