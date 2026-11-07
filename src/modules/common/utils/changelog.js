@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.17',
+    date: '2026-11-07',
+    title: {
+      de: 'Uhrzeit für Kalendereinträge',
+      en: 'Time for Calendar Entries'
+    },
+    highlights: {
+      de: [
+        'Kalendereinträge haben ein optionales Uhrzeitfeld. Die Uhrzeit steht hinter dem Datum, Einträge am selben Tag sind danach sortiert',
+        'Der Kalender-Export übernimmt die Uhrzeit als Termin mit 60 Minuten Dauer'
+      ],
+      en: [
+        'Calendar entries have an optional time field. The time is shown after the date, and entries on the same day are sorted by it',
+        'The calendar export uses the time as a 60 minute appointment'
+      ]
+    }
+  },
+  {
     version: '1.10.16',
     date: '2026-11-07',
     title: {
