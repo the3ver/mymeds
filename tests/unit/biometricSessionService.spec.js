@@ -105,6 +105,24 @@ describe('biometricSessionService', () => {
       expect(createSpy).toHaveBeenCalledWith('MyMeds', 'Hausapotheke', expect.any(Uint8Array));
     });
 
+    it('applies a TTL passed in the legacy third argument position', async () => {
+      const mockKey = await webAuthnPrf.deriveAesKeyFromPrfOutput(generateSalt(32), generateSalt(16));
+      vi.spyOn(webAuthnPrf, 'createPrfCredential').mockResolvedValue({
+        credentialId: 'test-ttl-cred',
+        rawId: new Uint8Array([1, 2, 3]),
+        prfEnabled: true,
+        initialPrfKey: mockKey,
+      });
+
+      const before = Date.now();
+      await biometricService.enrollBiometrics(44, 'secret-pw', 7);
+      const session = await dbAdapter.getBiometricSession(44);
+
+      const sevenDays = 7 * 24 * 60 * 60 * 1000;
+      expect(session.expiresAt - before).toBeGreaterThanOrEqual(sevenDays);
+      expect(session.expiresAt - before).toBeLessThan(sevenDays + 60 * 1000);
+    });
+
     it('handles user cancellation gracefully', async () => {
       const session = {
         vaultId: 50,
