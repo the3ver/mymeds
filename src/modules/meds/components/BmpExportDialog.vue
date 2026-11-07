@@ -216,6 +216,7 @@ import { ref, reactive, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { generateBmpXml, generateBmpPayload, generateBmpSvg, generateBmpDataUrl } from '../utils/bmpGenerator';
 import { state as appState } from '../../../app-state';
+import { getLocalDateString } from '../../calendar/utils/calendarUtils';
 
 const props = defineProps({
   modelValue: {
@@ -319,7 +320,7 @@ async function downloadPng() {
     const dataUrl = await generateBmpDataUrl(bmpPayload.value, { size: 400, margin: 4 });
     const link = document.createElement('a');
     link.href = dataUrl;
-    link.download = `medikationsplan-bmp-${new Date().toISOString().slice(0, 10)}.png`;
+    link.download = `medikationsplan-bmp-${getLocalDateString()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
