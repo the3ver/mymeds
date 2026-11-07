@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { collectUsedIcons, definedIcons } from '../../scripts/generate-icon-css.mjs';
 
 const ROOT = join(__dirname, '../..');
 const SRC = join(ROOT, 'src');
@@ -27,5 +28,11 @@ describe('source guards', () => {
     // Use getLocalDateString() from calendarUtils instead
     const matches = findMatches(/toISOString\(\)\s*\.\s*(split|slice|substring|substr)\(/);
     expect(matches).toEqual([]);
+  });
+
+  it('has a rule in the icon subset for every mdi icon the app uses (run npm run icons)', () => {
+    const defined = definedIcons();
+    const missing = [...collectUsedIcons()].filter(icon => !defined.has(icon)).sort();
+    expect(missing).toEqual([]);
   });
 });
