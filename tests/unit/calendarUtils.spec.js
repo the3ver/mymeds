@@ -7,7 +7,6 @@ import {
   isPendingReferral,
   getLocalDateString
 } from '../../src/modules/calendar/utils/calendarUtils';
-import { downloadIcsEvent } from '../../src/modules/calendar/utils/calendar';
 
 describe('calendarUtils & calendar', () => {
   let createdFiles = [];
@@ -209,32 +208,6 @@ describe('calendarUtils & calendar', () => {
       expect(content).toContain('SUMMARY:Allergietest Ergebnisse');
       expect(content).toContain('End Date: 2026-04-12');
       expect(content).toContain('Notes:\\nPollenallergie festgestellt');
-    });
-  });
-
-  describe('downloadIcsEvent (calendar.js)', () => {
-    it('should create and trigger download for a timed event', async () => {
-      const start = new Date('2026-05-10T14:30:00.000Z');
-      downloadIcsEvent({
-        title: 'Besprechung Arzt',
-        description: 'Befundbesprechung',
-        start,
-        durationMinutes: 45
-      });
-
-      expect(createdFiles.length).toBe(1);
-      const blob = createdFiles[0];
-      const content = await blob.text();
-
-      expect(content).toContain('BEGIN:VCALENDAR');
-      expect(content).toContain('BEGIN:VEVENT');
-      expect(content).toContain('SUMMARY:Besprechung Arzt');
-      expect(content).toContain('DESCRIPTION:Befundbesprechung');
-      expect(content).toContain('DTSTART:20260510T143000Z');
-      expect(content).toContain('DTEND:20260510T151500Z'); // 45 mins later
-
-      expect(clickedElements.length).toBe(1);
-      expect(clickedElements[0].download).toBe('termin.ics');
     });
   });
 

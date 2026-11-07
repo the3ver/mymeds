@@ -5,7 +5,7 @@ import EntryTypeDialog from './EntryTypeDialog.vue'
 import CalendarEntryDialog from './CalendarEntryDialog.vue'
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue'
 import FilterDialog from './FilterDialog.vue'
-import { createDetailedCalendarEvent, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
+import { createDetailedCalendarEvent, compareEntries, resolveEffectiveReferralStatus, isPendingReferral, getLocalDateString } from '../utils/calendarUtils'
 import { renderMarkdownLinks } from '../../common/utils/stringUtils'
 
 const props = defineProps({
@@ -66,7 +66,7 @@ const sortedEntries = computed(() => {
     })
   }
 
-  const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+  const sorted = filtered.sort(compareEntries)
 
   // Pre-compute effective referral status once per entry (avoids O(N^2) in template)
   return sorted.map(entry => {
@@ -107,7 +107,7 @@ const groupedEntries = computed(() => {
     }
   }
 
-  combined.sort((a, b) => new Date(b.date) - new Date(a.date))
+  combined.sort(compareEntries)
 
   const finalResult = []
   let todayInsertedLoop = false

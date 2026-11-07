@@ -59,12 +59,19 @@ export function createCalendarEvent(title, description, date, url) {
   }
 }
 
-export function createDetailedCalendarEvent(entry) {
+function icsStartLines(entry) {
   const date = new Date(entry.date)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
-  const dateFormatted = `${year}${month}${day}`
+  return [`DTSTART;VALUE=DATE:${year}${month}${day}`] // All day event
+}
+
+export function compareEntries(a, b) {
+  return new Date(b.date) - new Date(a.date)
+}
+
+export function createDetailedCalendarEvent(entry) {
 
   // Build description from all available fields
   let description = ''
@@ -98,7 +105,7 @@ export function createDetailedCalendarEvent(entry) {
     'BEGIN:VEVENT',
     `UID:${Date.now()}@mymeds.app`, // Unique ID for each event
     `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
-    `DTSTART;VALUE=DATE:${dateFormatted}`, // All day event
+    ...icsStartLines(entry),
     `SUMMARY:${entry.title}`,
     `DESCRIPTION:${description}`,
     entry.location ? `LOCATION:${entry.location}` : '',
