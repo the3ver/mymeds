@@ -114,8 +114,8 @@ defineExpose({
 
 <template>
   <div>
-    <v-window v-model="activeTab">
-      <v-window-item value="meds">
+    <v-window v-model="activeTab" :touch="false" class="main-tab-window">
+      <v-window-item value="meds" :transition="false" :reverse-transition="false">
         <v-container>
           <MedList
             :items="appState.decryptedData.meds"
@@ -124,18 +124,17 @@ defineExpose({
             @delete="deleteItem"
             data-testid="med-list"
           />
-          <v-card
-            class="mb-3 border-dashed"
+          <v-btn
+            block
             variant="outlined"
-            color="grey"
+            size="large"
+            prepend-icon="mdi-plus"
+            class="mb-3 add-med-btn btn-wrap"
             @click="openMedDialog"
-            style="border-style: dashed !important; border-width: 2px"
+            data-testid="add-med-btn"
           >
-            <v-card-text class="d-flex align-center justify-center py-3">
-              <v-icon start size="large">mdi-plus</v-icon>
-              <span class="text-subtitle-1 font-weight-medium">{{ t('app.addMed') }}</span>
-            </v-card-text>
-          </v-card>
+            {{ t('app.addMed') }}
+          </v-btn>
 
           <v-btn
             block
@@ -143,7 +142,7 @@ defineExpose({
             variant="tonal"
             size="large"
             prepend-icon="mdi-qrcode-scan"
-            class="mb-3"
+            class="mb-3 btn-wrap"
             @click="bmpScanDialog = true"
           >
             {{ t('app.scanBmp') }}
@@ -155,14 +154,14 @@ defineExpose({
             variant="outlined"
             size="large"
             prepend-icon="mdi-barcode-scan"
-            class="mb-4"
+            class="mb-4 btn-wrap"
             @click="bmpExportDialog = true"
           >
             {{ t('app.showBmp') }}
           </v-btn>
         </v-container>
       </v-window-item>
-      <v-window-item value="calendar">
+      <v-window-item value="calendar" :transition="false" :reverse-transition="false">
         <CalendarPage
           :initial-entries="appState.decryptedData.calendar"
           @update:entries="(newEntries) => (appState.decryptedData.calendar = newEntries)"
@@ -180,10 +179,11 @@ defineExpose({
       app
       appear
       class="mb-14"
+      :aria-label="t('calendar.add')"
       @click="openCalendarAddDialog"
     ></v-fab>
 
-    <v-bottom-navigation v-model="activeTab" color="primary" grow>
+    <v-bottom-navigation v-model="activeTab" color="primary" grow class="main-bottom-nav">
       <v-btn value="meds">
         <v-icon>mdi-format-list-bulleted</v-icon>
         <span>{{ t('app.nav.meds') }}</span>
@@ -225,7 +225,20 @@ body {
 </style>
 
 <style scoped>
-.border-dashed {
+.main-tab-window {
+  overflow-x: hidden;
+}
+.add-med-btn {
   border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: rgba(var(--v-border-color), 0.38) !important;
+  color: rgba(var(--v-theme-on-surface), 0.78) !important;
+  text-transform: none;
+  letter-spacing: normal;
+  min-height: 52px;
+}
+.main-bottom-nav :deep(.v-bottom-navigation__content > .v-btn) {
+  max-width: none;
+  flex: 1 1 50%;
 }
 </style>

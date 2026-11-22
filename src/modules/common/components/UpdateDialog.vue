@@ -16,7 +16,7 @@ const close = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" max-width="400px" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="(val) => !val && close()" max-width="400px">
     <v-card>
       <v-card-title class="text-h5 text-center pt-4">{{ t('update.title') }}</v-card-title>
       <v-card-text class="text-center">

@@ -51,9 +51,9 @@ async function handleClose() {
     scrollable
   >
     <v-card class="whats-new-card rounded-lg">
-      <v-card-title class="d-flex align-center pt-4 pb-2 px-5">
-        <v-icon color="primary" class="mr-2" size="28">mdi-sparkles</v-icon>
-        <span class="text-h6 font-weight-bold">{{ t('whatsNew.title') }}</span>
+      <v-card-title class="d-flex align-center pt-4 pb-3 px-5 text-wrap">
+        <v-icon color="primary" class="mr-2 flex-shrink-0" size="28">mdi-sparkles</v-icon>
+        <span class="text-h6 font-weight-bold line-height-normal">{{ t('whatsNew.title') }}</span>
       </v-card-title>
 
       <v-divider></v-divider>

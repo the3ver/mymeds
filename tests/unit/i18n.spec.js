@@ -57,6 +57,44 @@ describe('i18n disclaimer translations', () => {
         expect(app.haptics).toBeTruthy();
         expect(app.hapticsDesc).toBeTruthy();
       });
+
+      it('should contain medication delete confirmation, dose slots, colors and a11y translations', () => {
+        const med = messages[locale]?.med;
+        expect(med.deleteTitle).toBeTruthy();
+        expect(med.deleteConfirm).toBeTruthy();
+        expect(med.deleteConfirmNamed).toBeTruthy();
+        expect(med.doseMorning).toBeTruthy();
+        expect(med.doseNoon).toBeTruthy();
+        expect(med.doseEvening).toBeTruthy();
+        expect(med.doseNight).toBeTruthy();
+        expect(med.colors.white).toBeTruthy();
+        expect(med.colors['deep-orange']).toBeTruthy();
+
+        const db = messages[locale]?.app?.db;
+        expect(db.medsLabel).toContain('|');
+        expect(db.entriesLabel).toContain('|');
+
+        const a11y = messages[locale]?.a11y;
+        expect(a11y.openMenu).toBeTruthy();
+        expect(a11y.lockVault).toBeTruthy();
+        expect(a11y.selectColor).toBeTruthy();
+      });
     });
+  });
+
+  it('uses consistent informal German (Du) without formal Sie pronouns in messages.de', () => {
+    const collectStrings = (obj, path = '') => {
+      return Object.entries(obj).flatMap(([k, v]) => {
+        const nextPath = path ? `${path}.${k}` : k;
+        if (typeof v === 'string') return [{ path: nextPath, value: v }];
+        if (v && typeof v === 'object') return collectStrings(v, nextPath);
+        return [];
+      });
+    };
+
+    const formalMatches = collectStrings(messages.de).filter(({ value }) =>
+      /\b(Sie|Ihre[nrms]?|Ihr|Ihnen)\b/.test(value)
+    );
+    expect(formalMatches).toEqual([]);
   });
 });

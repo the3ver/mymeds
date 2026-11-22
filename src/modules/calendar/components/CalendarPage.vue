@@ -428,6 +428,7 @@ defineExpose({
           density="compact"
           size="small"
           :title="t('calendar.clearFilter')"
+          :aria-label="t('calendar.clearFilter')"
           @click="clearFilter"
         ></v-btn>
       </v-card-text>
@@ -478,19 +479,6 @@ defineExpose({
               <v-divider></v-divider>
               <v-card-text class="text-body-1">
                 <template v-if="item.data.type === 'doctor'">
-                  <div v-if="item.data.effectiveReferralStatus" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.referral.statusLabel') }}:</span>
-                    <div class="mt-1">
-                      <v-chip
-                        size="small"
-                        :color="getReferralChipColor(item.data.effectiveReferralStatus)"
-                        variant="tonal"
-                      >
-                        <v-icon start size="16">{{ getReferralChipIcon(item.data.effectiveReferralStatus) }}</v-icon>
-                        {{ t(`calendar.referral.status.${item.data.effectiveReferralStatus}`) }}
-                      </v-chip>
-                    </div>
-                  </div>
                   <div v-if="item.data.doctor" class="mb-2">
                     <span class="text-grey">{{ t('calendar.fields.doctor') }}:</span>
                     <div class="font-weight-medium">{{ item.data.doctor }}</div>
@@ -602,6 +590,7 @@ defineExpose({
       :message="t('calendar.exportConfirm')"
       :confirm-text="t('dialog.yes')"
       :cancel-text="t('dialog.no')"
+      confirm-color="primary"
       @confirm="confirmExport"
     />
     <ConfirmDialog

@@ -296,10 +296,15 @@ const close = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" fullscreen transition="dialog-bottom-transition">
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="(val) => !val && close()"
+    fullscreen
+    transition="dialog-bottom-transition"
+  >
     <v-card>
       <v-toolbar color="primary">
-        <v-btn icon="mdi-close" @click="close"></v-btn>
+        <v-btn icon="mdi-close" :aria-label="t('about.close')" @click="close"></v-btn>
         <v-toolbar-title>{{ t('app.settings') }}</v-toolbar-title>
       </v-toolbar>
 
@@ -426,6 +431,7 @@ const close = () => {
               color="warning"
               variant="outlined"
               prepend-icon="mdi-fingerprint-off"
+              class="btn-wrap"
               @click="confirmClearBiometricsDialog = true"
             >
               {{ t('biometrics.clearAllSessions') }}
@@ -598,6 +604,7 @@ const close = () => {
                   color="primary"
                   size="small"
                   prepend-icon="mdi-shield-plus-outline"
+                  class="btn-wrap"
                   :loading="isRequestingPersist"
                   @click="handleRequestPersistence"
                 >

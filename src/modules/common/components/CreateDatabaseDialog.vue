@@ -42,7 +42,12 @@ async function createDatabase() {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px" persistent>
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="(val) => !val && close()"
+    max-width="500px"
+    :persistent="loading"
+  >
     <v-card :loading="loading">
       <v-card-title>{{ t('dialog.createDbTitle') }}</v-card-title>
       <v-card-text>

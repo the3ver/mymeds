@@ -140,7 +140,12 @@ async function unlockWithPassword() {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="480px" persistent>
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="(val) => !val && close()"
+    max-width="480px"
+    :persistent="loading"
+  >
     <v-card :loading="loading">
       <v-card-title class="text-h6 pt-4 px-6">
         {{ t('dialog.unlockTitle', { name: database?.name || '' }) }}

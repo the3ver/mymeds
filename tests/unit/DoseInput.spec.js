@@ -1,18 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createVuetify } from 'vuetify';
+import { createI18n } from 'vue-i18n';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { messages } from '../../src/i18n';
 import DoseInput from '../../src/modules/meds/components/DoseInput.vue';
 
 const vuetify = createVuetify({ components, directives });
+const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
 
 describe('DoseInput.vue', () => {
   const mountComponent = (props = {}) => {
     return mount(DoseInput, {
       props,
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify, i18n]
       }
     });
   };
@@ -69,5 +72,19 @@ describe('DoseInput.vue', () => {
 
     const emitted = wrapper.emitted('update:modelValue');
     expect(emitted[emitted.length - 1]).toEqual(['1-0-1-0.5']);
+  });
+
+  it('should render consistent "0" placeholders and localized aria-labels on all 4 inputs', () => {
+    const wrapper = mountComponent({ modelValue: '' });
+    const inputs = wrapper.findAll('input');
+
+    expect(inputs.length).toBe(4);
+    inputs.forEach((input) => {
+      expect(input.attributes('placeholder')).toBe('0');
+    });
+    expect(inputs[0].attributes('aria-label')).toBe('Dosis Morgens');
+    expect(inputs[1].attributes('aria-label')).toBe('Dosis Mittags');
+    expect(inputs[2].attributes('aria-label')).toBe('Dosis Abends');
+    expect(inputs[3].attributes('aria-label')).toBe('Dosis Nachts');
   });
 });

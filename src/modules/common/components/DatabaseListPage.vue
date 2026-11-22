@@ -149,6 +149,7 @@ function onDatabaseUnlocked(result, password) {
         density="comfortable"
         size="small"
         :title="t('app.toggleVaultDisplayMode')"
+        :aria-label="t('app.toggleVaultDisplayMode')"
         @click="toggleVaultDisplayMode"
         data-testid="toggle-vault-display-btn"
       ></v-btn>
@@ -165,10 +166,10 @@ function onDatabaseUnlocked(result, password) {
           @click="handleDbClick(db)"
         >
           <v-card-title
-            class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4"
+            class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4 db-card-simple-title"
           >
             <div class="d-flex align-center min-width-0 mr-2">
-              <v-icon size="22" class="mr-2 flex-shrink-0 opacity-80">mdi-shield-lock-outline</v-icon>
+              <v-icon size="22" class="mr-2 flex-shrink-0">mdi-shield-lock-outline</v-icon>
               <span class="text-truncate">{{ db.name }}</span>
             </div>
             <div class="d-flex align-center flex-shrink-0 ga-1">
@@ -191,6 +192,7 @@ function onDatabaseUnlocked(result, password) {
                     size="small"
                     @click.stop
                     :title="t('app.vaultActions')"
+                    :aria-label="t('app.vaultActions')"
                   ></v-btn>
                 </template>
                 <v-list density="compact" min-width="180">
@@ -223,13 +225,15 @@ function onDatabaseUnlocked(result, password) {
             </div>
           </v-card-title>
 
-          <v-card-text class="pt-0 pb-3 px-4 cursor-pointer">
-            <div class="d-flex align-center text-body-2 opacity-80">
+          <v-card-text class="pt-0 pb-3 px-4 cursor-pointer db-card-simple-meta">
+            <div class="d-flex align-center flex-wrap text-body-2">
               <v-icon size="18" color="primary" class="mr-1">mdi-pill</v-icon>
-              <span class="font-weight-medium mr-3">{{ db.medsCount }} {{ t('app.db.meds') }}</span>
-              <span class="mr-3 opacity-40">•</span>
+              <span class="font-weight-medium mr-3">{{ db.medsCount }} {{ t('app.db.medsLabel', db.medsCount) }}</span>
+              <span class="mr-3 db-meta-dot" aria-hidden="true">•</span>
               <v-icon size="18" color="secondary" class="mr-1">mdi-calendar-check</v-icon>
-              <span class="font-weight-medium">{{ db.calendarCount }} {{ t('app.db.entries') }}</span>
+              <span class="font-weight-medium"
+                >{{ db.calendarCount }} {{ t('app.db.entriesLabel', db.calendarCount) }}</span
+              >
             </div>
           </v-card-text>
         </v-card>
@@ -261,7 +265,9 @@ function onDatabaseUnlocked(result, password) {
                 <v-icon size="28" color="primary" class="mr-3 flex-shrink-0">mdi-pill</v-icon>
                 <div class="d-flex flex-column">
                   <span class="text-h6 font-weight-bold line-height-1">{{ db.medsCount }}</span>
-                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{ t('app.db.meds') }}</span>
+                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{
+                    t('app.db.medsLabel', db.medsCount)
+                  }}</span>
                 </div>
               </div>
 
@@ -269,7 +275,9 @@ function onDatabaseUnlocked(result, password) {
                 <v-icon size="28" color="secondary" class="mr-3 flex-shrink-0">mdi-calendar-check</v-icon>
                 <div class="d-flex flex-column">
                   <span class="text-h6 font-weight-bold line-height-1">{{ db.calendarCount }}</span>
-                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{ t('app.db.entries') }}</span>
+                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{
+                    t('app.db.entriesLabel', db.calendarCount)
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -301,6 +309,7 @@ function onDatabaseUnlocked(result, password) {
               variant="text"
               size="default"
               :title="t('sync.transferToDevice')"
+              :aria-label="t('sync.transferToDevice')"
               @click.stop="handleSyncClick(db)"
             ></v-btn>
             <v-btn
@@ -310,11 +319,24 @@ function onDatabaseUnlocked(result, password) {
               size="default"
               color="warning"
               :title="t('biometrics.disabled')"
+              :aria-label="t('biometrics.disabled')"
               @click.stop="handleRevokeBiometrics(db)"
             ></v-btn>
             <v-spacer></v-spacer>
-            <v-btn icon="mdi-pencil" variant="text" size="default" @click.stop="handleRenameClick(db)"></v-btn>
-            <v-btn icon="mdi-delete-outline" variant="text" size="default" @click.stop="handleDeleteClick(db)"></v-btn>
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              size="default"
+              :aria-label="t('app.vaultRename')"
+              @click.stop="handleRenameClick(db)"
+            ></v-btn>
+            <v-btn
+              icon="mdi-delete-outline"
+              variant="text"
+              size="default"
+              :aria-label="t('app.vaultDelete')"
+              @click.stop="handleDeleteClick(db)"
+            ></v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -334,6 +356,7 @@ function onDatabaseUnlocked(result, password) {
     app
     appear
     class="mb-4"
+    :aria-label="t('dialog.createDbTitle')"
     @click="handleCreateNew"
   ></v-fab>
 
@@ -409,6 +432,19 @@ body {
     transform 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;
   border-radius: 12px;
+}
+
+.db-card-simple-title {
+  color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !important;
+}
+
+.db-card-simple-meta {
+  color: rgba(var(--v-theme-on-surface), 0.87) !important;
+  opacity: 1 !important;
+}
+
+.db-meta-dot {
+  color: rgba(var(--v-theme-on-surface), 0.6);
 }
 
 .db-card-simple:hover {

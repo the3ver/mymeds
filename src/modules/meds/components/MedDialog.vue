@@ -176,7 +176,7 @@ defineExpose({
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px">
+  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px" scrollable>
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
         <span>{{ title }}</span>
@@ -235,11 +235,11 @@ defineExpose({
           density="compact"
           color="primary"
           variant="outlined"
-          class="mb-3 w-100 d-flex"
+          class="mb-3 responsive-btn-toggle"
         >
-          <v-btn value="daily" class="flex-grow-1">{{ t('med.scheduleDaily') }}</v-btn>
-          <v-btn value="weekly" class="flex-grow-1">{{ t('med.scheduleWeekly') }}</v-btn>
-          <v-btn value="interval" class="flex-grow-1">{{ t('med.scheduleInterval') }}</v-btn>
+          <v-btn value="daily">{{ t('med.scheduleDaily') }}</v-btn>
+          <v-btn value="weekly">{{ t('med.scheduleWeekly') }}</v-btn>
+          <v-btn value="interval">{{ t('med.scheduleInterval') }}</v-btn>
         </v-btn-toggle>
 
         <!-- Weekly days selector -->
@@ -284,6 +284,9 @@ defineExpose({
             variant="flat"
             class="ma-1 color-btn"
             :class="{ 'color-btn--white': color === 'white' }"
+            :aria-label="t('a11y.selectColor', { color: t(`med.colors.${color}`) })"
+            :aria-pressed="localMed.color === color"
+            :title="t(`med.colors.${color}`)"
             @click="localMed.color = color"
           >
             <v-icon v-if="localMed.color === color" :color="color === 'white' ? 'grey-darken-4' : 'white'" size="16"
@@ -304,6 +307,8 @@ defineExpose({
             size="small"
             class="shape-btn"
             :title="t(s.labelKey)"
+            :aria-label="t(s.labelKey)"
+            :aria-pressed="localMed.shape === s.id"
             @click="localMed.shape = s.id"
           >
             <PillAvatar
@@ -326,11 +331,11 @@ defineExpose({
             density="compact"
             color="primary"
             variant="outlined"
-            class="w-100 d-flex"
+            class="responsive-btn-toggle"
           >
-            <v-btn value="small" class="flex-grow-1">{{ t('med.sizeSmall') }}</v-btn>
-            <v-btn value="medium" class="flex-grow-1">{{ t('med.sizeMedium') }}</v-btn>
-            <v-btn value="large" class="flex-grow-1">{{ t('med.sizeLarge') }}</v-btn>
+            <v-btn value="small">{{ t('med.sizeSmall') }}</v-btn>
+            <v-btn value="medium">{{ t('med.sizeMedium') }}</v-btn>
+            <v-btn value="large">{{ t('med.sizeLarge') }}</v-btn>
           </v-btn-toggle>
         </div>
       </v-card-text>

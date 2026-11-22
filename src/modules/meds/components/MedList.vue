@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import * as dataService from '../../common/utils/dataService';
 import MedCard from './MedCard.vue';
 import CalendarDialog from '../../common/components/CalendarDialog.vue';
+import ConfirmDialog from '../../common/components/ConfirmDialog.vue';
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils';
 
 const props = defineProps({
@@ -24,6 +25,28 @@ const sortMode = ref('added');
 const yellowLimit = ref(21);
 const redLimit = ref(7);
 const calendarDialog = ref(false);
+const confirmDeleteDialog = ref(false);
+const medIndexToDelete = ref(-1);
+
+const medToDelete = computed(() => {
+  if (medIndexToDelete.value > -1 && props.items[medIndexToDelete.value]) {
+    return props.items[medIndexToDelete.value];
+  }
+  return null;
+});
+
+function requestDelete(index) {
+  medIndexToDelete.value = index;
+  confirmDeleteDialog.value = true;
+}
+
+function confirmDelete() {
+  if (medIndexToDelete.value > -1) {
+    emit('delete', medIndexToDelete.value);
+    medIndexToDelete.value = -1;
+  }
+  confirmDeleteDialog.value = false;
+}
 
 async function updateSettings() {
   const settings = await dataService.getSettings();
@@ -155,11 +178,17 @@ const calendarDateFormatted = computed(() => {
         <div class="text-center font-weight-bold flex-grow-1 text-body-1">
           {{
             overviewData.isCritical
-              ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days })
+              ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }, overviewData.days)
               : t('app.overviewText', { date: overviewData.date })
           }}
         </div>
-        <v-btn icon="mdi-calendar-plus" variant="text" density="compact" @click="calendarDialog = true"></v-btn>
+        <v-btn
+          icon="mdi-calendar-plus"
+          variant="text"
+          density="compact"
+          :aria-label="t('calendar.title')"
+          @click="calendarDialog = true"
+        ></v-btn>
       </v-card-text>
     </v-card>
 
@@ -169,7 +198,7 @@ const calendarDateFormatted = computed(() => {
       :item="item"
       :deduction="deductions[item.name]"
       @edit="emit('edit', item.originalIndex)"
-      @delete="emit('delete', item.originalIndex)"
+      @delete="requestDelete(item.originalIndex)"
     />
 
     <CalendarDialog
@@ -177,6 +206,15 @@ const calendarDateFormatted = computed(() => {
       v-model="calendarDialog"
       :date="calendarDateFormatted"
       :raw-date="calendarDate"
+    />
+
+    <ConfirmDialog
+      v-model="confirmDeleteDialog"
+      :title="t('med.deleteTitle')"
+      :message="medToDelete ? t('med.deleteConfirmNamed', { name: medToDelete.name }) : t('med.deleteConfirm')"
+      :confirm-text="t('dialog.delete')"
+      :cancel-text="t('dialog.cancel')"
+      @confirm="confirmDelete"
     />
   </div>
   <div v-else class="text-center mt-10 text-grey">

@@ -48,7 +48,7 @@ export const messages = {
       notification: 'Attention: {name} lasts only {days} days!',
       showOverview: 'Show Overview Card',
       overviewText: 'Meds last until {date}',
-      overviewTextCritical: 'Meds last only {days} days until {date}',
+      overviewTextCritical: 'Meds last only 1 day until {date} | Meds last only {days} days until {date}',
       haptics: 'Haptic Feedback',
       hapticsDesc: 'Subtle vibration for barcode scans and confirmations',
       reset: 'Reset Settings',
@@ -65,7 +65,9 @@ export const messages = {
         created: 'Created',
         modified: 'Modified',
         meds: 'Medications',
-        entries: 'Entries'
+        medsLabel: 'Medication | Medications',
+        entries: 'Entries',
+        entriesLabel: 'Entry | Entries'
       },
       dataManagement: 'Data Management',
       deleteConfirmLabel: 'Type "Delete" to confirm',
@@ -133,7 +135,33 @@ export const messages = {
       packageSize: 'Package Size',
       dose: 'Daily Dose',
       doseHint: 'e.g. 1, 0.5, 1/2',
+      doseMorning: 'Morning dose',
+      doseNoon: 'Noon dose',
+      doseEvening: 'Evening dose',
+      doseNight: 'Night dose',
+      slotMorning: 'Morning',
+      slotNoon: 'Noon',
+      slotEvening: 'Evening',
+      slotNight: 'Night',
+      deleteTitle: 'Delete Medication',
+      deleteConfirm: 'Are you sure you want to delete this medication?',
+      deleteConfirmNamed: 'Are you sure you want to delete "{name}"?',
       color: 'Color',
+      colors: {
+        white: 'White',
+        'deep-orange': 'Deep Orange',
+        orange: 'Orange',
+        amber: 'Amber',
+        red: 'Red',
+        pink: 'Pink',
+        purple: 'Purple',
+        indigo: 'Indigo',
+        blue: 'Blue',
+        cyan: 'Cyan',
+        teal: 'Teal',
+        green: 'Green',
+        'blue-grey': 'Blue Grey'
+      },
       plan: 'Plan',
       daysRemaining: 'Days remaining',
       emptyDate: 'Estimated empty date',
@@ -509,6 +537,13 @@ export const messages = {
       usage: 'Storage Used',
       persistSuccess: 'Persistent storage successfully granted.',
       persistFailed: 'Persistent storage could not be granted. Install MyMeds to home screen to allow this.'
+    },
+    a11y: {
+      openMenu: 'Open navigation menu',
+      lockVault: 'Lock vault',
+      selectColor: 'Select color {color}',
+      switchCamera: 'Switch camera',
+      toggleFlashlight: 'Toggle flashlight'
     }
   },
   de: {
@@ -516,14 +551,14 @@ export const messages = {
       title: 'MyMeds',
       databases: 'Datenbanken',
       noDatabases: 'Keine Datenbanken gefunden.',
-      createFirstDb: 'Erstellen Sie Ihre erste verschlüsselte Datenbank, um zu beginnen.',
+      createFirstDb: 'Erstelle deine erste verschlüsselte Datenbank, um zu beginnen.',
       deleteDatabaseTitle: 'Datenbank löschen',
       deleteDatabaseConfirm:
-        'Sind Sie sicher, dass Sie die Datenbank "{name}" dauerhaft löschen möchten? Dies kann nicht rückgängig gemacht werden.',
+        'Möchtest du die Datenbank "{name}" wirklich dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.',
       clearEntries: 'Alle Einträge löschen',
       clearEntriesTitle: 'Alle Einträge löschen',
       clearEntriesConfirm:
-        'Sind Sie sicher, dass Sie alle Medikamenten- und Kalendereinträge in dieser Datenbank löschen möchten? Dies kann nicht rückgängig gemacht werden.',
+        'Möchtest du wirklich alle Medikamenten- und Kalendereinträge in dieser Datenbank löschen? Dies kann nicht rückgängig gemacht werden.',
       settings: 'Einstellungen',
       preferences: 'App Einstellungen',
       lightMode: 'Heller Modus',
@@ -557,7 +592,7 @@ export const messages = {
       notification: 'Achtung: {name} hält noch {days} Tage!',
       showOverview: 'Übersichtskarte anzeigen',
       overviewText: 'Meds reichen bis {date}',
-      overviewTextCritical: 'Meds reichen nur noch {days} Tage bis {date}',
+      overviewTextCritical: 'Meds reichen nur noch 1 Tag bis {date} | Meds reichen nur noch {days} Tage bis {date}',
       haptics: 'Haptisches Feedback',
       hapticsDesc: 'Dezente Vibration bei Barcode-Scans und Bestätigungen',
       reset: 'Einstellungen zurücksetzen',
@@ -574,7 +609,9 @@ export const messages = {
         created: 'Erstellt',
         modified: 'Geändert',
         meds: 'Medikamente',
-        entries: 'Einträge'
+        medsLabel: 'Medikament | Medikamente',
+        entries: 'Einträge',
+        entriesLabel: 'Eintrag | Einträge'
       },
       dataManagement: 'Datenverwaltung',
       deleteConfirmLabel: 'Tippe "Löschen" zum Bestätigen',
@@ -643,7 +680,33 @@ export const messages = {
       packageSize: 'Packungsgröße',
       dose: 'Tagesdosis',
       doseHint: 'z.B. 1, 0.5, 1/2',
+      doseMorning: 'Dosis Morgens',
+      doseNoon: 'Dosis Mittags',
+      doseEvening: 'Dosis Abends',
+      doseNight: 'Dosis Nachts',
+      slotMorning: 'Morgens',
+      slotNoon: 'Mittags',
+      slotEvening: 'Abends',
+      slotNight: 'Nachts',
+      deleteTitle: 'Medikament löschen',
+      deleteConfirm: 'Möchtest du dieses Medikament wirklich löschen?',
+      deleteConfirmNamed: 'Möchtest du „{name}“ wirklich löschen?',
       color: 'Farbe',
+      colors: {
+        white: 'Weiß',
+        'deep-orange': 'Dunkelorange',
+        orange: 'Orange',
+        amber: 'Bernstein',
+        red: 'Rot',
+        pink: 'Pink',
+        purple: 'Lila',
+        indigo: 'Indigo',
+        blue: 'Blau',
+        cyan: 'Cyan',
+        teal: 'Türkis',
+        green: 'Grün',
+        'blue-grey': 'Blaugrau'
+      },
       plan: 'Plan',
       daysRemaining: 'Verbleibende Tage',
       emptyDate: 'Voraussichtlich leer am',
@@ -709,7 +772,7 @@ export const messages = {
       no: 'Nein',
       createDbTitle: 'Neue Datenbank erstellen',
       createDbWarning:
-        'Wichtig: Es gibt keine Möglichkeit, Ihr Passwort wiederherzustellen, wenn Sie es vergessen. Der Zugriff auf Ihre Daten geht dann für immer verloren, da die eingegebenen medizinischen Daten ausschließlich auf Ihrem Endgerät gespeichert und nicht übers Netz an irgendwelche Server geschickt werden.',
+        'Wichtig: Es gibt keine Möglichkeit, dein Passwort wiederherzustellen, wenn du es vergisst. Der Zugriff auf deine Daten geht dann für immer verloren, da die eingegebenen medizinischen Daten ausschließlich auf deinem Endgerät gespeichert und nicht übers Netz an irgendwelche Server geschickt werden.',
       dbNameLabel: 'Name der Datenbank',
       passwordLabel: 'Passwort',
       passwordConfirmLabel: 'Passwort bestätigen',
@@ -1023,6 +1086,13 @@ export const messages = {
       persistSuccess: 'Dauerhafter Speicherplatz wurde erfolgreich aktiviert.',
       persistFailed:
         'Dauerhafter Speicher konnte nicht aktiviert werden. Installiere MyMeds auf dem Homescreen, um dies zu ermöglichen.'
+    },
+    a11y: {
+      openMenu: 'Navigationsmenü öffnen',
+      lockVault: 'Tresor sperren',
+      selectColor: 'Farbe {color} wählen',
+      switchCamera: 'Kamera wechseln',
+      toggleFlashlight: 'Taschenlampe umschalten'
     }
   }
 };

@@ -24,12 +24,21 @@ export function generateBmpBitMatrix(payload) {
  */
 export function generateBmpSvg(payload, options = {}) {
   const margin = options.margin !== undefined ? options.margin : 2;
+  const size = options.size !== undefined ? options.size : 260;
   const matrix = generateBmpBitMatrix(payload);
   const matrixWidth = matrix.getWidth();
   const matrixHeight = matrix.getHeight();
 
   const totalWidth = matrixWidth + margin * 2;
   const totalHeight = matrixHeight + margin * 2;
+
+  let sizeAttrs = '';
+  if (size && size > 0) {
+    const scale = size / Math.max(totalWidth, totalHeight);
+    const svgWidth = Math.round(totalWidth * scale);
+    const svgHeight = Math.round(totalHeight * scale);
+    sizeAttrs = ` width="${svgWidth}" height="${svgHeight}"`;
+  }
 
   let rects = '';
   for (let y = 0; y < matrixHeight; y++) {
@@ -41,7 +50,7 @@ export function generateBmpSvg(payload, options = {}) {
   }
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalWidth} ${totalHeight}" shape-rendering="crispEdges">` +
+    `<svg xmlns="http://www.w3.org/2000/svg"${sizeAttrs} viewBox="0 0 ${totalWidth} ${totalHeight}" shape-rendering="crispEdges">` +
     `<rect width="${totalWidth}" height="${totalHeight}" fill="#ffffff"/>` +
     rects +
     `</svg>`

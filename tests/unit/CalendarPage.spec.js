@@ -480,4 +480,33 @@ describe('CalendarPage.vue', () => {
     expect(wrapper.text()).toContain('Impfung Zukunft');
     expect(wrapper.text()).toContain('Arzttermin mit fehlender Überweisung');
   });
+
+  it('passes primary confirm color to export confirmation dialog and avoids duplicate referral chips when expanded', async () => {
+    const entries = [
+      {
+        title: 'Facharzt Kontrolle',
+        date: '2026-11-20',
+        type: 'doctor',
+        doctor: 'Dr. Test',
+        needsReferral: true,
+        referralStatus: 'needed'
+      }
+    ];
+    const wrapper = mountComponent({ initialEntries: entries });
+
+    // ConfirmDialog stubs: first is exportDialog, second is confirmDeleteDialog
+    const confirmDialogs = wrapper.findAllComponents({ name: 'ConfirmDialog' });
+    expect(confirmDialogs.length).toBe(2);
+    expect(confirmDialogs[0].props('confirmColor')).toBe('primary');
+
+    // Expand the doctor entry card
+    await wrapper.find('#entry-0').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    const statusChips = wrapper
+      .find('#entry-0')
+      .findAllComponents(components.VChip)
+      .filter((chip) => chip.text().includes('Zu besorgen'));
+    expect(statusChips.length).toBe(1);
+  });
 });

@@ -127,24 +127,38 @@ function openCalendarFilter() {
   <v-app>
     <NavDrawer
       v-model="drawer"
-      @open-data="dataDialog = true"
+      @open-data="
+        dataDialog = true;
+        drawer = false;
+      "
       @open-whats-new="whatsNewDialog = true"
       @vault-imported="handleVaultImported"
     />
 
     <v-app-bar :color="theme.global.current.value.dark ? 'surface' : 'primary'" density="compact">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" data-testid="nav-drawer-toggle"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon
+          :aria-label="t('a11y.openMenu')"
+          @click.stop="drawer = !drawer"
+          data-testid="nav-drawer-toggle"
+        ></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title>{{ t('app.title') }}</v-app-bar-title>
       <template v-slot:append>
         <v-btn
           v-if="!appState.isLocked && activeTab === 'calendar'"
           icon="mdi-filter-variant"
+          :aria-label="t('calendar.filter')"
           @click="openCalendarFilter"
           data-testid="calendar-filter-btn"
         ></v-btn>
-        <v-btn v-if="!appState.isLocked" icon="mdi-lock" @click="handleLock"></v-btn>
+        <v-btn
+          v-if="!appState.isLocked"
+          icon="mdi-lock"
+          :aria-label="t('a11y.lockVault')"
+          @click="handleLock"
+          data-testid="lock-vault-btn"
+        ></v-btn>
       </template>
     </v-app-bar>
 
@@ -163,8 +177,14 @@ function openCalendarFilter() {
     <WelcomeDialog v-model="welcomeDialog" :is-existing-user="isExistingUser" />
     <WhatsNewDialog v-model="whatsNewDialog" />
 
-    <!-- Background Update Available Banner/Snackbar -->
-    <v-snackbar v-model="updateAvailableSnackbar" color="primary" :timeout="-1" location="bottom center">
+    <!-- Background Update Available Banner/Snackbar (suppressed while WelcomeDialog is open) -->
+    <v-snackbar
+      :model-value="updateAvailableSnackbar && !welcomeDialog"
+      @update:model-value="updateAvailableSnackbar = $event"
+      color="primary"
+      :timeout="-1"
+      location="bottom center"
+    >
       {{ t('updates.updateReady') }}
       <template v-slot:actions>
         <v-btn

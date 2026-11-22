@@ -81,10 +81,15 @@ const close = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" fullscreen transition="dialog-bottom-transition">
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="(val) => !val && close()"
+    fullscreen
+    transition="dialog-bottom-transition"
+  >
     <v-card>
       <v-toolbar color="primary">
-        <v-btn icon="mdi-close" @click="close"></v-btn>
+        <v-btn icon="mdi-close" :aria-label="t('about.close')" @click="close"></v-btn>
         <v-toolbar-title>{{ t('app.dataManagement') }}</v-toolbar-title>
       </v-toolbar>
 
@@ -93,16 +98,28 @@ const close = () => {
           <!-- Import / Export -->
           <div class="text-h6 mb-4">Import / Export</div>
           <div class="d-flex flex-column gap-2 mb-6">
-            <v-btn color="primary" variant="outlined" prepend-icon="mdi-export" @click="handleExport">
+            <v-btn color="primary" variant="outlined" prepend-icon="mdi-export" class="btn-wrap" @click="handleExport">
               {{ t('app.exportData') }}
             </v-btn>
-            <v-btn color="primary" variant="outlined" prepend-icon="mdi-import" @click="triggerImport">
+            <v-btn color="primary" variant="outlined" prepend-icon="mdi-import" class="btn-wrap" @click="triggerImport">
               {{ t('app.importData') }}
             </v-btn>
-            <v-btn color="primary" variant="tonal" prepend-icon="mdi-qrcode-scan" @click="bmpScanDialog = true">
+            <v-btn
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-qrcode-scan"
+              class="btn-wrap"
+              @click="bmpScanDialog = true"
+            >
               {{ t('app.scanBmp') }}
             </v-btn>
-            <v-btn color="secondary" variant="tonal" prepend-icon="mdi-barcode-scan" @click="bmpExportDialog = true">
+            <v-btn
+              color="secondary"
+              variant="tonal"
+              prepend-icon="mdi-barcode-scan"
+              class="btn-wrap"
+              @click="bmpExportDialog = true"
+            >
               {{ t('app.showBmp') }}
             </v-btn>
             <input type="file" ref="fileInput" style="display: none" accept=".json" @change="onFileSelected" />

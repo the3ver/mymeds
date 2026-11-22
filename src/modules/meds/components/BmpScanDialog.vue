@@ -1,9 +1,15 @@
 <template>
-  <v-dialog :model-value="modelValue" max-width="640px" scrollable persistent @update:model-value="handleClose">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="640px"
+    scrollable
+    :persistent="isProcessingImage"
+    @update:model-value="(val) => !val && handleClose()"
+  >
     <v-card class="bmp-scan-dialog">
       <!-- Toolbar Header -->
       <v-toolbar color="primary" density="comfortable">
-        <v-btn icon="mdi-close" variant="text" @click="handleClose" />
+        <v-btn icon="mdi-close" variant="text" :aria-label="t('about.close')" @click="handleClose" />
         <v-toolbar-title class="text-subtitle-1 font-weight-bold">
           {{ t('bmp.scanTitle') }}
         </v-toolbar-title>
@@ -13,6 +19,7 @@
           icon="mdi-refresh"
           variant="text"
           :title="t('bmp.rescan')"
+          :aria-label="t('bmp.rescan')"
           @click="resetToScanner"
         />
       </v-toolbar>
@@ -58,6 +65,7 @@
                 variant="flat"
                 color="surface"
                 class="ma-1"
+                :aria-label="t('a11y.switchCamera')"
                 @click="switchCameraFacing"
               />
               <v-btn
@@ -67,6 +75,7 @@
                 variant="flat"
                 color="surface"
                 class="ma-1"
+                :aria-label="t('a11y.toggleFlashlight')"
                 @click="toggleTorch"
               />
             </div>

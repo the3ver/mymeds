@@ -164,6 +164,8 @@ describe('bmpGenerator', () => {
     expect(typeof svg).toBe('string');
     expect(svg).toContain('<svg');
     expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
+    expect(svg).toContain('width="300"');
+    expect(svg).toContain('height="300"');
     expect(svg).toContain('viewBox=');
     expect(svg).toContain('fill="#000000"');
     expect(svg).toContain('</svg>');
@@ -173,5 +175,20 @@ describe('bmpGenerator', () => {
     renderBmpToCanvas(canvas, payload, { size: 250, margin: 2 });
     expect(canvas.width).toBe(250);
     expect(canvas.height).toBe(250);
+  });
+
+  it('should generate explicit non-zero SVG dimensions for Ibuprofen 400 in both compressed and XML modes', () => {
+    const xml = generateBmpXml({
+      meds: [{ name: 'Ibuprofen 400', ingredient: 'Ibuprofen', count: 40, dose: '1-0-1' }]
+    });
+
+    for (const compress of [true, false]) {
+      const payload = generateBmpPayload(xml, { compress });
+      const svg = generateBmpSvg(payload, { size: 260, margin: 2 });
+      expect(svg).toMatch(/width="260"/);
+      expect(svg).toMatch(/height="260"/);
+      const blackRects = svg.match(/fill="#000000"/g) || [];
+      expect(blackRects.length).toBeGreaterThan(50);
+    }
   });
 });

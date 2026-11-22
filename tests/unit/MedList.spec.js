@@ -99,4 +99,36 @@ describe('MedList.vue', () => {
     expect(titles[1]).toContain('M-Medikament');
     expect(titles[2]).toContain('Z-Medikament');
   });
+
+  it('requires confirmation before emitting delete when a MedCard requests deletion', async () => {
+    const wrapper = mountComponent();
+    const firstCard = wrapper.findComponent({ name: 'MedCard' });
+    expect(firstCard.exists()).toBe(true);
+
+    firstCard.vm.$emit('delete');
+    await wrapper.vm.$nextTick();
+
+    // Must not emit delete immediately
+    expect(wrapper.emitted('delete')).toBeUndefined();
+
+    // ConfirmDialog should now be open
+    const confirmDialog = wrapper.findComponent({ name: 'ConfirmDialog' });
+    expect(confirmDialog.exists()).toBe(true);
+    expect(confirmDialog.props('modelValue')).toBe(true);
+    expect(confirmDialog.props('message')).toContain('Z-Medikament');
+
+    // Confirm deletion
+    confirmDialog.vm.$emit('confirm');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted('delete')).toEqual([[0]]);
+  });
+
+  it('uses singular wording when only 1 day remains in overview banner', () => {
+    const wrapper = mountComponent({
+      items: [{ name: 'Urgent Med', count: 1, dose: '1', packageSize: 10 }]
+    });
+    expect(wrapper.text()).toContain('1 Tag');
+    expect(wrapper.text()).not.toContain('1 Tage');
+  });
 });

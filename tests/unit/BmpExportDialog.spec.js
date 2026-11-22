@@ -42,7 +42,11 @@ describe('BmpExportDialog.vue', () => {
 
     expect(document.body.textContent).toContain('Bundesmedikationsplan (BMP)');
     expect(document.body.querySelector('.bmp-matrix-preview')).not.toBeNull();
-    expect(document.body.querySelector('.bmp-matrix-preview svg')).not.toBeNull();
+    const svgEl = document.body.querySelector('.bmp-matrix-preview svg');
+    expect(svgEl).not.toBeNull();
+    expect(Number(svgEl.getAttribute('width'))).toBeGreaterThan(0);
+    expect(Number(svgEl.getAttribute('height'))).toBeGreaterThan(0);
+    expect(svgEl.querySelectorAll('rect[fill="#000000"]').length).toBeGreaterThan(50);
   });
 
   it('shows a payload generation error and clears it once generation succeeds again', async () => {

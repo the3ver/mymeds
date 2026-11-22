@@ -2,27 +2,35 @@
   <v-dialog
     :model-value="modelValue"
     max-width="560px"
-    persistent
-    @update:model-value="$emit('update:modelValue', $event)"
+    :persistent="receiverStatus === 'connecting' || receiverStatus === 'receiving'"
+    scrollable
+    @update:model-value="(val) => !val && handleClose()"
   >
     <v-card class="pa-2">
       <!-- Header -->
       <v-card-title class="d-flex align-center justify-space-between pb-2">
-        <div class="d-flex align-center font-weight-bold">
-          <v-icon icon="mdi-sync" color="primary" class="mr-2" />
-          {{ t('sync.title') }}
+        <div class="d-flex align-center font-weight-bold min-width-0">
+          <v-icon icon="mdi-sync" color="primary" class="mr-2 flex-shrink-0" />
+          <span>{{ t('sync.title') }}</span>
         </div>
-        <v-btn icon="mdi-close" variant="text" density="comfortable" class="close-sync-btn" @click="handleClose" />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          density="comfortable"
+          class="close-sync-btn flex-shrink-0"
+          :aria-label="t('about.close')"
+          @click="handleClose"
+        />
       </v-card-title>
 
       <!-- Tabs (Send / Receive) -->
-      <v-tabs v-model="activeTab" color="primary" grow class="border-b mb-4">
-        <v-tab value="send">
-          <v-icon icon="mdi-upload" class="mr-1" />
+      <v-tabs v-model="activeTab" color="primary" grow :show-arrows="false" class="border-b mb-4 sync-tabs">
+        <v-tab value="send" class="sync-tab">
+          <v-icon icon="mdi-upload" size="small" class="mr-1" />
           {{ t('sync.tabSend') }}
         </v-tab>
-        <v-tab value="receive">
-          <v-icon icon="mdi-download" class="mr-1" />
+        <v-tab value="receive" class="sync-tab">
+          <v-icon icon="mdi-download" size="small" class="mr-1" />
           {{ t('sync.tabReceive') }}
         </v-tab>
       </v-tabs>
@@ -85,6 +93,7 @@
                   variant="text"
                   color="primary"
                   :title="t('sync.copyCode')"
+                  :aria-label="t('sync.copyCode')"
                   @click="copySyncCode"
                 />
               </div>
@@ -111,6 +120,7 @@
                 size="small"
                 prepend-icon="mdi-content-copy"
                 color="primary"
+                class="btn-wrap"
                 @click="copyEncryptedPayload"
               >
                 {{ t('sync.copyEncryptedText') }}
@@ -150,7 +160,7 @@
               prepend-inner-icon="mdi-key"
               variant="outlined"
               maxlength="8"
-              class="text-h6 font-monospace mb-2"
+              class="sync-code-input mb-2"
               :disabled="receiverStatus === 'connecting' || receiverStatus === 'receiving'"
               @keyup.enter="handleConnectAndReceive"
             />
@@ -626,5 +636,29 @@ onUnmounted(() => {
 }
 .font-monospace {
   font-family: 'Courier New', Courier, monospace;
+}
+.min-width-0 {
+  min-width: 0;
+}
+.sync-tabs :deep(.v-slide-group__content) {
+  width: 100%;
+}
+.sync-tab {
+  flex: 1 1 50%;
+  min-width: 0 !important;
+  padding: 0 8px !important;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.875rem;
+}
+.sync-tab :deep(.v-btn__content) {
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+.sync-code-input :deep(input) {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.12em;
 }
 </style>

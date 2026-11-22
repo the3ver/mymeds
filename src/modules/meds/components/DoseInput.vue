@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   modelValue: {
@@ -13,6 +14,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 
 // Internal state for the 4 slots: Morning, Noon, Evening, Night
 const morning = ref('');
@@ -91,46 +93,62 @@ const onInput = (field, val) => {
 <template>
   <div class="dose-input-container">
     <div class="text-caption text-grey mb-1">{{ label }}</div>
-    <div class="d-flex align-center gap-2">
-      <v-text-field
-        v-model="morning"
-        variant="underlined"
-        density="compact"
-        placeholder="0"
-        hide-details
-        class="centered-input"
-        @update:model-value="(v) => onInput('morning', v)"
-      ></v-text-field>
+    <div class="d-flex align-start gap-2">
+      <div class="dose-slot">
+        <v-text-field
+          v-model="morning"
+          variant="underlined"
+          density="compact"
+          placeholder="0"
+          :aria-label="t('med.doseMorning')"
+          hide-details
+          class="centered-input"
+          @update:model-value="(v) => onInput('morning', v)"
+        ></v-text-field>
+        <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotMorning') }}</div>
+      </div>
       <span class="separator">-</span>
-      <v-text-field
-        v-model="noon"
-        variant="underlined"
-        density="compact"
-        placeholder="0"
-        hide-details
-        class="centered-input"
-        @update:model-value="(v) => onInput('noon', v)"
-      ></v-text-field>
+      <div class="dose-slot">
+        <v-text-field
+          v-model="noon"
+          variant="underlined"
+          density="compact"
+          placeholder="0"
+          :aria-label="t('med.doseNoon')"
+          hide-details
+          class="centered-input"
+          @update:model-value="(v) => onInput('noon', v)"
+        ></v-text-field>
+        <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotNoon') }}</div>
+      </div>
       <span class="separator">-</span>
-      <v-text-field
-        v-model="evening"
-        variant="underlined"
-        density="compact"
-        placeholder="0"
-        hide-details
-        class="centered-input"
-        @update:model-value="(v) => onInput('evening', v)"
-      ></v-text-field>
+      <div class="dose-slot">
+        <v-text-field
+          v-model="evening"
+          variant="underlined"
+          density="compact"
+          placeholder="0"
+          :aria-label="t('med.doseEvening')"
+          hide-details
+          class="centered-input"
+          @update:model-value="(v) => onInput('evening', v)"
+        ></v-text-field>
+        <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotEvening') }}</div>
+      </div>
       <span class="separator text-grey">-</span>
-      <v-text-field
-        v-model="night"
-        variant="underlined"
-        density="compact"
-        placeholder="N"
-        hide-details
-        class="centered-input"
-        @update:model-value="(v) => onInput('night', v)"
-      ></v-text-field>
+      <div class="dose-slot">
+        <v-text-field
+          v-model="night"
+          variant="underlined"
+          density="compact"
+          placeholder="0"
+          :aria-label="t('med.doseNight')"
+          hide-details
+          class="centered-input"
+          @update:model-value="(v) => onInput('night', v)"
+        ></v-text-field>
+        <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotNight') }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -139,12 +157,21 @@ const onInput = (field, val) => {
 .dose-input-container {
   margin-bottom: 16px;
 }
+.dose-slot {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.dose-slot-label {
+  font-size: 0.7rem !important;
+  line-height: 1.2;
+  margin-top: 2px;
+}
 .gap-2 {
-  gap: 8px;
+  gap: 6px;
 }
 .separator {
   font-weight: bold;
-  padding-bottom: 8px; /* Align with text baseline */
+  padding-top: 8px;
 }
 :deep(.centered-input input) {
   text-align: center;

@@ -26,9 +26,9 @@ const createEvent = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" max-width="400px" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="(val) => !val && close()" max-width="400px">
     <v-card>
-      <v-card-title class="text-h5">{{ t('calendar.title') }}</v-card-title>
+      <v-card-title class="text-h6 text-wrap">{{ t('calendar.title') }}</v-card-title>
       <v-card-text>
         <p>{{ t('calendar.message', { date: date }) }}</p>
       </v-card-text>

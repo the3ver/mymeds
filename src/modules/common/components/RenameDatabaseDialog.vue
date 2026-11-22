@@ -35,7 +35,7 @@ const save = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="(val) => !val && close()" max-width="500px">
     <v-card>
       <v-card-title>Rename Database</v-card-title>
       <v-card-text>

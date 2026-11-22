@@ -62,6 +62,9 @@ describe('DatabaseListPage.vue', () => {
     expect(text).toContain('Haupt-Tresor');
     expect(text).toContain('4 Medikamente');
     expect(text).toContain('2 Einträge');
+    expect(text).toContain('1 Medikament');
+    expect(text).not.toContain('1 Medikamente');
+    expect(text).toContain('0 Einträge');
     expect(text).not.toContain('Erstellt:');
     expect(text).not.toContain('Geändert:');
 
@@ -166,5 +169,61 @@ describe('DatabaseListPage.vue', () => {
     await new Promise((r) => setTimeout(r, 20));
 
     expect(wrapper.text()).toContain('Keine Datenbanken gefunden');
+  });
+
+  it('pluralizes singular and plural counts correctly in German and English', async () => {
+    const singleVault = [
+      {
+        id: 3,
+        name: 'Einzel-Tresor',
+        medsCount: 1,
+        calendarCount: 1,
+        createdAt: '2026-01-15T10:00:00.000Z',
+        modifiedAt: '2026-03-01T14:30:00.000Z'
+      }
+    ];
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(singleVault);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const enI18n = createI18n({ legacy: false, locale: 'en', fallbackLocale: 'en', messages });
+    const deWrapper = mount(DatabaseListPage, {
+      global: {
+        plugins: [vuetify, i18n],
+        stubs: {
+          VFab: true,
+          CreateDatabaseDialog: true,
+          DatabaseUnlockDialog: true,
+          RenameDatabaseDialog: true,
+          SyncDialog: true,
+          ConfirmDialog: true
+        }
+      }
+    });
+    const enWrapper = mount(DatabaseListPage, {
+      global: {
+        plugins: [vuetify, enI18n],
+        stubs: {
+          VFab: true,
+          CreateDatabaseDialog: true,
+          DatabaseUnlockDialog: true,
+          RenameDatabaseDialog: true,
+          SyncDialog: true,
+          ConfirmDialog: true
+        }
+      }
+    });
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(deWrapper.text()).toContain('1 Medikament');
+    expect(deWrapper.text()).not.toContain('1 Medikamente');
+    expect(deWrapper.text()).toContain('1 Eintrag');
+    expect(deWrapper.text()).not.toContain('1 Einträge');
+
+    expect(enWrapper.text()).toContain('1 Medication');
+    expect(enWrapper.text()).not.toContain('1 Medications');
+    expect(enWrapper.text()).toContain('1 Entry');
+    expect(enWrapper.text()).not.toContain('1 Entries');
   });
 });

@@ -138,4 +138,14 @@ describe('App.vue', () => {
     await flushPromises();
     expect(storageService.autoRequestPersistence).toHaveBeenCalled();
   });
+
+  it('provides aria-labels on navigation and lock icon buttons', async () => {
+    appState.isLocked = false;
+    appState.decryptedData = { meds: [], calendar: [], version: 1 };
+    const wrapper = mountApp();
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="nav-drawer-toggle"]').attributes('aria-label')).toBeTruthy();
+    expect(wrapper.find('[data-testid="lock-vault-btn"]').attributes('aria-label')).toBeTruthy();
+  });
 });

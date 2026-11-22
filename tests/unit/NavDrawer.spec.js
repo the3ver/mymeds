@@ -138,6 +138,7 @@ describe('NavDrawer.vue', () => {
     const settingsDialog = navDrawer.findComponent({ name: 'SettingsDialog' });
     expect(settingsDialog.exists()).toBe(true);
     expect(settingsDialog.props('modelValue')).toBe(true);
+    expect(navDrawer.emitted('update:modelValue')).toContainEqual([false]);
   });
 
   it('opens SyncDialog when Sync list item is clicked', async () => {
@@ -153,6 +154,7 @@ describe('NavDrawer.vue', () => {
     const syncDialog = navDrawer.findComponent({ name: 'SyncDialog' });
     expect(syncDialog.exists()).toBe(true);
     expect(syncDialog.props('modelValue')).toBe(true);
+    expect(navDrawer.emitted('update:modelValue')).toContainEqual([false]);
   });
 
   it('opens HelpDialog when Help list item is clicked', async () => {
@@ -168,5 +170,26 @@ describe('NavDrawer.vue', () => {
     const helpDialog = navDrawer.findComponent({ name: 'HelpDialog' });
     expect(helpDialog.exists()).toBe(true);
     expect(helpDialog.props('modelValue')).toBe(true);
+    expect(navDrawer.emitted('update:modelValue')).toContainEqual([false]);
+  });
+
+  it('closes drawer when opening About dialog and places external-link icons on GitHub and License', async () => {
+    const { wrapper, navDrawer } = mountComponent();
+    await flushPromises();
+
+    const aboutBtn = wrapper.find('[data-testid="nav-about-btn"]');
+    expect(aboutBtn.exists()).toBe(true);
+
+    await aboutBtn.trigger('click');
+    await flushPromises();
+
+    expect(navDrawer.emitted('update:modelValue')).toContainEqual([false]);
+
+    const versionItem = document.body.querySelector('[data-testid="about-version-item"]');
+    const githubItem = document.body.querySelector('[data-testid="about-github-item"]');
+    const licenseItem = document.body.querySelector('[data-testid="about-license-item"]');
+    expect(versionItem?.querySelector('.mdi-open-in-new')).toBeNull();
+    expect(githubItem?.querySelector('.mdi-open-in-new')).not.toBeNull();
+    expect(licenseItem?.querySelector('.mdi-open-in-new')).not.toBeNull();
   });
 });

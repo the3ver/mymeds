@@ -80,9 +80,39 @@ async function loadDatabasesForSync() {
   }
 }
 
+function closeDrawer() {
+  emit('update:modelValue', false);
+}
+
+function handleOpenSettings() {
+  settingsDialog.value = true;
+  closeDrawer();
+}
+
 function handleOpenSync() {
   loadDatabasesForSync();
   syncDialog.value = true;
+  closeDrawer();
+}
+
+function handleOpenData() {
+  emit('open-data');
+  closeDrawer();
+}
+
+function handleOpenHelp() {
+  helpDialog.value = true;
+  closeDrawer();
+}
+
+function handleOpenAbout() {
+  aboutDialog.value = true;
+  closeDrawer();
+}
+
+function handleOpenWhatsNew() {
+  emit('open-whats-new');
+  closeDrawer();
 }
 
 const toggleTheme = () => {
@@ -97,68 +127,64 @@ const toggleTheme = () => {
     :model-value="modelValue"
     @update:model-value="(val) => emit('update:modelValue', val)"
     temporary
+    :width="288"
+    class="nav-drawer"
   >
     <v-list>
-      <v-list-item :title="t('app.settings')" :subtitle="t('app.preferences')"></v-list-item>
+      <v-list-item :title="t('app.title')" :subtitle="t('app.preferences')"></v-list-item>
       <v-divider></v-divider>
 
       <v-list-item @click="toggleTheme">
         <template v-slot:prepend>
           <v-icon>{{ theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
         </template>
-        <v-list-item-title>
+        <v-list-item-title class="drawer-item-title">
           {{ theme.global.current.value.dark ? t('app.lightMode') : t('app.darkMode') }}
         </v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="settingsDialog = true" data-testid="nav-settings-btn">
+      <v-list-item @click="handleOpenSettings" data-testid="nav-settings-btn">
         <template v-slot:prepend>
           <v-icon>mdi-cog</v-icon>
         </template>
-        <v-list-item-title>{{ t('app.settings') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('app.settings') }}</v-list-item-title>
       </v-list-item>
 
       <v-list-item @click="handleOpenSync" data-testid="nav-sync-btn">
         <template v-slot:prepend>
           <v-icon>mdi-sync</v-icon>
         </template>
-        <v-list-item-title>{{ t('sync.title') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('sync.title') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item v-if="!appState.isLocked" @click="emit('open-data')">
+      <v-list-item v-if="!appState.isLocked" @click="handleOpenData" data-testid="nav-data-btn">
         <template v-slot:prepend>
           <v-icon>mdi-database</v-icon>
         </template>
-        <v-list-item-title>{{ t('app.dataManagement') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('app.dataManagement') }}</v-list-item-title>
       </v-list-item>
 
       <v-divider></v-divider>
 
-      <v-list-item @click="helpDialog = true" data-testid="nav-help-btn">
+      <v-list-item @click="handleOpenHelp" data-testid="nav-help-btn">
         <template v-slot:prepend>
           <v-icon>mdi-help-circle-outline</v-icon>
         </template>
-        <v-list-item-title>{{ t('app.help') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('app.help') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item @click="aboutDialog = true">
+      <v-list-item @click="handleOpenAbout" data-testid="nav-about-btn">
         <template v-slot:prepend>
           <v-icon>mdi-information</v-icon>
         </template>
-        <v-list-item-title>{{ t('app.about') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('app.about') }}</v-list-item-title>
       </v-list-item>
 
-      <v-list-item
-        @click="
-          emit('open-whats-new');
-          emit('update:modelValue', false);
-        "
-        data-testid="nav-whats-new-btn"
-      >
+      <v-list-item @click="handleOpenWhatsNew" data-testid="nav-whats-new-btn">
         <template v-slot:prepend>
           <v-icon color="primary">mdi-sparkles</v-icon>
         </template>
-        <v-list-item-title>{{ t('whatsNew.title') }}</v-list-item-title>
+        <v-list-item-title class="drawer-item-title">{{ t('whatsNew.title') }}</v-list-item-title>
       </v-list-item>
 
       <v-list-item @click="handleCheckUpdates" :disabled="isCheckingUpdates" data-testid="nav-check-updates-btn">
@@ -173,7 +199,7 @@ const toggleTheme = () => {
           ></v-progress-circular>
           <v-icon v-else>mdi-update</v-icon>
         </template>
-        <v-list-item-title>
+        <v-list-item-title class="drawer-item-title">
           {{ isCheckingUpdates ? t('updates.checking') : t('updates.check') }}
         </v-list-item-title>
       </v-list-item>
@@ -198,29 +224,29 @@ const toggleTheme = () => {
         <p class="mb-4 text-body-2 text-grey-darken-1">{{ t('about.explanation') }}</p>
 
         <v-list density="compact">
-          <v-list-item prepend-icon="mdi-tag-text-outline" :title="t('about.version')" :subtitle="appVersion">
-            <template v-slot:append>
-              <v-btn
-                variant="text"
-                density="compact"
-                icon="mdi-open-in-new"
-                href="https://github.com/the3ver/mymeds/releases"
-                target="_blank"
-                :title="t('about.changelog')"
-              ></v-btn>
-            </template>
-          </v-list-item>
+          <v-list-item
+            prepend-icon="mdi-tag-text-outline"
+            :title="t('about.version')"
+            :subtitle="appVersion"
+            data-testid="about-version-item"
+          ></v-list-item>
           <v-list-item
             prepend-icon="mdi-github"
+            append-icon="mdi-open-in-new"
             :title="t('about.github')"
             href="https://github.com/the3ver/mymeds"
             target="_blank"
+            rel="noopener noreferrer"
+            data-testid="about-github-item"
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-license"
+            append-icon="mdi-open-in-new"
             :title="t('about.license')"
             href="https://github.com/the3ver/mymeds/blob/main/LICENSE"
             target="_blank"
+            rel="noopener noreferrer"
+            data-testid="about-license-item"
           ></v-list-item>
         </v-list>
 
@@ -284,4 +310,9 @@ const toggleTheme = () => {
   </v-snackbar>
 </template>
 
-<style scoped></style>
+<style scoped>
+.drawer-item-title {
+  white-space: normal;
+  line-height: 1.3;
+}
+</style>

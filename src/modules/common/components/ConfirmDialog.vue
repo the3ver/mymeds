@@ -8,6 +8,14 @@ const props = defineProps({
   message: String,
   confirmText: String,
   cancelText: String,
+  confirmColor: {
+    type: String,
+    default: 'error'
+  },
+  cancelColor: {
+    type: String,
+    default: undefined
+  },
   confirmInputLabel: String,
   confirmInputValue: String
 });
@@ -40,9 +48,14 @@ const confirm = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" max-width="400px" persistent>
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="(val) => !val && close()"
+    max-width="400px"
+    :persistent="!!confirmInputValue"
+  >
     <v-card>
-      <v-card-title class="text-h5">{{ title }}</v-card-title>
+      <v-card-title class="text-h6 text-wrap">{{ title }}</v-card-title>
       <v-card-text>
         <p class="mb-4">{{ message }}</p>
 
@@ -58,9 +71,9 @@ const confirm = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" variant="text" @click="close">{{ cancelText || t('dialog.cancel') }}</v-btn>
+        <v-btn :color="cancelColor" variant="text" @click="close">{{ cancelText || t('dialog.cancel') }}</v-btn>
         <v-btn
-          color="error"
+          :color="confirmColor"
           variant="text"
           @click="confirm"
           :disabled="confirmInputValue && inputValue !== confirmInputValue"

@@ -85,12 +85,16 @@ describe('MainPage.vue', () => {
     );
   };
 
-  it('renders BMP scan and BMP export buttons in meds tab', async () => {
+  it('renders BMP scan, BMP export, and semantic Add Medication button in meds tab', async () => {
     const wrapper = mountMainPage();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('Arztplan einscannen (BMP)');
     expect(wrapper.text()).toContain('Plan als BMP anzeigen (DataMatrix)');
+
+    const addBtn = wrapper.find('[data-testid="add-med-btn"]');
+    expect(addBtn.exists()).toBe(true);
+    expect(addBtn.element.tagName).toBe('BUTTON');
   });
 
   it('switches to calendar tab when shortcut tab intent is calendar', async () => {

@@ -132,7 +132,7 @@ const save = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px">
+  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="500px" scrollable>
     <v-card>
       <v-card-title>{{ title }}</v-card-title>
       <v-card-text class="text-body-1">
@@ -303,7 +303,14 @@ const save = () => {
           auto-grow
         >
           <template v-slot:append-inner>
-            <v-btn icon variant="text" size="small" @click="showLinkDialog = true">
+            <v-btn
+              icon
+              variant="text"
+              size="small"
+              :aria-label="t('calendar.addLink.title')"
+              :title="t('calendar.addLink.title')"
+              @click="showLinkDialog = true"
+            >
               <v-icon>mdi-link-plus</v-icon>
             </v-btn>
           </template>

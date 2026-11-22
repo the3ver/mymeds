@@ -3,7 +3,7 @@
     <v-card class="bmp-export-dialog">
       <!-- Toolbar Header -->
       <v-toolbar color="primary" density="comfortable">
-        <v-btn icon="mdi-close" variant="text" @click="handleClose" />
+        <v-btn icon="mdi-close" variant="text" :aria-label="t('about.close')" @click="handleClose" />
         <v-toolbar-title class="text-subtitle-1 font-weight-bold">
           {{ t('bmp.exportTitle') }}
         </v-toolbar-title>
@@ -38,16 +38,17 @@
           <v-btn-toggle
             v-model="format"
             mandatory
+            divided
             density="compact"
             color="primary"
-            class="w-100 d-flex"
+            class="responsive-btn-toggle"
             variant="outlined"
           >
-            <v-btn value="standard" class="flex-grow-1" size="small">
+            <v-btn value="standard" size="small">
               <v-icon start size="16">mdi-zip-box</v-icon>
               {{ t('bmp.formatStandard') }}
             </v-btn>
-            <v-btn value="xml" class="flex-grow-1" size="small">
+            <v-btn value="xml" size="small">
               <v-icon start size="16">mdi-code-tags</v-icon>
               {{ t('bmp.formatXml') }}
             </v-btn>
@@ -229,7 +230,7 @@ const availableMeds = computed(() => {
 
 // Initialize all selected when dialog opens or meds change
 watch(
-  () => [props.modelValue, availableMeds.value],
+  () => [props.modelValue, availableMeds.value, availableMeds.value.length],
   ([isOpen, meds]) => {
     if (isOpen && meds) {
       selectedIndices.value = meds.map((_, i) => i);
@@ -381,15 +382,17 @@ defineExpose({
 }
 
 .bmp-svg-wrapper {
-  display: inline-flex;
+  display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 100%;
+  width: 100%;
+  max-width: 260px;
 }
 
 .bmp-svg-wrapper :deep(svg) {
   display: block;
-  max-width: 100%;
+  width: 100%;
+  max-width: 260px;
   height: auto;
 }
 

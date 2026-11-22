@@ -126,7 +126,7 @@ const statusColor = computed(() => {
 </script>
 
 <template>
-  <v-card class="mb-4" variant="elevated" @click="isExpanded = !isExpanded" :ripple="true">
+  <v-card class="mb-4" variant="elevated" @click="isExpanded = !isExpanded" :ripple="false">
     <v-card-item>
       <template v-slot:prepend>
         <div class="mr-3 d-flex align-center justify-center">
