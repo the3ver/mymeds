@@ -1,13 +1,38 @@
 {
-  "hooks": {
-    "Stop": [
+  "sensitive-path-guard": {
+    "PreToolUse": [
       {
+        "matcher": "read_file|view_file|edit_file|write_file|write_to_file|replace_file_content|multi_replace_file_content",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/scripts/check.sh\" --hook"
+            "command": "node ../scripts/guard-sensitive-paths.mjs",
+            "timeout": 10
           }
         ]
+      }
+    ]
+  },
+  "format-edited": {
+    "PostToolUse": [
+      {
+        "matcher": "edit_file|write_file|replace_file_content|multi_replace_file_content|write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ../scripts/format-edited.mjs",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "project-check": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ../scripts/check.mjs --agy-hook",
+        "timeout": 180
       }
     ]
   }

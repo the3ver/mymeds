@@ -11,7 +11,7 @@ Client-only Progressive Web App (PWA) zur verschlüsselten Erfassung von Medikam
 
 ## Commands
 - Dev Server: `npm run dev`
-- Check (Prettier + ESLint + tsc + Tests, eine Zeile wenn grün): `npm run check`. Nur Lint: `npm run lint`. Formatieren: `npm run fmt` (Claude Code formatiert bearbeitete Dateien per PostToolUse-Hook selbst). Läuft als Stop-Hook in Claude Code (`.claude/settings.json`) und Antigravity (`.agents/hooks.json`).
+- Check (Prettier + ESLint + tsc + Tests, eine Zeile wenn grün): `npm run check`. Nur Lint: `npm run lint`. Formatieren: `npm run fmt` (Claude Code und Antigravity formatieren bearbeitete Dateien per `PostToolUse`-Hook selbst). Der vollständige Check läuft als `Stop`-Hook in Claude Code (`.claude/settings.json`) und Antigravity (`.agents/hooks.json`).
 - Tests ausführen: `npx vitest run` (`npm test` ohne `--run` startet den Watch-Mode und hängt)
 - Icon-Subset neu erzeugen nach neuem `mdi-*`-Icon: `npm run icons` (ein Test prüft, dass kein Icon fehlt)
 - Build PWA: `npm run build`
@@ -65,6 +65,8 @@ GitHub issues via `gh` CLI (`the3ver/mymeds`). See `docs/agents/issue-tracker.md
 
 Canonical roles mapped 1:1 (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
 
-### Domain docs
+### Domain docs & shared guidelines
 
 Single-context (`CONTEXT.md` and `docs/adr/` at the repo root). See `docs/agents/domain.md`.
+Shared implementation guidelines live in `docs/agents/crypto-and-data.md` and `docs/agents/vue-and-ui.md` (wired into `.agents/rules/` for Antigravity and `.claude/rules/` for Claude Code).
+Tool-specific instructions live in `GEMINI.md` (Antigravity only) and `CLAUDE.md` (Claude Code only).

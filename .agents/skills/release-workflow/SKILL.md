@@ -9,9 +9,9 @@ Follow these steps when creating a new release of MyMeds:
 
 ## Pre-Release Checks
 1. Ensure the working tree is clean (`git status`).
-2. Run test suite to verify everything passes:
+2. Run the full project check (Prettier, ESLint, `tsc`, Vitest) to verify everything passes:
    ```bash
-   cmd /c npm test -- --run
+   npm run check
    ```
 3. Build the PWA locally to verify bundling succeeds:
    ```bash
