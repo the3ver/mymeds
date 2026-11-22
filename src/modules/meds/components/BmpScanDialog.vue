@@ -1,14 +1,14 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    max-width="640px"
-    scrollable
+    fullscreen
+    transition="dialog-bottom-transition"
     :persistent="isProcessingImage || step === 'preview'"
     @update:model-value="(val) => !val && handleClose()"
   >
-    <v-card class="bmp-scan-dialog">
-      <!-- Toolbar Header -->
-      <v-toolbar color="primary" density="comfortable">
+    <v-card color="background" rounded="0" class="bmp-scan-dialog">
+      <!-- Sticky M3 Top Toolbar -->
+      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar">
         <v-btn icon="mdi-close" variant="text" :aria-label="t('about.close')" @click="handleClose" />
         <v-toolbar-title class="text-subtitle-1 font-weight-bold">
           {{ t('bmp.scanTitle') }}

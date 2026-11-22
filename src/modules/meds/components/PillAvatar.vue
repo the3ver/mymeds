@@ -383,20 +383,24 @@ const isPill = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 14px;
   overflow: hidden;
   user-select: none;
   flex-shrink: 0;
 }
 
 .pill-avatar--pill {
-  background-color: rgba(125, 125, 125, 0.12);
-  border: 1px solid rgba(125, 125, 125, 0.2);
+  background-color: rgb(var(--v-theme-surface-variant));
+  border: 1px solid rgba(var(--v-border-color), 0.35);
 }
 
 .pill-avatar--white.pill-avatar--letter {
-  border: 1.5px solid #cbd5e1;
-  background-color: #ffffff !important;
+  border: 1.5px solid rgba(var(--v-border-color), 0.7);
+  background-color: rgb(var(--v-theme-surface-light)) !important;
+}
+
+.pill-avatar--white.pill-avatar--letter .pill-avatar-letter {
+  color: rgb(var(--v-theme-on-surface)) !important;
 }
 
 .pill-avatar-svg {

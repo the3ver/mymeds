@@ -1,5 +1,11 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family:
+    'Roboto',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Inter,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,15 +19,61 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overscroll-behavior-y: contain;
 }
 
 #app {
   width: 100%;
 }
 
+/* Material 3 typography: sentence case on buttons, never shouting all-caps */
+.v-btn {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Subtle M3 outlined tonal surface cards */
+.m3-card {
+  background-color: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-border-color), 0.55) !important;
+  border-radius: 20px !important;
+}
+
+.m3-section-card {
+  background-color: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-border-color), 0.55) !important;
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+/* M3 Bottom Sheet styling for dialogs anchored to bottom on mobile */
+.v-dialog.m3-sheet-dialog > .v-overlay__content {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 560px !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.v-dialog.m3-sheet-dialog > .v-overlay__content > .v-card {
+  border-radius: 28px 28px 0 0 !important;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.m3-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background-color: rgba(var(--v-theme-on-surface), 0.28);
+  margin: 10px auto 4px;
+}
+
 /* Darker dialog scrim via Vuetify's variable, so the fade transition keeps working */
 .v-overlay.v-dialog {
-  --v-overlay-opacity: 0.54;
+  --v-overlay-opacity: 0.48;
 }
 
 /* Ensure modal dialog cards always render with a solid, opaque surface in Light & Dark Mode.
@@ -43,7 +95,7 @@ body {
 /* Allow long button labels to wrap cleanly inside their border without horizontal overflow */
 .v-btn.btn-wrap {
   height: auto !important;
-  min-height: var(--v-btn-height, 36px);
+  min-height: var(--v-btn-height, 44px);
   max-width: 100%;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -57,20 +109,21 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* Responsive toggle button groups that stay within narrow mobile widths (e.g. 412px) */
+/* Responsive toggle button groups that stay within narrow mobile widths (e.g. 412px) with 44dp touch targets */
 .v-btn-toggle.responsive-btn-toggle {
   display: flex;
   width: 100%;
   height: auto !important;
-  min-height: 36px;
+  min-height: 44px;
+  border-radius: 999px;
 }
 
 .v-btn-toggle.responsive-btn-toggle .v-btn {
   flex: 1 1 0;
   min-width: 0 !important;
   height: auto !important;
-  min-height: 36px;
-  padding: 6px 6px !important;
+  min-height: 44px;
+  padding: 8px 8px !important;
   text-transform: none;
   letter-spacing: normal;
   font-size: 0.8125rem;
@@ -83,4 +136,28 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   overflow-wrap: break-word;
+}
+
+/* Ensure M3 Bottom Nav active pill looks crisp and full-width */
+.m3-bottom-nav {
+  border-top: 1px solid rgba(var(--v-border-color), 0.45);
+}
+
+.m3-bottom-nav .v-bottom-navigation__content {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.m3-bottom-nav .v-bottom-navigation__content > .v-btn {
+  max-width: none !important;
+  flex: 1 1 0 !important;
+}
+
+/* M3 Sticky Fullscreen Dialog Topbar */
+.m3-fullscreen-toolbar {
+  position: sticky !important;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.45);
 }

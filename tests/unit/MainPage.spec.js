@@ -7,6 +7,7 @@ import * as directives from 'vuetify/directives';
 import MainPage from '../../src/MainPage.vue';
 import { messages } from '../../src/i18n';
 import { state as appState } from '../../src/app-state';
+import { snackbarState, triggerSnackbarAction, dismissSnackbar } from '../../src/modules/common/utils/snackbarService';
 import * as shortcutService from '../../src/modules/common/utils/shortcutService';
 import * as badgingService from '../../src/modules/common/utils/badgingService';
 
@@ -85,8 +86,13 @@ describe('MainPage.vue', () => {
     );
   };
 
-  it('renders BMP scan, BMP export, and semantic Add Medication button in meds tab', async () => {
+  it('opens M3 FAB speed-dial menu with Add Medication, BMP scan, and BMP export actions in meds tab', async () => {
     const wrapper = mountMainPage();
+    await wrapper.vm.$nextTick();
+
+    const fabBtn = wrapper.find('[data-testid="meds-fab-btn"] button, button[data-testid="meds-fab-btn"]');
+    expect(fabBtn.exists()).toBe(true);
+    await fabBtn.trigger('click');
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('Arztplan einscannen (BMP)');
@@ -95,6 +101,41 @@ describe('MainPage.vue', () => {
     const addBtn = wrapper.find('[data-testid="add-med-btn"]');
     expect(addBtn.exists()).toBe(true);
     expect(addBtn.element.tagName).toBe('BUTTON');
+  });
+
+  it('supports undo via global snackbar when deleting or refilling a medication', async () => {
+    dismissSnackbar();
+    appState.decryptedData.meds = [{ name: 'Ibuprofen', dose: '1-0-1', count: 10, packageSize: 20 }];
+    const wrapper = mountMainPage();
+    await wrapper.vm.$nextTick();
+
+    const medList = wrapper.findComponent({ name: 'MedList' });
+    medList.vm.$emit('refill', 0);
+    await wrapper.vm.$nextTick();
+    expect(appState.decryptedData.meds[0].count).toBe(30);
+    expect(snackbarState.open).toBe(true);
+    expect(snackbarState.actionText).toBe('Rückgängig');
+
+    triggerSnackbarAction();
+    expect(appState.decryptedData.meds[0].count).toBe(10);
+
+    medList.vm.$emit('delete', 0);
+    await wrapper.vm.$nextTick();
+    expect(appState.decryptedData.meds.length).toBe(0);
+    expect(snackbarState.actionText).toBe('Rückgängig');
+
+    triggerSnackbarAction();
+    expect(appState.decryptedData.meds.length).toBe(1);
+    expect(appState.decryptedData.meds[0].name).toBe('Ibuprofen');
+  });
+
+  it('renders 3-tab Material 3 bottom navigation including More tab', async () => {
+    const wrapper = mountMainPage();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="nav-tab-meds"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="nav-tab-calendar"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="nav-tab-more"]').exists()).toBe(true);
   });
 
   it('switches to calendar tab when shortcut tab intent is calendar', async () => {

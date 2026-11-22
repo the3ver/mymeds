@@ -6,6 +6,7 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { messages } from '../../src/i18n';
 import CalendarPage from '../../src/modules/calendar/components/CalendarPage.vue';
+import { snackbarState, triggerSnackbarAction, dismissSnackbar } from '../../src/modules/common/utils/snackbarService';
 
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
@@ -508,5 +509,46 @@ describe('CalendarPage.vue', () => {
       .findAllComponents(components.VChip)
       .filter((chip) => chip.text().includes('Zu besorgen'));
     expect(statusChips.length).toBe(1);
+  });
+
+  it('renders all inline wrapped filter chips and offers undo snackbar after confirming entry deletion', async () => {
+    dismissSnackbar();
+    const wrapper = mountComponent({
+      initialEntries: [
+        { title: 'Termin A', date: '2026-11-20', type: 'doctor', doctor: 'Dr. Z' },
+        { title: 'Termin B', date: '2026-01-10', type: 'vaccination', agent: 'BioNTech' },
+        { title: 'Notiz C', date: '2026-05-15', type: 'note', notes: 'Blutdruck gut' }
+      ]
+    });
+    const filters = wrapper.find('[data-testid="calendar-inline-filters"]');
+    expect(filters.exists()).toBe(true);
+    expect(filters.text()).toContain('Alle');
+    expect(filters.text()).toContain('Offene Überweisungen');
+    expect(filters.text()).toContain('Arzttermin');
+    expect(filters.text()).toContain('Impfung');
+    expect(filters.text()).toContain('Erkrankung');
+    expect(filters.text()).toContain('Notiz');
+
+    wrapper.vm.requestDeleteEntry(0);
+    wrapper.vm.confirmDelete();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.entries.length).toBe(2);
+    expect(snackbarState.open).toBe(true);
+    expect(snackbarState.actionText).toBe('Rückgängig');
+
+    triggerSnackbarAction();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.entries.length).toBe(3);
+  });
+
+  it('shows edit and delete buttons in the entry detail bottom sheet when tapping an entry', async () => {
+    document.body.innerHTML = '';
+    const wrapper = mountComponent();
+    await wrapper.find('#entry-0').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.querySelector('[data-testid="calendar-detail-edit-btn"]')).not.toBeNull();
+    expect(document.body.querySelector('[data-testid="calendar-detail-delete-btn"]')).not.toBeNull();
   });
 });

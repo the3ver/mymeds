@@ -139,13 +139,23 @@ describe('App.vue', () => {
     expect(storageService.autoRequestPersistence).toHaveBeenCalled();
   });
 
-  it('provides aria-labels on navigation and lock icon buttons', async () => {
-    appState.isLocked = false;
-    appState.decryptedData = { meds: [], calendar: [], version: 1 };
-    const wrapper = mountApp();
+  it('provides aria-labels on top-bar action buttons and displays active vault name when unlocked', async () => {
+    appState.isLocked = true;
+    const lockedWrapper = mountApp();
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="nav-drawer-toggle"]').attributes('aria-label')).toBeTruthy();
-    expect(wrapper.find('[data-testid="lock-vault-btn"]').attributes('aria-label')).toBeTruthy();
+    expect(lockedWrapper.find('[data-testid="locked-sync-btn"]').attributes('aria-label')).toBeTruthy();
+    expect(lockedWrapper.find('[data-testid="locked-theme-btn"]').attributes('aria-label')).toBeTruthy();
+    expect(lockedWrapper.find('[data-testid="locked-help-btn"]').attributes('aria-label')).toBeTruthy();
+    expect(lockedWrapper.find('[data-testid="locked-settings-btn"]').attributes('aria-label')).toBeTruthy();
+
+    appState.isLocked = false;
+    appState.activeDatabaseName = 'Mein Tresor';
+    appState.decryptedData = { meds: [], calendar: [], version: 1 };
+    const unlockedWrapper = mountApp();
+    await flushPromises();
+
+    expect(unlockedWrapper.find('[data-testid="app-bar-title"]').text()).toBe('Mein Tresor');
+    expect(unlockedWrapper.find('[data-testid="lock-vault-btn"]').attributes('aria-label')).toBeTruthy();
   });
 });

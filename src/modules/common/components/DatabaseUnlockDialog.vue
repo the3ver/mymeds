@@ -143,22 +143,24 @@ async function unlockWithPassword() {
   <v-dialog
     :model-value="modelValue"
     @update:model-value="(val) => !val && close()"
-    max-width="480px"
+    class="m3-sheet-dialog"
+    transition="dialog-bottom-transition"
     :persistent="loading"
   >
-    <v-card :loading="loading">
-      <v-card-title class="text-h6 pt-4 px-6">
+    <v-card :loading="loading" class="pa-2">
+      <div class="m3-sheet-handle"></div>
+      <v-card-title class="text-h6 font-weight-bold pt-2 px-5">
         {{ t('dialog.unlockTitle', { name: database?.name || '' }) }}
       </v-card-title>
-      <v-card-text class="pt-2 px-6">
-        <v-alert v-if="error" type="error" density="compact" class="mb-4" variant="tonal">
+      <v-card-text class="pt-2 px-5">
+        <v-alert v-if="error" type="error" density="compact" rounded="lg" class="mb-4" variant="tonal">
           {{ error }}
         </v-alert>
 
         <!-- Biometric Unlock Mode -->
         <div v-if="hasBiometric && !showPasswordInput" class="text-center py-4">
-          <v-avatar color="primary" size="72" class="mb-3 elevation-1">
-            <v-icon icon="mdi-fingerprint" size="44" color="white"></v-icon>
+          <v-avatar color="primary" variant="tonal" size="76" class="mb-3">
+            <v-icon icon="mdi-fingerprint" size="44" color="primary"></v-icon>
           </v-avatar>
           <div class="text-subtitle-1 font-weight-bold mb-1">
             {{ t('biometrics.title') }}
@@ -169,7 +171,9 @@ async function unlockWithPassword() {
 
           <v-btn
             color="primary"
+            variant="flat"
             size="large"
+            rounded="pill"
             block
             prepend-icon="mdi-fingerprint"
             :loading="loading"
@@ -179,7 +183,7 @@ async function unlockWithPassword() {
             {{ t('biometrics.unlockWith') }}
           </v-btn>
 
-          <v-btn variant="text" size="small" :disabled="loading" @click="showPasswordInput = true">
+          <v-btn variant="text" rounded="pill" :disabled="loading" @click="showPasswordInput = true">
             {{ t('biometrics.usePasswordInstead') }}
           </v-btn>
         </div>
@@ -188,9 +192,9 @@ async function unlockWithPassword() {
         <div v-else>
           <div v-if="hasBiometric" class="d-flex justify-end mb-2">
             <v-btn
-              variant="text"
-              density="comfortable"
+              variant="tonal"
               size="small"
+              rounded="pill"
               color="primary"
               prepend-icon="mdi-fingerprint"
               @click="showPasswordInput = false"
@@ -212,19 +216,27 @@ async function unlockWithPassword() {
             v-if="!hasBiometric && isBiometricSupported"
             v-model="rememberBiometrics"
             :label="t('biometrics.rememberOnDevice')"
-            density="compact"
+            density="comfortable"
             hide-details
             color="primary"
             class="mt-1"
           ></v-checkbox>
         </div>
       </v-card-text>
-      <v-card-actions class="px-6 pb-4">
+      <v-card-actions class="px-5 pb-4">
         <v-spacer></v-spacer>
-        <v-btn variant="text" :disabled="loading" @click="close">
+        <v-btn variant="text" rounded="pill" :disabled="loading" @click="close">
           {{ t('dialog.cancel') }}
         </v-btn>
-        <v-btn v-if="showPasswordInput || !hasBiometric" color="primary" :loading="loading" @click="unlockWithPassword">
+        <v-btn
+          v-if="showPasswordInput || !hasBiometric"
+          color="primary"
+          variant="flat"
+          rounded="pill"
+          class="px-6"
+          :loading="loading"
+          @click="unlockWithPassword"
+        >
           {{ t('dialog.unlock') }}
         </v-btn>
       </v-card-actions>

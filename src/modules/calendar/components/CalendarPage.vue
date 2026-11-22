@@ -14,6 +14,7 @@ import {
   getLocalDateString
 } from '../utils/calendarUtils';
 import { renderMarkdownLinks } from '../../common/utils/stringUtils';
+import { showSnackbar } from '../../common/utils/snackbarService';
 
 const props = defineProps({
   initialEntries: {
@@ -31,11 +32,11 @@ const exportDialog = ref(false);
 const filterDialog = ref(false);
 const currentEntry = ref({});
 const editingIndex = ref(-1);
-const expandedIndex = ref(-1);
+const detailEntryIndex = ref(-1);
+const detailSheetOpen = ref(false);
 const lastAddedEntry = ref(null);
 const filterTypes = ref([]);
 
-// Emit updates back to the parent
 watch(
   entries,
   (newVal) => {
@@ -45,7 +46,6 @@ watch(
 );
 
 onMounted(() => {
-  // Scroll to today separator after render
   nextTick(() => {
     const todayEl = document.getElementById('separator-today');
     if (todayEl) {
@@ -55,12 +55,11 @@ onMounted(() => {
 });
 
 const sortedEntries = computed(() => {
-  // Map originalIndex against the full entries array first to preserve correct reference on edit/delete
   let filtered = entries.value.map((item, index) => ({ ...item, originalIndex: index }));
 
   if (filterTypes.value.length > 0) {
     const hasOpenReferrals = filterTypes.value.includes('open_referrals');
-    const regularTypes = filterTypes.value.filter((t) => t !== 'open_referrals');
+    const regularTypes = filterTypes.value.filter((ft) => ft !== 'open_referrals');
     const today = getLocalDateString();
 
     filtered = filtered.filter((entry) => {
@@ -79,7 +78,6 @@ const sortedEntries = computed(() => {
 
   const sorted = filtered.sort(compareEntries);
 
-  // Pre-compute effective referral status once per entry (avoids O(N^2) in template)
   return sorted.map((entry) => {
     if (entry.type === 'doctor' && entry.needsReferral) {
       return { ...entry, effectiveReferralStatus: resolveEffectiveReferralStatus(entry, entries.value) || 'needed' };
@@ -88,9 +86,19 @@ const sortedEntries = computed(() => {
   });
 });
 
+const selectedDetailEntry = computed(() => {
+  if (detailEntryIndex.value < 0) return null;
+  const raw = entries.value[detailEntryIndex.value];
+  if (!raw) return null;
+  const enriched = { ...raw, originalIndex: detailEntryIndex.value };
+  if (enriched.type === 'doctor' && enriched.needsReferral) {
+    enriched.effectiveReferralStatus = resolveEffectiveReferralStatus(enriched, entries.value) || 'needed';
+  }
+  return enriched;
+});
+
 const groupedEntries = computed(() => {
   const today = getLocalDateString();
-
   const combined = [...sortedEntries.value];
 
   if (combined.length > 0) {
@@ -146,7 +154,7 @@ const formatDate = (dateStr, forceShort = false) => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Normalize today to the start of the day
+  today.setHours(0, 0, 0, 0);
 
   const currentQuarter = Math.floor(today.getMonth() / 3);
   const dateQuarter = Math.floor(date.getMonth() / 3);
@@ -189,11 +197,11 @@ const getEntryColor = (type) => {
     case 'doctor':
       return 'primary';
     case 'vaccination':
-      return 'teal';
+      return 'tertiary';
     case 'illness':
-      return 'orange';
+      return 'warning';
     case 'note':
-      return 'blue-grey';
+      return 'secondary';
     case 'quarter':
       return 'grey';
     default:
@@ -260,7 +268,13 @@ const addEntry = (entry) => {
   }
 };
 
+const openDetailSheet = (index) => {
+  detailEntryIndex.value = index;
+  detailSheetOpen.value = true;
+};
+
 const openEditDialog = (entry) => {
+  detailSheetOpen.value = false;
   currentEntry.value = { ...entry };
   if (Array.isArray(currentEntry.value.treatments)) {
     currentEntry.value.treatments = currentEntry.value.treatments.join(', ');
@@ -290,21 +304,32 @@ const entryToDelete = computed(() => {
 });
 
 const requestDeleteEntry = (index) => {
+  detailSheetOpen.value = false;
   entryIndexToDelete.value = index;
   confirmDeleteDialog.value = true;
 };
 
 const confirmDelete = () => {
   if (entryIndexToDelete.value > -1) {
-    entries.value.splice(entryIndexToDelete.value, 1);
+    const idx = entryIndexToDelete.value;
+    const removed = entries.value[idx];
+    entries.value.splice(idx, 1);
     entryIndexToDelete.value = -1;
-    expandedIndex.value = -1;
+    detailEntryIndex.value = -1;
+    detailSheetOpen.value = false;
+
+    if (removed) {
+      showSnackbar({
+        text: t('calendar.deletedToast', { name: removed.title }),
+        actionText: t('app.undo'),
+        onAction: () => {
+          entries.value.splice(idx, 0, removed);
+          showSnackbar({ text: t('calendar.restoredToast', { name: removed.title }), timeout: 2500 });
+        }
+      });
+    }
   }
   confirmDeleteDialog.value = false;
-};
-
-const toggleExpand = (index) => {
-  expandedIndex.value = expandedIndex.value === index ? -1 : index;
 };
 
 const exportToCalendar = (entry) => {
@@ -323,11 +348,19 @@ const clearFilter = () => {
 };
 
 const removeFilter = (filterType) => {
-  filterTypes.value = filterTypes.value.filter((t) => t !== filterType);
+  filterTypes.value = filterTypes.value.filter((ft) => ft !== filterType);
+};
+
+const toggleFilterChip = (filterType) => {
+  if (filterTypes.value.includes(filterType)) {
+    removeFilter(filterType);
+  } else {
+    filterTypes.value = [...filterTypes.value, filterType];
+  }
 };
 
 const filterText = computed(() => {
-  const regularTypes = filterTypes.value.filter((t) => t !== 'open_referrals');
+  const regularTypes = filterTypes.value.filter((ft) => ft !== 'open_referrals');
   if (regularTypes.length === 0) return '';
   const typeNames = regularTypes.map((type) => t(`calendar.types.${type}`)).join(', ');
   return t('calendar.filterBy', { types: typeNames });
@@ -343,7 +376,7 @@ const existingTreatments = computed(() => {
         treatments.add(match[1]);
       }
     } else if (Array.isArray(entry.treatments)) {
-      entry.treatments.forEach((t) => treatments.add(t));
+      entry.treatments.forEach((tr) => treatments.add(tr));
     }
   });
   return Array.from(treatments).sort();
@@ -377,6 +410,14 @@ const pendingReferralsCount = computed(() => {
   return entries.value.filter((e) => isPendingReferral(e, entries.value, today)).length;
 });
 
+const inlineFilterItems = computed(() => [
+  { value: 'open_referrals', label: t('calendar.referral.filter'), icon: 'mdi-file-alert-outline', color: 'warning' },
+  { value: 'doctor', label: t('calendar.types.doctor'), icon: 'mdi-doctor', color: 'primary' },
+  { value: 'vaccination', label: t('calendar.types.vaccination'), icon: 'mdi-needle', color: 'tertiary' },
+  { value: 'illness', label: t('calendar.types.illness'), icon: 'mdi-emoticon-sick', color: 'warning' },
+  { value: 'note', label: t('calendar.types.note'), icon: 'mdi-note-text', color: 'secondary' }
+]);
+
 defineExpose({
   openFilterDialog,
   openTypeDialog,
@@ -388,191 +429,286 @@ defineExpose({
   filterTypes,
   clearFilter,
   removeFilter,
-  filterText
+  filterText,
+  groupedEntries,
+  sortedEntries,
+  filterDialog,
+  typeDialog
 });
 </script>
 
 <template>
-  <v-container>
+  <v-container class="calendar-container pb-24 pt-2">
     <!-- Referral Alert Banner -->
     <v-alert
       v-if="pendingReferralsCount > 0"
       type="warning"
       variant="tonal"
-      density="compact"
+      density="comfortable"
+      rounded="xl"
       icon="mdi-alert-circle-outline"
-      class="mb-4 referral-alert-banner"
+      class="mb-3 referral-alert-banner"
     >
-      {{ t('calendar.referral.banner.message', pendingReferralsCount, { count: pendingReferralsCount }) }}
+      <div class="d-flex align-center justify-space-between ga-2 flex-wrap">
+        <span class="text-body-2 font-weight-medium">
+          {{ t('calendar.referral.banner.message', pendingReferralsCount, { count: pendingReferralsCount }) }}
+        </span>
+        <v-btn
+          size="small"
+          variant="tonal"
+          color="warning"
+          rounded="pill"
+          @click="filterTypes = ['open_referrals']"
+          data-testid="banner-show-referrals-btn"
+        >
+          {{ t('calendar.showPendingReferrals') }}
+        </v-btn>
+      </div>
     </v-alert>
 
-    <v-card v-if="filterTypes.length > 0" class="mb-4 bg-primary-lighten-5" variant="tonal" density="compact">
-      <v-card-text class="d-flex align-center justify-space-between py-2">
-        <div class="d-flex align-center flex-wrap ga-2 mr-2">
-          <v-chip
-            v-if="filterTypes.includes('open_referrals')"
-            class="open-referrals-filter-chip"
-            color="amber-darken-3"
-            size="small"
-            closable
-            @click:close="removeFilter('open_referrals')"
-          >
-            <v-icon start size="16">mdi-file-alert-outline</v-icon>
-            {{ t('calendar.referral.filter') }}
-          </v-chip>
-          <span class="text-body-2 font-weight-bold text-truncate">{{ filterText }}</span>
-        </div>
-        <v-btn
-          icon="mdi-delete"
-          variant="text"
-          density="compact"
-          size="small"
-          :title="t('calendar.clearFilter')"
-          :aria-label="t('calendar.clearFilter')"
-          @click="clearFilter"
-        ></v-btn>
-      </v-card-text>
-    </v-card>
+    <!-- Multi-line Wrapped M3 Filter Chips (All filters visible at once, zero horizontal overflow) -->
+    <div class="d-flex flex-wrap ga-2 mb-4" data-testid="calendar-inline-filters">
+      <v-chip
+        :variant="filterTypes.length === 0 ? 'flat' : 'outlined'"
+        :color="filterTypes.length === 0 ? 'primary' : undefined"
+        size="small"
+        rounded="pill"
+        role="button"
+        tabindex="0"
+        :aria-pressed="filterTypes.length === 0"
+        class="cursor-pointer filter-chip-item"
+        @click="clearFilter"
+      >
+        <v-icon v-if="filterTypes.length === 0" start size="15">mdi-check</v-icon>
+        {{ t('calendar.filterAll') }}
+      </v-chip>
+
+      <v-chip
+        v-for="f in inlineFilterItems"
+        :key="f.value"
+        :variant="filterTypes.includes(f.value) ? 'flat' : 'outlined'"
+        :color="filterTypes.includes(f.value) ? f.color : undefined"
+        :closable="filterTypes.includes(f.value)"
+        size="small"
+        rounded="pill"
+        role="button"
+        tabindex="0"
+        :aria-pressed="filterTypes.includes(f.value)"
+        class="cursor-pointer filter-chip-item"
+        :class="{
+          'open-referrals-filter-chip': f.value === 'open_referrals' && filterTypes.includes('open_referrals')
+        }"
+        @click="toggleFilterChip(f.value)"
+        @click:close.stop="removeFilter(f.value)"
+      >
+        <v-icon start size="15">{{ filterTypes.includes(f.value) ? 'mdi-check' : f.icon }}</v-icon>
+        {{ f.label }}
+      </v-chip>
+    </div>
 
     <div v-if="entries.length > 0">
       <template v-for="(item, i) in groupedEntries" :key="i">
-        <div v-if="item.type === 'separator-today'" id="separator-today">
-          <v-card class="mb-4 bg-primary-lighten-5 text-center py-1" variant="tonal" density="compact">
-            <span class="text-body-1 font-weight-bold">{{ t('calendar.today') }}, {{ formatDate(item.date) }}</span>
-          </v-card>
+        <div v-if="item.type === 'separator-today'" id="separator-today" class="d-flex align-center ga-3 my-4">
+          <v-divider color="primary" opacity="0.35"></v-divider>
+          <v-chip color="primary" variant="tonal" size="small" rounded="pill" class="font-weight-bold flex-shrink-0">
+            {{ t('calendar.today') }} · {{ formatDate(item.date) }}
+          </v-chip>
+          <v-divider color="primary" opacity="0.35"></v-divider>
         </div>
-        <div v-else-if="item.type === 'quarter'" class="d-flex align-center justify-center mb-4 text-grey">
-          <v-divider class="flex-grow-1"></v-divider>
-          <span class="mx-4 text-body-1 font-weight-bold">{{ item.data.title }}</span>
-          <v-divider class="flex-grow-1"></v-divider>
+
+        <div
+          v-else-if="item.type === 'quarter'"
+          class="d-flex align-center ga-3 mt-4 mb-2 text-overline text-medium-emphasis"
+        >
+          <span class="font-weight-bold flex-shrink-0">{{ item.data.title }}</span>
+          <v-divider></v-divider>
         </div>
+
         <v-card
           v-else
           :id="`entry-${item.data.originalIndex}`"
-          class="mb-4"
-          variant="elevated"
-          @click="toggleExpand(item.data.originalIndex)"
+          class="m3-card mb-3 cursor-pointer"
+          @click="openDetailSheet(item.data.originalIndex)"
         >
           <v-card-item class="py-3">
             <template v-slot:prepend>
-              <v-avatar :color="getEntryColor(item.data.type)" size="36" class="mr-3">
-                <v-icon color="white" size="20">{{ getEntryIcon(item.data.type) }}</v-icon>
+              <v-avatar :color="getEntryColor(item.data.type)" variant="tonal" size="42" rounded="lg" class="mr-3">
+                <v-icon size="22">{{ getEntryIcon(item.data.type) }}</v-icon>
               </v-avatar>
             </template>
-            <v-card-title class="d-flex flex-wrap align-baseline" style="gap: 0.5rem; line-height: 1.2">
-              <div class="text-h6">{{ item.data.title }}</div>
-              <div class="text-body-1 text-grey">{{ getEntrySubtitle(item.data) }}</div>
-              <v-chip
-                v-if="item.data.effectiveReferralStatus"
-                size="small"
-                :color="getReferralChipColor(item.data.effectiveReferralStatus)"
-                variant="tonal"
-                class="ml-auto"
-              >
-                <v-icon start size="16">{{ getReferralChipIcon(item.data.effectiveReferralStatus) }}</v-icon>
+
+            <v-card-title class="text-subtitle-1 font-weight-bold text-wrap pa-0" style="line-height: 1.25">
+              {{ item.data.title }}
+            </v-card-title>
+
+            <v-card-subtitle class="pt-1 text-wrap">
+              {{ getEntrySubtitle(item.data) }}
+              <span v-if="item.data.doctor"> · {{ item.data.doctor }}</span>
+            </v-card-subtitle>
+
+            <div v-if="item.data.effectiveReferralStatus" class="mt-2">
+              <v-chip size="x-small" :color="getReferralChipColor(item.data.effectiveReferralStatus)" variant="tonal">
+                <v-icon start size="14">{{ getReferralChipIcon(item.data.effectiveReferralStatus) }}</v-icon>
                 {{ t(`calendar.referral.status.${item.data.effectiveReferralStatus}`) }}
               </v-chip>
-            </v-card-title>
-          </v-card-item>
-          <v-expand-transition>
-            <div v-if="expandedIndex === item.data.originalIndex">
-              <v-divider></v-divider>
-              <v-card-text class="text-body-1">
-                <template v-if="item.data.type === 'doctor'">
-                  <div v-if="item.data.doctor" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.doctor') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.doctor }}</div>
-                  </div>
-                  <div v-if="item.data.doctorType" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.type') }}:</span>
-                    <div class="font-weight-medium">{{ t(`calendar.doctorTypes.${item.data.doctorType}`) }}</div>
-                  </div>
-                  <div v-if="item.data.location" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.location') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.location }}</div>
-                  </div>
-                  <div v-if="item.data.treatments" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.treatments') }}:</span>
-                    <div class="mt-1">
-                      <template v-for="(segment, idx) in parseTreatmentText(item.data.treatments)" :key="idx"
-                        ><span v-if="segment.type === 'text'">{{ segment.content }}</span
-                        ><v-chip v-else size="small" color="primary" variant="tonal" class="mx-1">{{
-                          segment.content
-                        }}</v-chip></template
-                      >
-                    </div>
-                  </div>
-                </template>
-                <template v-if="item.data.type === 'vaccination'">
-                  <div v-if="item.data.agent" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.agent') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.agent }}</div>
-                  </div>
-                  <div v-if="item.data.method" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.method') }}:</span>
-                    <div class="font-weight-medium">{{ t(`calendar.methods.${item.data.method}`) }}</div>
-                  </div>
-                  <div v-if="item.data.bodyPart" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.bodyPart') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.bodyPart }}</div>
-                  </div>
-                </template>
-                <template v-if="item.data.type === 'illness'">
-                  <div v-if="item.data.pathogen" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.pathogen') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.pathogen }}</div>
-                  </div>
-                  <div v-if="item.data.symptoms" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.symptoms') }}:</span>
-                    <div class="font-weight-medium">{{ item.data.symptoms }}</div>
-                  </div>
-                  <div v-if="item.data.endDate" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
-                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
-                  </div>
-                </template>
-                <template v-if="item.data.type === 'note'">
-                  <div v-if="item.data.endDate" class="mb-2">
-                    <span class="text-grey">{{ t('calendar.fields.endDate') }}:</span>
-                    <div class="font-weight-medium">{{ formatDate(item.data.endDate, true) }}</div>
-                  </div>
-                </template>
-                <div v-if="item.data.notes" class="mb-4">
-                  <span class="text-grey">{{ t('calendar.fields.notes') }}:</span>
-                  <div class="text-body-2 mt-1" v-html="renderMarkdownLinks(item.data.notes)"></div>
-                </div>
-                <div class="d-flex justify-end gap-2 mt-4">
-                  <v-btn
-                    icon="mdi-calendar-export"
-                    variant="text"
-                    color="primary"
-                    :aria-label="t('calendar.export')"
-                    @click.stop="exportToCalendar(item.data)"
-                  ></v-btn>
-                  <v-btn
-                    icon="mdi-pencil"
-                    variant="text"
-                    color="primary"
-                    :aria-label="t('dialog.edit')"
-                    @click.stop="openEditDialog(item.data)"
-                  ></v-btn>
-                  <v-btn
-                    icon="mdi-delete"
-                    variant="text"
-                    color="error"
-                    :aria-label="t('dialog.delete')"
-                    @click.stop="requestDeleteEntry(item.data.originalIndex)"
-                  ></v-btn>
-                </div>
-              </v-card-text>
             </div>
-          </v-expand-transition>
+          </v-card-item>
         </v-card>
       </template>
     </div>
-    <div v-else class="text-center mt-10 text-grey">
-      {{ t('calendar.noEntries') }}
+
+    <div v-else class="text-center mt-14 px-4 text-medium-emphasis">
+      <v-avatar color="primary" variant="tonal" size="64" rounded="xl" class="mb-4">
+        <v-icon size="34">mdi-calendar-clock</v-icon>
+      </v-avatar>
+      <div class="text-subtitle-1 font-weight-medium">{{ t('calendar.noEntries') }}</div>
     </div>
+
+    <!-- M3 Entry Detail Bottom Sheet (Includes Export, Edit, and Delete!) -->
+    <v-dialog v-model="detailSheetOpen" class="m3-sheet-dialog" transition="dialog-bottom-transition">
+      <v-card v-if="selectedDetailEntry" class="pa-2">
+        <div class="m3-sheet-handle"></div>
+        <v-card-item class="pt-2 pb-1">
+          <template v-slot:prepend>
+            <v-avatar
+              :color="getEntryColor(selectedDetailEntry.type)"
+              variant="tonal"
+              size="44"
+              rounded="lg"
+              class="mr-3"
+            >
+              <v-icon size="22">{{ getEntryIcon(selectedDetailEntry.type) }}</v-icon>
+            </v-avatar>
+          </template>
+          <v-card-title class="text-h6 font-weight-bold text-wrap">{{ selectedDetailEntry.title }}</v-card-title>
+          <v-card-subtitle>{{ getEntrySubtitle(selectedDetailEntry) }}</v-card-subtitle>
+        </v-card-item>
+
+        <v-card-text class="pt-3 pb-4 text-body-2">
+          <div v-if="selectedDetailEntry.effectiveReferralStatus" class="mb-3">
+            <v-chip
+              size="small"
+              :color="getReferralChipColor(selectedDetailEntry.effectiveReferralStatus)"
+              variant="tonal"
+            >
+              <v-icon start size="16">{{ getReferralChipIcon(selectedDetailEntry.effectiveReferralStatus) }}</v-icon>
+              {{ t(`calendar.referral.status.${selectedDetailEntry.effectiveReferralStatus}`) }}
+            </v-chip>
+          </div>
+
+          <div class="detail-surface rounded-xl pa-3 mb-4">
+            <template v-if="selectedDetailEntry.type === 'doctor'">
+              <div v-if="selectedDetailEntry.doctor" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.doctor') }}</span>
+                <span class="font-weight-medium text-right">{{ selectedDetailEntry.doctor }}</span>
+              </div>
+              <div v-if="selectedDetailEntry.doctorType" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.type') }}</span>
+                <span class="font-weight-medium text-right">
+                  {{ t(`calendar.doctorTypes.${selectedDetailEntry.doctorType}`) }}
+                </span>
+              </div>
+              <div v-if="selectedDetailEntry.location" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.location') }}</span>
+                <span class="font-weight-medium text-right">{{ selectedDetailEntry.location }}</span>
+              </div>
+              <div v-if="selectedDetailEntry.treatments" class="mt-2">
+                <div class="text-medium-emphasis mb-1">{{ t('calendar.fields.treatments') }}</div>
+                <div class="d-flex flex-wrap ga-1">
+                  <template v-for="(segment, idx) in parseTreatmentText(selectedDetailEntry.treatments)" :key="idx">
+                    <span v-if="segment.type === 'text'">{{ segment.content }}</span>
+                    <v-chip v-else size="small" color="primary" variant="tonal">{{ segment.content }}</v-chip>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <template v-if="selectedDetailEntry.type === 'vaccination'">
+              <div v-if="selectedDetailEntry.agent" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.agent') }}</span>
+                <span class="font-weight-medium text-right">{{ selectedDetailEntry.agent }}</span>
+              </div>
+              <div v-if="selectedDetailEntry.method" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.method') }}</span>
+                <span class="font-weight-medium text-right">
+                  {{ t(`calendar.methods.${selectedDetailEntry.method}`) }}
+                </span>
+              </div>
+              <div v-if="selectedDetailEntry.bodyPart" class="d-flex justify-space-between ga-3">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.bodyPart') }}</span>
+                <span class="font-weight-medium text-right">{{ selectedDetailEntry.bodyPart }}</span>
+              </div>
+            </template>
+
+            <template v-if="selectedDetailEntry.type === 'illness'">
+              <div v-if="selectedDetailEntry.pathogen" class="d-flex justify-space-between ga-3 mb-2">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.pathogen') }}</span>
+                <span class="font-weight-medium text-right">{{ selectedDetailEntry.pathogen }}</span>
+              </div>
+              <div v-if="selectedDetailEntry.symptoms" class="mb-2">
+                <div class="text-medium-emphasis">{{ t('calendar.fields.symptoms') }}</div>
+                <div class="font-weight-medium">{{ selectedDetailEntry.symptoms }}</div>
+              </div>
+              <div v-if="selectedDetailEntry.endDate" class="d-flex justify-space-between ga-3">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.endDate') }}</span>
+                <span class="font-weight-medium">{{ formatDate(selectedDetailEntry.endDate, true) }}</span>
+              </div>
+            </template>
+
+            <template v-if="selectedDetailEntry.type === 'note'">
+              <div v-if="selectedDetailEntry.endDate" class="d-flex justify-space-between ga-3">
+                <span class="text-medium-emphasis">{{ t('calendar.fields.endDate') }}</span>
+                <span class="font-weight-medium">{{ formatDate(selectedDetailEntry.endDate, true) }}</span>
+              </div>
+            </template>
+
+            <div v-if="selectedDetailEntry.notes" class="mt-2 pt-2 border-t">
+              <div class="text-medium-emphasis mb-1">{{ t('calendar.fields.notes') }}</div>
+              <div v-html="renderMarkdownLinks(selectedDetailEntry.notes)"></div>
+            </div>
+          </div>
+
+          <v-btn
+            block
+            color="primary"
+            variant="tonal"
+            size="large"
+            rounded="pill"
+            prepend-icon="mdi-calendar-export"
+            class="mb-3"
+            @click.stop="exportToCalendar(selectedDetailEntry)"
+          >
+            {{ t('calendar.export') }}
+          </v-btn>
+
+          <div class="d-flex ga-2">
+            <v-btn
+              class="flex-grow-1"
+              color="secondary"
+              variant="tonal"
+              size="large"
+              rounded="pill"
+              prepend-icon="mdi-pencil"
+              @click.stop="openEditDialog(selectedDetailEntry)"
+              data-testid="calendar-detail-edit-btn"
+            >
+              {{ t('dialog.edit') }}
+            </v-btn>
+            <v-btn
+              color="error"
+              variant="tonal"
+              size="large"
+              rounded="pill"
+              prepend-icon="mdi-delete"
+              @click.stop="requestDeleteEntry(selectedDetailEntry.originalIndex)"
+              data-testid="calendar-detail-delete-btn"
+            >
+              {{ t('dialog.delete') }}
+            </v-btn>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
 
     <EntryTypeDialog v-model="typeDialog" @select="onTypeSelected" />
     <CalendarEntryDialog
@@ -610,13 +746,22 @@ defineExpose({
 </template>
 
 <style scoped>
-.border-dashed {
-  border-style: dashed !important;
+.calendar-container {
+  max-width: 680px;
 }
-.gap-2 {
-  gap: 8px;
+.cursor-pointer {
+  cursor: pointer;
 }
 .text-wrap {
   white-space: normal !important;
+}
+.filter-chip-item {
+  min-height: 36px;
+}
+.detail-surface {
+  background-color: rgb(var(--v-theme-surface-light));
+}
+.border-t {
+  border-top: 1px solid rgba(var(--v-border-color), 0.35);
 }
 </style>

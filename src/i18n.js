@@ -59,7 +59,26 @@ export const messages = {
       calendarDesc: 'Your meds are running low, click here to check.',
       nav: {
         meds: 'Medications',
-        calendar: 'Calendar'
+        calendar: 'Calendar',
+        more: 'More'
+      },
+      lock: 'Lock',
+      undo: 'Undo',
+      vaultsSubtitle: 'Encrypted vaults',
+      zeroKnowledgeHint: 'Zero-Knowledge local: All data stays AES-256-GCM encrypted on this device.',
+      more: {
+        sectionAppearance: 'Appearance & Behavior',
+        sectionData: 'Data, Backup & Sync',
+        sectionApp: 'Manual, Updates & About',
+        darkModeOn: 'Dark theme active',
+        darkModeOff: 'Light theme active',
+        settingsSubtitle: 'Language, limits, reminders, haptics & storage',
+        syncSubtitle: 'Transfer encrypted vault via 6-digit code or QR',
+        dataSubtitle: 'JSON backup, restore or clear vault',
+        bmpSubtitle: 'Scan or display DataMatrix medication plan',
+        helpSubtitle: 'Searchable user manual for all features',
+        whatsNewSubtitle: 'Latest improvements and changes',
+        aboutSubtitle: 'Version, GitHub & license'
       },
       db: {
         created: 'Created',
@@ -146,6 +165,14 @@ export const messages = {
       deleteTitle: 'Delete Medication',
       deleteConfirm: 'Are you sure you want to delete this medication?',
       deleteConfirmNamed: 'Are you sure you want to delete "{name}"?',
+      deletedToast: '"{name}" was deleted',
+      restoredToast: '"{name}" restored',
+      quickRefill: 'Refill +1 pack (+{size} pcs)',
+      refilledToast: 'Added +{size} pcs to "{name}"',
+      refillUndoneToast: 'Refill undone',
+      appearance: 'Pill Appearance',
+      appearanceHint: 'Customize color, shape & size',
+      actionsMenu: 'Medication actions',
       color: 'Color',
       colors: {
         white: 'White',
@@ -275,6 +302,8 @@ export const messages = {
     },
     help: {
       title: 'User Manual',
+      searchPlaceholder: 'Search user manual...',
+      noResults: 'No matching help topics found.',
       intro:
         'Welcome to the MyMeds User Manual. Here you will find all information on how to manage your medications, schedule appointments, and secure your data.',
       sections: {
@@ -409,8 +438,13 @@ export const messages = {
       deleteEntryConfirm: 'Are you sure you want to delete this calendar entry?',
       deleteEntryConfirmNamed: 'Are you sure you want to delete the entry "{name}"?',
       filter: 'Filter',
+      filterAll: 'All',
       filterBy: 'Filtered by type: {types}',
       clearFilter: 'Clear Filter',
+      showPendingReferrals: 'Show',
+      deletedToast: '"{name}" was deleted',
+      restoredToast: '"{name}" restored',
+      addTreatmentTag: 'Add tag',
       addLink: {
         title: 'Add Link',
         url: 'URL',
@@ -603,7 +637,26 @@ export const messages = {
       calendarDesc: 'Deine Meds gehen zur Neige, klicke hier um nachzusehen.',
       nav: {
         meds: 'Medikamente',
-        calendar: 'Kalender'
+        calendar: 'Kalender',
+        more: 'Mehr'
+      },
+      lock: 'Sperren',
+      undo: 'Rückgängig',
+      vaultsSubtitle: 'Verschlüsselte Tresore',
+      zeroKnowledgeHint: 'Zero-Knowledge lokal: Alle Daten bleiben AES-256-GCM-verschlüsselt auf diesem Gerät.',
+      more: {
+        sectionAppearance: 'Darstellung & Verhalten',
+        sectionData: 'Daten, Backup & Sync',
+        sectionApp: 'Handbuch, Updates & Info',
+        darkModeOn: 'Dunkles Design aktiv',
+        darkModeOff: 'Helles Design aktiv',
+        settingsSubtitle: 'Sprache, Warnlimits, Erinnerungen, Haptik & Speicher',
+        syncSubtitle: 'Tresor per 6-stelligem Code oder QR übertragen',
+        dataSubtitle: 'JSON-Backup sichern, importieren oder leeren',
+        bmpSubtitle: 'DataMatrix-Medikationsplan scannen oder anzeigen',
+        helpSubtitle: 'Durchsuchbares Handbuch zu allen Funktionen',
+        whatsNewSubtitle: 'Aktuelle Verbesserungen und Änderungen',
+        aboutSubtitle: 'Version, GitHub & Lizenz'
       },
       db: {
         created: 'Erstellt',
@@ -691,6 +744,14 @@ export const messages = {
       deleteTitle: 'Medikament löschen',
       deleteConfirm: 'Möchtest du dieses Medikament wirklich löschen?',
       deleteConfirmNamed: 'Möchtest du "{name}" wirklich löschen?',
+      deletedToast: '„{name}“ wurde gelöscht',
+      restoredToast: '„{name}“ wiederhergestellt',
+      quickRefill: '+1 Packung nachfüllen (+{size} Stk.)',
+      refilledToast: '+{size} Stk. zu „{name}“ hinzugefügt',
+      refillUndoneToast: 'Nachfüllen rückgängig gemacht',
+      appearance: 'Aussehen der Tablette',
+      appearanceHint: 'Farbe, Form & Größe anpassen',
+      actionsMenu: 'Medikamenten-Aktionen',
       color: 'Farbe',
       colors: {
         white: 'Weiß',
@@ -821,6 +882,8 @@ export const messages = {
     },
     help: {
       title: 'Benutzerhandbuch',
+      searchPlaceholder: 'Handbuch durchsuchen...',
+      noResults: 'Keine passenden Hilfethemen gefunden.',
       intro:
         'Willkommen im MyMeds Benutzerhandbuch. Hier findest du alle Informationen zur Erfassung von Medikamenten, Terminplanung und Datensicherheit.',
       sections: {
@@ -955,8 +1018,13 @@ export const messages = {
       deleteEntryConfirm: 'Möchtest du diesen Kalendereintrag wirklich löschen?',
       deleteEntryConfirmNamed: 'Möchtest du den Eintrag „{name}“ wirklich löschen?',
       filter: 'Filtern',
+      filterAll: 'Alle',
       filterBy: 'Gefiltert nach Typ: {types}',
       clearFilter: 'Filter löschen',
+      showPendingReferrals: 'Anzeigen',
+      deletedToast: '„{name}“ wurde gelöscht',
+      restoredToast: '„{name}“ wiederhergestellt',
+      addTreatmentTag: 'Tag hinzufügen',
       addLink: {
         title: 'Link hinzufügen',
         url: 'URL',

@@ -32,8 +32,13 @@ async function createDatabase() {
   loading.value = true;
   error.value = null;
   try {
-    await dataService.createDatabaseWithPassword(dbName.value, password.value);
-    emit('created');
+    const newId = await dataService.createDatabaseWithPassword(dbName.value, password.value);
+    const createdName = dbName.value;
+    const createdPassword = password.value;
+    dbName.value = '';
+    password.value = '';
+    passwordConfirm.value = '';
+    emit('created', { id: newId, name: createdName, password: createdPassword });
   } catch (e) {
     console.error('Failed to create database:', e);
     error.value = 'Could not create database.';
@@ -47,15 +52,19 @@ async function createDatabase() {
   <v-dialog
     :model-value="modelValue"
     @update:model-value="(val) => !val && close()"
-    max-width="500px"
+    class="m3-sheet-dialog"
+    transition="dialog-bottom-transition"
     :persistent="isDirty"
   >
-    <v-card :loading="loading">
-      <v-card-title>{{ t('dialog.createDbTitle') }}</v-card-title>
-      <v-card-text>
-        <v-alert v-if="error" type="error" density="compact" class="mb-4">{{ error }}</v-alert>
+    <v-card :loading="loading" class="pa-2">
+      <div class="m3-sheet-handle"></div>
+      <v-card-title class="text-h6 font-weight-bold px-5 pt-2">{{ t('dialog.createDbTitle') }}</v-card-title>
+      <v-card-text class="px-5">
+        <v-alert v-if="error" type="error" variant="tonal" density="compact" rounded="lg" class="mb-4">
+          {{ error }}
+        </v-alert>
 
-        <v-alert type="warning" variant="tonal" class="mb-4" icon="mdi-key-alert">
+        <v-alert type="warning" variant="tonal" rounded="lg" class="mb-4 text-body-2" icon="mdi-key-alert">
           {{ t('dialog.createDbWarning') }}
         </v-alert>
 
@@ -75,10 +84,12 @@ async function createDatabase() {
           class="mt-2"
         ></v-text-field>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions class="px-5 pb-4">
         <v-spacer></v-spacer>
-        <v-btn text @click="close" :disabled="loading">{{ t('dialog.cancel') }}</v-btn>
-        <v-btn color="primary" @click="createDatabase" :loading="loading">{{ t('dialog.create') }}</v-btn>
+        <v-btn variant="text" rounded="pill" @click="close" :disabled="loading">{{ t('dialog.cancel') }}</v-btn>
+        <v-btn color="primary" variant="flat" rounded="pill" class="px-6" @click="createDatabase" :loading="loading">
+          {{ t('dialog.create') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

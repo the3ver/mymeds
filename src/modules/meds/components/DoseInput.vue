@@ -16,13 +16,11 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 const { t } = useI18n();
 
-// Internal state for the 4 slots: Morning, Noon, Evening, Night
 const morning = ref('');
 const noon = ref('');
 const evening = ref('');
 const night = ref('');
 
-// Parse the initial modelValue into the 4 slots
 watch(
   () => props.modelValue,
   (val) => {
@@ -34,7 +32,6 @@ watch(
       return;
     }
 
-    // Check if it matches the pattern X-X-X or X-X-X-X
     if (val.includes('-')) {
       const parts = val.split('-').map((p) => p.trim());
       morning.value = parts[0] || '0';
@@ -42,12 +39,6 @@ watch(
       evening.value = parts[2] || '0';
       night.value = parts[3] || '';
     } else {
-      // If it's just a single number, put it in morning or treat as custom?
-      // For backward compatibility, if it's a single number, we might just leave it
-      // But this component enforces the pattern.
-      // Let's assume if it's not a pattern, we try to parse it as morning dose or reset.
-      // Actually, let's try to be smart: if it's a single number, maybe user just entered "1".
-      // We can set morning=1 and others 0.
       morning.value = val;
       noon.value = '0';
       evening.value = '0';
@@ -57,7 +48,6 @@ watch(
   { immediate: true }
 );
 
-// Reconstruct the string whenever any input changes
 const updateModel = () => {
   const m = morning.value || '0';
   const n = noon.value || '0';
@@ -72,9 +62,7 @@ const updateModel = () => {
   emit('update:modelValue', result);
 };
 
-// Helper to validate input (allow numbers, fractions, decimals)
 const validateInput = (val) => {
-  // Allow empty, numbers, /, , .
   return /^[0-9/.,]*$/.test(val);
 };
 
@@ -92,14 +80,15 @@ const onInput = (field, val) => {
 
 <template>
   <div class="dose-input-container">
-    <div class="text-caption text-grey mb-1">{{ label }}</div>
-    <div class="d-flex align-start gap-2">
+    <div class="text-subtitle-2 font-weight-bold mb-2">{{ label }}</div>
+    <div class="dose-grid">
       <div class="dose-slot">
         <v-text-field
           v-model="morning"
-          variant="underlined"
-          density="compact"
+          variant="outlined"
+          density="comfortable"
           placeholder="0"
+          inputmode="decimal"
           :aria-label="t('med.doseMorning')"
           hide-details
           class="centered-input"
@@ -107,13 +96,14 @@ const onInput = (field, val) => {
         ></v-text-field>
         <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotMorning') }}</div>
       </div>
-      <span class="separator">-</span>
+
       <div class="dose-slot">
         <v-text-field
           v-model="noon"
-          variant="underlined"
-          density="compact"
+          variant="outlined"
+          density="comfortable"
           placeholder="0"
+          inputmode="decimal"
           :aria-label="t('med.doseNoon')"
           hide-details
           class="centered-input"
@@ -121,13 +111,14 @@ const onInput = (field, val) => {
         ></v-text-field>
         <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotNoon') }}</div>
       </div>
-      <span class="separator">-</span>
+
       <div class="dose-slot">
         <v-text-field
           v-model="evening"
-          variant="underlined"
-          density="compact"
+          variant="outlined"
+          density="comfortable"
           placeholder="0"
+          inputmode="decimal"
           :aria-label="t('med.doseEvening')"
           hide-details
           class="centered-input"
@@ -135,13 +126,14 @@ const onInput = (field, val) => {
         ></v-text-field>
         <div class="text-caption text-medium-emphasis text-center dose-slot-label">{{ t('med.slotEvening') }}</div>
       </div>
-      <span class="separator text-grey">-</span>
+
       <div class="dose-slot">
         <v-text-field
           v-model="night"
-          variant="underlined"
-          density="compact"
+          variant="outlined"
+          density="comfortable"
           placeholder="0"
+          inputmode="decimal"
           :aria-label="t('med.doseNight')"
           hide-details
           class="centered-input"
@@ -157,23 +149,21 @@ const onInput = (field, val) => {
 .dose-input-container {
   margin-bottom: 16px;
 }
+.dose-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
 .dose-slot {
-  flex: 1 1 0;
   min-width: 0;
 }
 .dose-slot-label {
-  font-size: 0.7rem !important;
-  line-height: 1.2;
-  margin-top: 2px;
-}
-.gap-2 {
-  gap: 6px;
-}
-.separator {
-  font-weight: bold;
-  padding-top: 8px;
+  font-size: 0.75rem !important;
+  line-height: 1.25;
+  margin-top: 4px;
 }
 :deep(.centered-input input) {
   text-align: center;
+  font-weight: 600;
 }
 </style>

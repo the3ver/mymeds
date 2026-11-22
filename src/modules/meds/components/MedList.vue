@@ -18,10 +18,11 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['edit', 'delete']);
+const emit = defineEmits(['edit', 'delete', 'refill']);
 const { t, locale } = useI18n();
 
 const sortMode = ref('added');
+const displayMode = ref('pills');
 const yellowLimit = ref(21);
 const redLimit = ref(7);
 const calendarDialog = ref(false);
@@ -50,24 +51,50 @@ function confirmDelete() {
 
 async function updateSettings() {
   const settings = await dataService.getSettings();
-  sortMode.value = settings.sortMode;
-  yellowLimit.value = settings.yellowLimit;
-  redLimit.value = settings.redLimit;
+  if (settings?.sortMode) sortMode.value = settings.sortMode;
+  if (settings?.displayMode) displayMode.value = settings.displayMode;
+  if (settings?.yellowLimit !== undefined) yellowLimit.value = settings.yellowLimit;
+  if (settings?.redLimit !== undefined) redLimit.value = settings.redLimit;
 }
+
+async function setDisplayMode(mode) {
+  displayMode.value = mode;
+  if (typeof dataService.saveDisplayMode === 'function') {
+    await dataService.saveDisplayMode(mode);
+  }
+  window.dispatchEvent(new Event('storage-display-mode-changed'));
+}
+
+async function cycleSortMode() {
+  const order = ['days', 'name', 'added'];
+  const next = order[(order.indexOf(sortMode.value) + 1) % order.length];
+  sortMode.value = next;
+  if (typeof dataService.saveSortMode === 'function') {
+    await dataService.saveSortMode(next);
+  }
+  window.dispatchEvent(new Event('storage-sort-mode-changed'));
+}
+
+const sortLabel = computed(() => {
+  if (sortMode.value === 'days') return t('app.sortDays');
+  if (sortMode.value === 'name') return t('app.sortName');
+  return t('app.sortAdded');
+});
 
 onMounted(() => {
   updateSettings();
   window.addEventListener('storage-sort-mode-changed', updateSettings);
+  window.addEventListener('storage-display-mode-changed', updateSettings);
   window.addEventListener('storage-limits-changed', updateSettings);
 });
 
 onUnmounted(() => {
   window.removeEventListener('storage-sort-mode-changed', updateSettings);
+  window.removeEventListener('storage-display-mode-changed', updateSettings);
   window.removeEventListener('storage-limits-changed', updateSettings);
 });
 
 const sortedItems = computed(() => {
-  // Create a copy to sort, but we need to keep track of original indices for editing/deleting
   const itemsWithIndex = props.items.map((item, index) => ({ ...item, originalIndex: index }));
 
   if (sortMode.value === 'name') {
@@ -77,7 +104,6 @@ const sortedItems = computed(() => {
       const doseA = parseDose(a.dose);
       const doseB = parseDose(b.dose);
 
-      // Handle cases with 0 dose (infinite days) -> put at end
       if (doseA <= 0 && doseB <= 0) return 0;
       if (doseA <= 0) return 1;
       if (doseB <= 0) return -1;
@@ -88,7 +114,6 @@ const sortedItems = computed(() => {
     });
   }
 
-  // Default: 'added' (no sort, just original order)
   return itemsWithIndex;
 });
 
@@ -113,7 +138,6 @@ const overviewData = computed(() => {
   const date = new Date();
   date.setDate(date.getDate() + minDays);
 
-  // Format date with weekday
   const options = { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' };
   const formattedDate = date.toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-US', options);
 
@@ -131,24 +155,12 @@ const overviewData = computed(() => {
 const calendarDate = computed(() => {
   if (!overviewData.value) return null;
 
-  // Calculate date for yellow limit warning
-  // If we are already below yellow limit, use tomorrow
-  // Otherwise use the date when we hit the yellow limit
-
-  // Actually, the requirement says: "Termin sollte zum Datum eingestellt werden das der gelben Warnstufe entspeicht"
-  // This means: Date when meds run out MINUS yellow limit days?
-  // Or simply the date when meds run out?
-  // Usually a reminder is set BEFORE it runs out.
-  // Let's set it to (Empty Date - Yellow Limit Days)
-  // But if that date is in the past, set it to tomorrow.
-
   const emptyDate = new Date(overviewData.value.rawDate);
   const reminderDate = new Date(emptyDate);
   reminderDate.setDate(reminderDate.getDate() - yellowLimit.value);
 
   const now = new Date();
   if (reminderDate < now) {
-    // If reminder would be in the past, set it to tomorrow 9:00 AM
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(9, 0, 0, 0);
@@ -167,30 +179,78 @@ const calendarDateFormatted = computed(() => {
 
 <template>
   <div v-if="items.length > 0">
-    <v-card
-      v-if="overviewData"
-      class="mb-4"
-      :color="overviewData.status || 'success'"
-      variant="tonal"
-      density="compact"
-    >
-      <v-card-text class="d-flex align-center justify-space-between py-1 pr-1">
-        <div class="text-center font-weight-bold flex-grow-1 text-body-1">
-          {{
-            overviewData.isCritical
-              ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }, overviewData.days)
-              : t('app.overviewText', { date: overviewData.date })
-          }}
+    <!-- M3 High-Contrast Overview Status Banner -->
+    <v-card v-if="overviewData" class="mb-3" :color="overviewData.status || 'success'" variant="tonal" rounded="xl">
+      <div class="d-flex align-center justify-space-between pa-3 ga-2">
+        <div class="d-flex align-center ga-3 min-width-0">
+          <v-icon size="22" class="flex-shrink-0">
+            {{ overviewData.isCritical ? 'mdi-alert-outline' : 'mdi-check-circle-outline' }}
+          </v-icon>
+          <div class="text-body-2 font-weight-bold">
+            {{
+              overviewData.isCritical
+                ? t('app.overviewTextCritical', { date: overviewData.date, days: overviewData.days }, overviewData.days)
+                : t('app.overviewText', { date: overviewData.date })
+            }}
+          </div>
         </div>
         <v-btn
           icon="mdi-calendar-plus"
           variant="text"
-          density="compact"
+          size="default"
           :aria-label="t('calendar.title')"
           @click="calendarDialog = true"
         ></v-btn>
-      </v-card-text>
+      </div>
     </v-card>
+
+    <!-- Direct Display Mode & Sort Controls -->
+    <div class="d-flex align-center justify-space-between flex-wrap ga-2 mb-3">
+      <div class="d-flex align-center ga-1 quick-mode-group pa-1 rounded-pill">
+        <v-btn
+          size="small"
+          rounded="pill"
+          :variant="displayMode === 'pills' ? 'flat' : 'text'"
+          :color="displayMode === 'pills' ? 'primary' : undefined"
+          @click="setDisplayMode('pills')"
+          data-testid="quick-display-pills"
+        >
+          {{ t('app.showPills') }}
+        </v-btn>
+        <v-btn
+          size="small"
+          rounded="pill"
+          :variant="displayMode === 'days' ? 'flat' : 'text'"
+          :color="displayMode === 'days' ? 'primary' : undefined"
+          @click="setDisplayMode('days')"
+          data-testid="quick-display-days"
+        >
+          {{ t('app.showDays') }}
+        </v-btn>
+        <v-btn
+          size="small"
+          rounded="pill"
+          :variant="displayMode === 'packages' ? 'flat' : 'text'"
+          :color="displayMode === 'packages' ? 'primary' : undefined"
+          @click="setDisplayMode('packages')"
+          data-testid="quick-display-packages"
+        >
+          {{ t('app.showPackages') }}
+        </v-btn>
+      </div>
+
+      <v-btn
+        size="small"
+        variant="tonal"
+        color="secondary"
+        rounded="pill"
+        prepend-icon="mdi-sort"
+        @click="cycleSortMode"
+        data-testid="quick-sort-btn"
+      >
+        {{ sortLabel }}
+      </v-btn>
+    </div>
 
     <MedCard
       v-for="item in sortedItems"
@@ -199,6 +259,7 @@ const calendarDateFormatted = computed(() => {
       :deduction="deductions[item.name]"
       @edit="emit('edit', item.originalIndex)"
       @delete="requestDelete(item.originalIndex)"
+      @refill="emit('refill', item.originalIndex)"
     />
 
     <CalendarDialog
@@ -217,9 +278,20 @@ const calendarDateFormatted = computed(() => {
       @confirm="confirmDelete"
     />
   </div>
-  <div v-else class="text-center mt-10 text-grey">
-    {{ t('app.noMeds') }}
+  <div v-else class="text-center mt-14 px-4 text-medium-emphasis">
+    <v-avatar color="primary" variant="tonal" size="64" rounded="xl" class="mb-4">
+      <v-icon size="34">mdi-pill</v-icon>
+    </v-avatar>
+    <div class="text-subtitle-1 font-weight-medium">{{ t('app.noMeds') }}</div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.quick-mode-group {
+  background-color: rgb(var(--v-theme-surface-light));
+  border: 1px solid rgba(var(--v-border-color), 0.4);
+}
+.min-width-0 {
+  min-width: 0;
+}
+</style>

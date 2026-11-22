@@ -66,4 +66,31 @@ describe('HelpDialog.vue', () => {
     expect(wrapper.emitted('update:modelValue')).toBeDefined();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
   });
+
+  it('filters manual sections live via search input', async () => {
+    document.body.innerHTML = '';
+    const wrapper = mountComponent();
+    await wrapper.vm.$nextTick();
+
+    const searchInput = document.body.querySelector('[data-testid="help-search-input"] input');
+    expect(searchInput).not.toBeNull();
+    searchInput.value = 'ICS-Export';
+    searchInput.dispatchEvent(new Event('input'));
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.textContent).toContain('Gesundheitskalender & ICS-Export');
+    expect(document.body.textContent).not.toContain('Verschlüsselung & Datensicherheit');
+  });
+
+  it('shows all sections again when the clearable search resets the query to null', async () => {
+    document.body.innerHTML = '';
+    const wrapper = mountComponent();
+    wrapper.vm.searchQuery = 'ICS';
+    await wrapper.vm.$nextTick();
+    wrapper.vm.searchQuery = null;
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.textContent).toContain('Verschlüsselung & Datensicherheit');
+    expect(document.body.textContent).toContain('Gesundheitskalender & ICS-Export');
+  });
 });

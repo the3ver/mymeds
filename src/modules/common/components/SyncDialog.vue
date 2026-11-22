@@ -1,41 +1,47 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    max-width="560px"
+    fullscreen
+    transition="dialog-bottom-transition"
     :persistent="isTransferActive"
-    scrollable
     @update:model-value="(val) => !val && handleClose()"
   >
-    <v-card class="pa-2">
-      <!-- Header -->
-      <v-card-title class="d-flex align-center justify-space-between pb-2">
-        <div class="d-flex align-center font-weight-bold min-width-0">
-          <v-icon icon="mdi-sync" color="primary" class="mr-2 flex-shrink-0" />
-          <span>{{ t('sync.title') }}</span>
-        </div>
+    <v-card color="background" rounded="0">
+      <!-- Sticky M3 Top Toolbar -->
+      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar">
         <v-btn
           icon="mdi-close"
           variant="text"
-          density="comfortable"
-          class="close-sync-btn flex-shrink-0"
+          class="close-sync-btn"
           :aria-label="t('about.close')"
           @click="handleClose"
         />
-      </v-card-title>
+        <v-toolbar-title class="d-flex align-center font-weight-bold text-subtitle-1">
+          <v-icon icon="mdi-cellphone-link" color="primary" class="mr-2" />
+          <span>{{ t('sync.title') }}</span>
+        </v-toolbar-title>
+      </v-toolbar>
 
       <!-- Tabs (Send / Receive) -->
-      <v-tabs v-model="activeTab" color="primary" grow :show-arrows="false" class="border-b mb-4 sync-tabs">
-        <v-tab value="send" class="sync-tab">
+      <v-tabs
+        v-model="activeTab"
+        color="primary"
+        bg-color="surface"
+        grow
+        :show-arrows="false"
+        class="border-b sync-tabs"
+      >
+        <v-tab value="send" class="sync-tab text-none">
           <v-icon icon="mdi-upload" size="small" class="mr-1" />
           {{ t('sync.tabSend') }}
         </v-tab>
-        <v-tab value="receive" class="sync-tab">
+        <v-tab value="receive" class="sync-tab text-none">
           <v-icon icon="mdi-download" size="small" class="mr-1" />
           {{ t('sync.tabReceive') }}
         </v-tab>
       </v-tabs>
 
-      <v-card-text class="pt-0">
+      <v-card-text class="pt-4">
         <!-- Error Alert -->
         <v-alert
           v-if="errorMessage"

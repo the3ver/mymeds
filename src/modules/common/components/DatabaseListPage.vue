@@ -23,16 +23,6 @@ const syncDialog = ref(false);
 const syncDbId = ref(null);
 const selectedDb = ref(null);
 
-const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'error', 'info'];
-const getRandomColor = (id) => {
-  let hash = 0;
-  const strId = String(id);
-  for (let i = 0; i < strId.length; i++) {
-    hash = strId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-};
-
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   return new Date(dateString).toLocaleDateString(locale.value, {
@@ -126,9 +116,21 @@ function onVaultImported() {
   loadDatabases();
 }
 
-function onDatabaseCreated() {
-  loadDatabases();
+async function onDatabaseCreated(createdPayload) {
+  await loadDatabases();
   createDialog.value = false;
+
+  // Auto-unlock newly created vault so the user does not have to re-enter the password
+  if (createdPayload?.id && createdPayload?.password) {
+    try {
+      const result = await dataService.unlockDatabase(createdPayload.id, createdPayload.password);
+      if (result.success) {
+        unlock(createdPayload.id, createdPayload.password, result.data, result.deductions, createdPayload.name);
+      }
+    } catch (err) {
+      console.warn('[DatabaseListPage] Auto-unlock after creation skipped:', err);
+    }
+  }
 }
 
 function onDatabaseUnlocked(result, password) {
@@ -138,44 +140,53 @@ function onDatabaseUnlocked(result, password) {
 </script>
 
 <template>
-  <v-container>
+  <v-container class="db-list-container pb-24">
     <div v-if="databases.length > 0" class="d-flex align-center justify-space-between mb-3 px-1">
-      <div class="text-subtitle-1 font-weight-medium opacity-80">
-        {{ t('app.databases') }}
+      <div class="text-overline font-weight-bold text-medium-emphasis">
+        {{ t('app.databases') }} ({{ databases.length }})
       </div>
       <v-btn
-        :icon="vaultDisplayMode === 'simple' ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline'"
-        variant="text"
-        density="comfortable"
+        :prepend-icon="vaultDisplayMode === 'simple' ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline'"
+        variant="tonal"
+        color="secondary"
+        rounded="pill"
         size="small"
         :title="t('app.toggleVaultDisplayMode')"
         :aria-label="t('app.toggleVaultDisplayMode')"
         @click="toggleVaultDisplayMode"
         data-testid="toggle-vault-display-btn"
-      ></v-btn>
+      >
+        {{ vaultDisplayMode === 'simple' ? t('app.vaultDisplayComfortable') : t('app.vaultDisplaySimple') }}
+      </v-btn>
     </div>
 
-    <v-row>
-      <v-col v-for="db in databases" :key="db.id" cols="12" sm="6" md="4">
+    <v-row dense>
+      <v-col v-for="db in databases" :key="db.id" cols="12" sm="6">
         <!-- Simple / Ruhige Ansicht -->
         <v-card
           v-if="vaultDisplayMode === 'simple'"
-          class="d-flex flex-column fill-height db-card db-card-simple cursor-pointer"
-          :color="getRandomColor(db.id)"
-          variant="tonal"
+          class="m3-card db-card db-card-simple cursor-pointer mb-2"
           @click="handleDbClick(db)"
         >
-          <v-card-title
-            class="text-h6 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1 pt-3 px-4 db-card-simple-title"
-          >
-            <div class="d-flex align-center min-width-0 mr-2">
-              <v-icon size="22" class="mr-2 flex-shrink-0">mdi-shield-lock-outline</v-icon>
-              <span class="text-truncate">{{ db.name }}</span>
+          <div class="d-flex align-center justify-space-between pa-4 ga-3">
+            <div class="d-flex align-center ga-3 min-width-0 flex-grow-1">
+              <v-avatar color="primary" variant="tonal" size="44" rounded="lg" class="flex-shrink-0">
+                <v-icon size="24">mdi-shield-lock-outline</v-icon>
+              </v-avatar>
+              <div class="min-width-0 flex-grow-1">
+                <div class="text-subtitle-1 font-weight-bold text-truncate">{{ db.name }}</div>
+                <div class="d-flex align-center flex-wrap text-body-2 text-medium-emphasis ga-2 mt-0.5">
+                  <span>{{ db.medsCount }} {{ t('app.db.medsLabel', db.medsCount) }}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{{ db.calendarCount }} {{ t('app.db.entriesLabel', db.calendarCount) }}</span>
+                </div>
+              </div>
             </div>
-            <div class="d-flex align-center flex-shrink-0 ga-1">
+
+            <div class="d-flex align-center flex-shrink-0">
               <v-icon
                 v-if="activeBiometricVaults.has(db.id)"
-                size="20"
+                size="22"
                 color="primary"
                 class="mr-1"
                 :title="t('biometrics.activeOnThisDevice')"
@@ -188,21 +199,20 @@ function onDatabaseUnlocked(result, password) {
                     v-bind="menuProps"
                     icon="mdi-dots-vertical"
                     variant="text"
-                    density="comfortable"
-                    size="small"
+                    size="default"
                     @click.stop
                     :title="t('app.vaultActions')"
                     :aria-label="t('app.vaultActions')"
                   ></v-btn>
                 </template>
-                <v-list density="compact" min-width="180">
+                <v-list density="comfortable" rounded="xl" min-width="200">
                   <v-list-item
                     prepend-icon="mdi-pencil"
                     :title="t('app.vaultRename')"
                     @click.stop="handleRenameClick(db)"
                   ></v-list-item>
                   <v-list-item
-                    prepend-icon="mdi-swap-vertical"
+                    prepend-icon="mdi-cellphone-link"
                     :title="t('sync.transferToDevice')"
                     @click.stop="handleSyncClick(db)"
                   ></v-list-item>
@@ -213,99 +223,81 @@ function onDatabaseUnlocked(result, password) {
                     color="warning"
                     @click.stop="handleRevokeBiometrics(db)"
                   ></v-list-item>
-                  <v-divider></v-divider>
+                  <v-divider class="my-1"></v-divider>
                   <v-list-item
                     prepend-icon="mdi-delete-outline"
                     :title="t('app.vaultDelete')"
-                    color="error"
+                    base-color="error"
                     @click.stop="handleDeleteClick(db)"
                   ></v-list-item>
                 </v-list>
               </v-menu>
             </div>
-          </v-card-title>
-
-          <v-card-text class="pt-0 pb-3 px-4 cursor-pointer db-card-simple-meta">
-            <div class="d-flex align-center flex-wrap text-body-2">
-              <v-icon size="18" color="primary" class="mr-1">mdi-pill</v-icon>
-              <span class="font-weight-medium mr-3">{{ db.medsCount }} {{ t('app.db.medsLabel', db.medsCount) }}</span>
-              <span class="mr-3 db-meta-dot" aria-hidden="true">•</span>
-              <v-icon size="18" color="secondary" class="mr-1">mdi-calendar-check</v-icon>
-              <span class="font-weight-medium"
-                >{{ db.calendarCount }} {{ t('app.db.entriesLabel', db.calendarCount) }}</span
-              >
-            </div>
-          </v-card-text>
+          </div>
         </v-card>
 
         <!-- Comfortable / Detaillierte Ansicht -->
-        <v-card v-else class="d-flex flex-column fill-height db-card" :color="getRandomColor(db.id)" variant="tonal">
-          <v-card-title
-            class="text-h5 font-weight-bold cursor-pointer d-flex align-center justify-space-between pb-1"
-            @click="handleDbClick(db)"
-          >
-            <span class="text-truncate mr-2">{{ db.name }}</span>
+        <v-card v-else class="m3-card db-card d-flex flex-column fill-height mb-2" @click="handleDbClick(db)">
+          <v-card-title class="d-flex align-center justify-space-between pt-4 pb-2 px-4">
+            <div class="d-flex align-center ga-3 min-width-0">
+              <v-avatar color="primary" variant="tonal" size="42" rounded="lg" class="flex-shrink-0">
+                <v-icon size="22">mdi-shield-lock-outline</v-icon>
+              </v-avatar>
+              <span class="text-h6 font-weight-bold text-truncate">{{ db.name }}</span>
+            </div>
             <v-chip
               v-if="activeBiometricVaults.has(db.id)"
               size="small"
               color="primary"
-              variant="flat"
+              variant="tonal"
               prepend-icon="mdi-fingerprint"
-              class="flex-shrink-0 font-weight-medium"
+              class="flex-shrink-0 font-weight-medium ml-2"
               :title="t('biometrics.activeOnThisDevice')"
             >
               {{ t('biometrics.title') }}
             </v-chip>
           </v-card-title>
 
-          <v-card-text class="flex-grow-1 cursor-pointer pt-2 pb-2 db-card-text" @click="handleDbClick(db)">
-            <!-- Prominent horizontal stats row for medication & calendar counts -->
+          <v-card-text class="flex-grow-1 pt-1 pb-2 px-4">
             <div class="db-stats-row d-flex flex-wrap align-center ga-3 mb-3">
-              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-lg">
-                <v-icon size="28" color="primary" class="mr-3 flex-shrink-0">mdi-pill</v-icon>
+              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-xl">
+                <v-icon size="24" color="primary" class="mr-3 flex-shrink-0">mdi-pill</v-icon>
                 <div class="d-flex flex-column">
                   <span class="text-h6 font-weight-bold line-height-1">{{ db.medsCount }}</span>
-                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{
-                    t('app.db.medsLabel', db.medsCount)
-                  }}</span>
+                  <span class="text-caption font-weight-medium text-medium-emphasis">
+                    {{ t('app.db.medsLabel', db.medsCount) }}
+                  </span>
                 </div>
               </div>
 
-              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-lg">
-                <v-icon size="28" color="secondary" class="mr-3 flex-shrink-0">mdi-calendar-check</v-icon>
+              <div class="db-stat-pill flex-grow-1 d-flex align-center px-3 py-2 rounded-xl">
+                <v-icon size="24" color="secondary" class="mr-3 flex-shrink-0">mdi-calendar-check</v-icon>
                 <div class="d-flex flex-column">
                   <span class="text-h6 font-weight-bold line-height-1">{{ db.calendarCount }}</span>
-                  <span class="text-body-2 font-weight-medium opacity-90 text-truncate">{{
-                    t('app.db.entriesLabel', db.calendarCount)
-                  }}</span>
+                  <span class="text-caption font-weight-medium text-medium-emphasis">
+                    {{ t('app.db.entriesLabel', db.calendarCount) }}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <!-- Horizontal dates row utilizing the available horizontal space -->
-            <div
-              class="db-dates-row d-flex flex-wrap justify-space-between align-center ga-2 pt-2 border-t text-body-1"
-            >
-              <div class="d-flex align-center py-1">
-                <v-icon size="22" class="mr-2 opacity-80 flex-shrink-0">mdi-calendar-plus</v-icon>
-                <span class="db-date-label">
-                  <span class="opacity-80 mr-1">{{ t('app.db.created') }}:</span>
-                  <strong class="font-weight-bold">{{ formatDate(db.createdAt) }}</strong>
-                </span>
+            <div class="d-flex flex-wrap justify-space-between align-center ga-2 pt-2 border-t text-caption">
+              <div class="d-flex align-center text-medium-emphasis">
+                <v-icon size="16" class="mr-1">mdi-calendar-plus</v-icon>
+                <span class="mr-1">{{ t('app.db.created') }}:</span>
+                <strong class="text-high-emphasis">{{ formatDate(db.createdAt) }}</strong>
               </div>
-              <div class="d-flex align-center py-1">
-                <v-icon size="22" class="mr-2 opacity-80 flex-shrink-0">mdi-calendar-edit</v-icon>
-                <span class="db-date-label">
-                  <span class="opacity-80 mr-1">{{ t('app.db.modified') }}:</span>
-                  <strong class="font-weight-bold">{{ formatDate(db.modifiedAt) }}</strong>
-                </span>
+              <div class="d-flex align-center text-medium-emphasis">
+                <v-icon size="16" class="mr-1">mdi-calendar-edit</v-icon>
+                <span class="mr-1">{{ t('app.db.modified') }}:</span>
+                <strong class="text-high-emphasis">{{ formatDate(db.modifiedAt) }}</strong>
               </div>
             </div>
           </v-card-text>
 
-          <v-card-actions class="px-3 pb-2 pt-0">
+          <v-card-actions class="px-3 pb-3 pt-0">
             <v-btn
-              icon="mdi-swap-vertical"
+              icon="mdi-cellphone-link"
               variant="text"
               size="default"
               :title="t('sync.transferToDevice')"
@@ -334,6 +326,7 @@ function onDatabaseUnlocked(result, password) {
               icon="mdi-delete-outline"
               variant="text"
               size="default"
+              color="error"
               :aria-label="t('app.vaultDelete')"
               @click.stop="handleDeleteClick(db)"
             ></v-btn>
@@ -342,9 +335,19 @@ function onDatabaseUnlocked(result, password) {
       </v-col>
     </v-row>
 
-    <div v-if="databases.length === 0" class="text-center text-grey mt-16">
-      <p class="text-h6">{{ t('app.noDatabases') }}</p>
-      <p>{{ t('app.createFirstDb') }}</p>
+    <v-card v-if="databases.length > 0" variant="tonal" color="secondary" rounded="xl" class="mt-4 pa-3">
+      <div class="d-flex align-start ga-3 text-caption">
+        <v-icon color="primary" size="20" class="flex-shrink-0 mt-0.5">mdi-lock-check-outline</v-icon>
+        <span>{{ t('app.zeroKnowledgeHint') }}</span>
+      </div>
+    </v-card>
+
+    <div v-if="databases.length === 0" class="text-center text-medium-emphasis mt-16 px-4">
+      <v-avatar color="primary" variant="tonal" size="64" rounded="xl" class="mb-4">
+        <v-icon size="34">mdi-shield-lock-outline</v-icon>
+      </v-avatar>
+      <p class="text-h6 font-weight-bold text-high-emphasis mb-1">{{ t('app.noDatabases') }}</p>
+      <p class="text-body-2">{{ t('app.createFirstDb') }}</p>
     </div>
   </v-container>
 
@@ -358,7 +361,6 @@ function onDatabaseUnlocked(result, password) {
     class="mb-4"
     @click="handleCreateNew"
   >
-    <!-- v-fab passes aria-label to its wrapper div, so the name goes into the button content -->
     <v-icon icon="mdi-plus" />
     <span class="d-sr-only">{{ t('dialog.createDbTitle') }}</span>
   </v-fab>
@@ -393,68 +395,23 @@ function onDatabaseUnlocked(result, password) {
   />
 </template>
 
-<style>
-/* Global style to prevent pull-to-refresh on this page */
-html,
-body {
-  overscroll-behavior-y: contain;
+<style scoped>
+.db-list-container {
+  max-width: 720px;
 }
 .cursor-pointer {
   cursor: pointer;
 }
-
-.db-card-text {
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: rgba(var(--v-theme-on-surface), 1) !important;
-  opacity: 1 !important;
-}
-
 .db-stat-pill {
-  background: rgba(var(--v-theme-surface), 0.78);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(var(--v-border-color), 0.2);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-width: 125px;
+  background-color: rgb(var(--v-theme-surface-light));
+  min-width: 120px;
 }
-
 .line-height-1 {
   line-height: 1.15;
 }
-
-.db-date-label {
-  font-size: 1rem;
-}
-
 .border-t {
-  border-top: 1px solid rgba(var(--v-border-color), 0.2);
+  border-top: 1px solid rgba(var(--v-border-color), 0.35);
 }
-
-.db-card-simple {
-  transition:
-    transform 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
-  border-radius: 12px;
-}
-
-.db-card-simple-title {
-  color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !important;
-}
-
-.db-card-simple-meta {
-  color: rgba(var(--v-theme-on-surface), 0.87) !important;
-  opacity: 1 !important;
-}
-
-.db-meta-dot {
-  color: rgba(var(--v-theme-on-surface), 0.6);
-}
-
-.db-card-simple:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-}
-
 .min-width-0 {
   min-width: 0;
 }

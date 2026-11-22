@@ -124,23 +124,38 @@
 .mdi-menu::before {
   content: "\F035C";
 }
-.mdi-filter-variant::before {
-  content: "\F0236";
+.mdi-cellphone-link::before {
+  content: "\F0121";
+}
+.mdi-weather-sunny::before {
+  content: "\F0599";
+}
+.mdi-weather-night::before {
+  content: "\F0594";
+}
+.mdi-book-open-page-variant-outline::before {
+  content: "\F15D6";
+}
+.mdi-cog-outline::before {
+  content: "\F08BB";
 }
 .mdi-lock::before {
   content: "\F033E";
 }
-.mdi-qrcode-scan::before {
-  content: "\F0433";
-}
 .mdi-barcode-scan::before {
   content: "\F0072";
 }
-.mdi-format-list-bulleted::before {
-  content: "\F0279";
+.mdi-qrcode-scan::before {
+  content: "\F0433";
+}
+.mdi-pill::before {
+  content: "\F0402";
 }
 .mdi-calendar-clock::before {
   content: "\F00F0";
+}
+.mdi-tune-variant::before {
+  content: "\F1542";
 }
 .mdi-link-plus::before {
   content: "\F0C94";
@@ -166,17 +181,41 @@
 .mdi-file-clock::before {
   content: "\F12E1";
 }
+.mdi-file-alert-outline::before {
+  content: "\F0A4C";
+}
 .mdi-alert-circle-outline::before {
   content: "\F05D6";
 }
-.mdi-file-alert-outline::before {
-  content: "\F0A4C";
+.mdi-calendar-export::before {
+  content: "\F0B24";
 }
 .mdi-delete::before {
   content: "\F01B4";
 }
-.mdi-calendar-export::before {
-  content: "\F0B24";
+.mdi-tag-text-outline::before {
+  content: "\F04FD";
+}
+.mdi-text-box-outline::before {
+  content: "\F09ED";
+}
+.mdi-open-in-new::before {
+  content: "\F03CC";
+}
+.mdi-github::before {
+  content: "\F02A4";
+}
+.mdi-license::before {
+  content: "\F0FC3";
+}
+.mdi-sparkles::before {
+  content: "\F0674";
+}
+.mdi-creation::before {
+  content: "\F0674";
+}
+.mdi-update::before {
+  content: "\F06B0";
 }
 .mdi-key-alert::before {
   content: "\F1983";
@@ -196,17 +235,11 @@
 .mdi-dots-vertical::before {
   content: "\F01D9";
 }
-.mdi-swap-vertical::before {
-  content: "\F04E2";
-}
 .mdi-fingerprint-off::before {
   content: "\F0EB1";
 }
 .mdi-delete-outline::before {
   content: "\F09E7";
-}
-.mdi-pill::before {
-  content: "\F0402";
 }
 .mdi-calendar-check::before {
   content: "\F00EF";
@@ -216,6 +249,9 @@
 }
 .mdi-calendar-edit::before {
   content: "\F08A7";
+}
+.mdi-lock-check-outline::before {
+  content: "\F16A8";
 }
 .mdi-export::before {
   content: "\F0207";
@@ -232,50 +268,38 @@
 .mdi-share-variant::before {
   content: "\F0497";
 }
+.mdi-cellphone-check::before {
+  content: "\F17FD";
+}
+.mdi-clock-outline::before {
+  content: "\F0150";
+}
+.mdi-view-list-outline::before {
+  content: "\F148B";
+}
+.mdi-check-decagram-outline::before {
+  content: "\F1740";
+}
+.mdi-database-export-outline::before {
+  content: "\F162C";
+}
+.mdi-magnify::before {
+  content: "\F0349";
+}
 .mdi-alert::before {
   content: "\F0026";
-}
-.mdi-weather-sunny::before {
-  content: "\F0599";
-}
-.mdi-weather-night::before {
-  content: "\F0594";
 }
 .mdi-cog::before {
   content: "\F0493";
 }
-.mdi-sync::before {
-  content: "\F04E6";
-}
 .mdi-database::before {
   content: "\F01BC";
 }
+.mdi-sync::before {
+  content: "\F04E6";
+}
 .mdi-help-circle-outline::before {
   content: "\F0625";
-}
-.mdi-sparkles::before {
-  content: "\F0674";
-}
-.mdi-creation::before {
-  content: "\F0674";
-}
-.mdi-update::before {
-  content: "\F06B0";
-}
-.mdi-tag-text-outline::before {
-  content: "\F04FD";
-}
-.mdi-text-box-outline::before {
-  content: "\F09ED";
-}
-.mdi-open-in-new::before {
-  content: "\F03CC";
-}
-.mdi-github::before {
-  content: "\F02A4";
-}
-.mdi-license::before {
-  content: "\F0FC3";
 }
 .mdi-package-variant-closed::before {
   content: "\F03D7";
@@ -322,6 +346,9 @@
 .mdi-check-circle-outline::before {
   content: "\F05E1";
 }
+.mdi-swap-vertical::before {
+  content: "\F04E2";
+}
 .mdi-zip-box::before {
   content: "\F05C4";
 }
@@ -357,4 +384,10 @@
 }
 .mdi-package-variant::before {
   content: "\F03D6";
+}
+.mdi-alert-outline::before {
+  content: "\F002A";
+}
+.mdi-sort::before {
+  content: "\F04BA";
 }

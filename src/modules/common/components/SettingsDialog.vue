@@ -302,10 +302,10 @@ const close = () => {
     fullscreen
     transition="dialog-bottom-transition"
   >
-    <v-card>
-      <v-toolbar color="primary">
+    <v-card color="background" rounded="0">
+      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar">
         <v-btn icon="mdi-close" :aria-label="t('about.close')" @click="close"></v-btn>
-        <v-toolbar-title>{{ t('app.settings') }}</v-toolbar-title>
+        <v-toolbar-title class="font-weight-bold">{{ t('app.settings') }}</v-toolbar-title>
       </v-toolbar>
 
       <v-card-text>

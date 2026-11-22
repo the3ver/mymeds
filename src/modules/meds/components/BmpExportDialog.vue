@@ -1,8 +1,13 @@
 <template>
-  <v-dialog :model-value="modelValue" max-width="600px" scrollable @update:model-value="handleClose">
-    <v-card class="bmp-export-dialog">
-      <!-- Toolbar Header -->
-      <v-toolbar color="primary" density="comfortable">
+  <v-dialog
+    :model-value="modelValue"
+    fullscreen
+    transition="dialog-bottom-transition"
+    @update:model-value="handleClose"
+  >
+    <v-card color="background" rounded="0" class="bmp-export-dialog">
+      <!-- Sticky M3 Top Toolbar -->
+      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar">
         <v-btn icon="mdi-close" variant="text" :aria-label="t('about.close')" @click="handleClose" />
         <v-toolbar-title class="text-subtitle-1 font-weight-bold">
           {{ t('bmp.exportTitle') }}

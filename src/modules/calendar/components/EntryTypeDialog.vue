@@ -10,9 +10,9 @@ const { t } = useI18n();
 
 const types = [
   { value: 'doctor', icon: 'mdi-doctor', color: 'primary' },
-  { value: 'vaccination', icon: 'mdi-needle', color: 'teal' },
-  { value: 'illness', icon: 'mdi-emoticon-sick', color: 'orange' },
-  { value: 'note', icon: 'mdi-note-text', color: 'blue-grey' }
+  { value: 'vaccination', icon: 'mdi-needle', color: 'tertiary' },
+  { value: 'illness', icon: 'mdi-emoticon-sick', color: 'warning' },
+  { value: 'note', icon: 'mdi-note-text', color: 'secondary' }
 ];
 
 const select = (type) => {
@@ -26,36 +26,39 @@ const close = () => {
 </script>
 
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="close" max-width="400px">
-    <v-card>
-      <v-card-title>{{ t('calendar.selectType') }}</v-card-title>
-      <v-card-text>
-        <v-list>
-          <v-list-item
+  <v-dialog
+    :model-value="modelValue"
+    @update:model-value="close"
+    class="m3-sheet-dialog"
+    transition="dialog-bottom-transition"
+  >
+    <v-card class="pa-2">
+      <div class="m3-sheet-handle"></div>
+      <v-card-title class="text-h6 font-weight-bold px-5 pt-2">{{ t('calendar.selectType') }}</v-card-title>
+      <v-card-text class="px-4 pb-5">
+        <div class="d-flex flex-column ga-2">
+          <v-card
             v-for="type in types"
             :key="type.value"
-            :prepend-icon="type.icon"
-            :title="t(`calendar.types.${type.value}`)"
-            @click="select(type.value)"
-            :color="type.color"
-            rounded="lg"
-            class="mb-2"
             variant="tonal"
+            :color="type.color"
+            rounded="xl"
+            class="cursor-pointer pa-3 d-flex align-center ga-3"
+            @click="select(type.value)"
           >
-            <template v-slot:prepend>
-              <v-avatar :color="type.color" class="mr-2">
-                <v-icon color="white">{{ type.icon }}</v-icon>
-              </v-avatar>
-            </template>
-          </v-list-item>
-        </v-list>
+            <v-avatar :color="type.color" size="42" rounded="lg">
+              <v-icon color="white" size="22">{{ type.icon }}</v-icon>
+            </v-avatar>
+            <span class="text-subtitle-1 font-weight-medium">{{ t(`calendar.types.${type.value}`) }}</span>
+          </v-card>
+        </div>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="close">{{ t('dialog.cancel') }}</v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
