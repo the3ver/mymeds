@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createVuetify } from 'vuetify';
 import { createI18n } from 'vue-i18n';
 import * as components from 'vuetify/components';
@@ -8,6 +8,19 @@ import { messages } from '../../src/i18n';
 import DatabaseListPage from '../../src/modules/common/components/DatabaseListPage.vue';
 import * as dataService from '../../src/modules/common/utils/dataService';
 import * as biometricService from '../../src/modules/common/utils/biometricSessionService';
+import { state as appState, lock } from '../../src/app-state';
+
+// DatabaseListPage loads its dialogs via defineAsyncComponent. Name-based stubs do not reach
+// an async wrapper, so the real dialogs (SyncDialog pulls in MQTT and QR code) would load and
+// could finish after teardown. Module stubs also let a test emit 'created' from the dialog.
+const { stubDialog } = vi.hoisted(() => ({
+  stubDialog: (name) => ({ __esModule: true, default: { name, template: '<div></div>' } })
+}));
+vi.mock('../../src/modules/common/components/CreateDatabaseDialog.vue', () => stubDialog('CreateDatabaseDialog'));
+vi.mock('../../src/modules/common/components/DatabaseUnlockDialog.vue', () => stubDialog('DatabaseUnlockDialog'));
+vi.mock('../../src/modules/common/components/ConfirmDialog.vue', () => stubDialog('ConfirmDialog'));
+vi.mock('../../src/modules/common/components/RenameDatabaseDialog.vue', () => stubDialog('RenameDatabaseDialog'));
+vi.mock('../../src/modules/common/components/SyncDialog.vue', () => stubDialog('SyncDialog'));
 
 const vuetify = createVuetify({ components, directives });
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages });
@@ -255,5 +268,62 @@ describe('DatabaseListPage.vue', () => {
     expect(fabBtn.exists()).toBe(true);
     const name = fabBtn.attributes('aria-label') || fabBtn.text().trim();
     expect(name).toBe(i18n.global.t('dialog.createDbTitle'));
+  });
+
+  describe('after creating a vault', () => {
+    const mountList = async () => {
+      vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([]);
+      vi.spyOn(dataService, 'getSettings').mockResolvedValue({});
+      vi.spyOn(dataService, 'saveAndLockDatabase').mockResolvedValue(true);
+      vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+      const wrapper = mount(DatabaseListPage, {
+        global: {
+          plugins: [vuetify, i18n],
+          stubs: { VFab: true, DatabaseUnlockDialog: true, RenameDatabaseDialog: true, SyncDialog: true }
+        }
+      });
+      await flushPromises();
+      return wrapper;
+    };
+
+    afterEach(async () => {
+      await lock();
+    });
+
+    it('unlocks the new vault with the password just entered, without asking again', async () => {
+      const unlockSpy = vi.spyOn(dataService, 'unlockDatabase').mockResolvedValue({
+        success: true,
+        data: { meds: [], calendar: [] },
+        deductions: {}
+      });
+      const wrapper = await mountList();
+
+      wrapper.findComponent({ name: 'CreateDatabaseDialog' }).vm.$emit('created', {
+        id: 7,
+        name: 'Neuer Tresor',
+        password: 'geheim123'
+      });
+      await flushPromises();
+
+      expect(unlockSpy).toHaveBeenCalledWith(7, 'geheim123');
+      expect(appState.isLocked).toBe(false);
+      expect(appState.activeDatabaseId).toBe(7);
+      expect(appState.activeDatabaseName).toBe('Neuer Tresor');
+    });
+
+    it('stays on the vault list when the new vault cannot be unlocked', async () => {
+      vi.spyOn(dataService, 'unlockDatabase').mockResolvedValue({ success: false });
+      const wrapper = await mountList();
+
+      wrapper.findComponent({ name: 'CreateDatabaseDialog' }).vm.$emit('created', {
+        id: 7,
+        name: 'Neuer Tresor',
+        password: 'falsch'
+      });
+      await flushPromises();
+
+      expect(appState.isLocked).toBe(true);
+      expect(appState.activeDatabaseId).toBeNull();
+    });
   });
 });

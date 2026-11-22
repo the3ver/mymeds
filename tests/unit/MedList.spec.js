@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createVuetify } from 'vuetify';
 import { createI18n } from 'vue-i18n';
 import * as components from 'vuetify/components';
@@ -13,7 +13,9 @@ vi.mock('../../src/modules/common/utils/dataService', () => ({
     sortMode: 'added',
     yellowLimit: 21,
     redLimit: 7
-  })
+  }),
+  saveSortMode: vi.fn().mockResolvedValue(undefined),
+  saveDisplayMode: vi.fn().mockResolvedValue(undefined)
 }));
 
 const vuetify = createVuetify({ components, directives });
@@ -130,5 +132,56 @@ describe('MedList.vue', () => {
     });
     expect(wrapper.text()).toContain('1 Tag');
     expect(wrapper.text()).not.toContain('1 Tage');
+  });
+
+  describe('quick display and sort controls', () => {
+    // Saved values come back from getSettings, as with the real settings store
+    let settings;
+    beforeEach(() => {
+      settings = { sortMode: 'added', displayMode: 'pills', yellowLimit: 21, redLimit: 7 };
+      dataService.getSettings.mockImplementation(async () => ({ ...settings }));
+      dataService.saveSortMode.mockImplementation(async (mode) => {
+        settings.sortMode = mode;
+      });
+      dataService.saveDisplayMode.mockImplementation(async (mode) => {
+        settings.displayMode = mode;
+      });
+    });
+
+    it('cycles the sort order added -> days -> name and stores it', async () => {
+      const wrapper = mountComponent();
+      await flushPromises();
+      const titles = () => wrapper.findAll('.v-card-title').map((el) => el.text());
+      const sortBtn = () => wrapper.find('[data-testid="quick-sort-btn"]');
+
+      await sortBtn().trigger('click');
+      await flushPromises();
+      expect(dataService.saveSortMode).toHaveBeenLastCalledWith('days');
+      expect(titles()[0]).toContain('A-Medikament');
+      expect(titles()[2]).toContain('Z-Medikament');
+
+      await sortBtn().trigger('click');
+      await flushPromises();
+      expect(dataService.saveSortMode).toHaveBeenLastCalledWith('name');
+      expect(titles().map((title) => title.charAt(0))).toEqual(['A', 'M', 'Z']);
+
+      await sortBtn().trigger('click');
+      await flushPromises();
+      expect(dataService.saveSortMode).toHaveBeenLastCalledWith('added');
+      expect(titles()[0]).toContain('Z-Medikament');
+    });
+
+    it('switches the cards to remaining days and stores the display mode', async () => {
+      const wrapper = mountComponent();
+      await flushPromises();
+
+      await wrapper.find('[data-testid="quick-display-days"]').trigger('click');
+      await flushPromises();
+
+      expect(dataService.saveDisplayMode).toHaveBeenCalledWith('days');
+      const firstCardChip = wrapper.findComponent({ name: 'MedCard' }).find('.v-chip');
+      expect(firstCardChip.text()).toContain('30');
+      expect(firstCardChip.text()).toContain(messages.de.med.unitDays);
+    });
   });
 });
