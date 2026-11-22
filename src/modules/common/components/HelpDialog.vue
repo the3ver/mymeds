@@ -14,12 +14,16 @@ const searchQuery = ref('');
 const sections = [
   { key: 'security', icon: 'mdi-shield-lock-outline' },
   { key: 'basics', icon: 'mdi-cellphone-check' },
+  { key: 'vaults', icon: 'mdi-safe' },
   { key: 'adding', icon: 'mdi-pill' },
   { key: 'dose', icon: 'mdi-clock-outline' },
   { key: 'display', icon: 'mdi-view-list-outline' },
   { key: 'tracking', icon: 'mdi-check-decagram-outline' },
   { key: 'warnings', icon: 'mdi-alert-circle-outline' },
+  { key: 'reminders', icon: 'mdi-bell-outline' },
   { key: 'calendar', icon: 'mdi-calendar-clock' },
+  { key: 'sync', icon: 'mdi-sync' },
+  { key: 'bmp', icon: 'mdi-qrcode-scan' },
   { key: 'exportImport', icon: 'mdi-database-export-outline' }
 ];
 

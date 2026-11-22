@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.24',
+    date: '2026-11-22',
+    title: {
+      de: 'Handbuch vervollständigt',
+      en: 'Manual Completed'
+    },
+    highlights: {
+      de: [
+        'Neue Kapitel im Handbuch: Geräte-Synchronisation, Medikationsplan (BMP), Tresore mit Biometrie und Einnahme-Erinnerungen',
+        'Bestehende Kapitel beschreiben jetzt Mehr-Tab, Einnahmerhythmus, Nachfüllen, Rückgängig, Uhrzeit und Links im Kalender sowie dauerhaften Speicher'
+      ],
+      en: [
+        'New manual chapters: device sync, medication plan (BMP), vaults with biometrics and intake reminders',
+        'Existing chapters now cover the More tab, intake rhythm, refill, undo, time and links in the calendar, and persistent storage'
+      ]
+    }
+  },
+  {
     version: '1.10.23',
     date: '2026-11-22',
     title: {

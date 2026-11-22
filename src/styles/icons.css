@@ -229,6 +229,9 @@
 .mdi-shield-lock-outline::before {
   content: "\F0CCC";
 }
+.mdi-calendar-check::before {
+  content: "\F00EF";
+}
 .mdi-fingerprint::before {
   content: "\F0237";
 }
@@ -240,9 +243,6 @@
 }
 .mdi-delete-outline::before {
   content: "\F09E7";
-}
-.mdi-calendar-check::before {
-  content: "\F00EF";
 }
 .mdi-calendar-plus::before {
   content: "\F00F3";
@@ -271,6 +271,9 @@
 .mdi-cellphone-check::before {
   content: "\F17FD";
 }
+.mdi-safe::before {
+  content: "\F0A6A";
+}
 .mdi-clock-outline::before {
   content: "\F0150";
 }
@@ -279,6 +282,12 @@
 }
 .mdi-check-decagram-outline::before {
   content: "\F1740";
+}
+.mdi-bell-outline::before {
+  content: "\F009C";
+}
+.mdi-sync::before {
+  content: "\F04E6";
 }
 .mdi-database-export-outline::before {
   content: "\F162C";
@@ -321,9 +330,6 @@
 }
 .mdi-upload::before {
   content: "\F0552";
-}
-.mdi-safe::before {
-  content: "\F0A6A";
 }
 .mdi-content-copy::before {
   content: "\F018F";

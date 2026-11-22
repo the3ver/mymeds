@@ -23,7 +23,7 @@ describe('HelpDialog.vue', () => {
     });
   };
 
-  it('should render all 9 user manual sections', async () => {
+  it('should render all 13 user manual sections', async () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
@@ -38,6 +38,24 @@ describe('HelpDialog.vue', () => {
     expect(bodyText).toContain('Warnschwellen & Vorrats-Banner');
     expect(bodyText).toContain('Gesundheitskalender & ICS-Export');
     expect(bodyText).toContain('Datensicherung & Import/Export');
+    expect(bodyText).toContain('Tresore, Sperren & Biometrie');
+    expect(bodyText).toContain('Einnahme-Erinnerungen');
+    expect(bodyText).toContain('Geräte-Synchronisation (Tresor übertragen)');
+    expect(bodyText).toContain('Medikationsplan (BMP / DataMatrix)');
+  });
+
+  it('has the same help sections in German and English', () => {
+    expect(Object.keys(messages.de.help.sections)).toEqual(Object.keys(messages.en.help.sections));
+  });
+
+  it('finds the sync section when searching for the sync code', async () => {
+    document.body.innerHTML = '';
+    const wrapper = mountComponent();
+    wrapper.vm.searchQuery = '6-stellig';
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.textContent).toContain('Geräte-Synchronisation (Tresor übertragen)');
+    expect(document.body.textContent).not.toContain('Gesundheitskalender & ICS-Export');
   });
 
   it('should include referral tracking details in the calendar section', async () => {

@@ -310,47 +310,67 @@ export const messages = {
         security: {
           title: 'Encryption & Data Security',
           content:
-            'All sensitive medical data (medications, stocks, appointments, notes) are stored locally in your browser’s IndexedDB using state-of-the-art 256-bit AES-GCM encryption derived from your password with PBKDF2 (100,000 iterations).\nThere is no backend server or cloud transmission – your health data belongs exclusively to you.\nImportant: Your vault password cannot be recovered or reset. If you lose your password, access to your encrypted data is permanently lost.'
+            'All sensitive medical data (medications, stocks, appointments, notes) is stored locally in your browser’s IndexedDB, encrypted with 256-bit AES-GCM. The key is derived from your vault password with PBKDF2 (100,000 iterations).\nThere is no MyMeds server and no cloud account. Data only leaves the device when you export a backup, share a file or use device sync. Sync sends only the already encrypted vault.\nImportant: Your vault password cannot be recovered or reset. If you lose your password, access to your encrypted data is permanently lost.'
         },
         basics: {
           title: 'Basics & Offline Use',
           content:
-            'MyMeds is a Progressive Web App (PWA) designed to work completely offline. You can install it on your mobile device or desktop via your browser’s "Add to Home Screen" or "Install App" feature.'
+            'MyMeds is a Progressive Web App (PWA) that works completely offline. Install it on your phone or desktop via the browser menu ("Add to Home Screen" or "Install App"). An Android app is also available (Android 7.0 or newer).\n• Navigation: The bottom bar switches between Medications, Calendar and More. The More tab holds settings, sync, backup, BMP medication plan, this manual, "What’s New" and About.\n• App shortcuts: Long-press the installed app icon to open Medications or Calendar directly.\n• Updates: Under More > Check for Updates, MyMeds loads a new version. "What’s New" lists the changes of every release.'
+        },
+        vaults: {
+          title: 'Vaults, Locking & Biometrics',
+          content:
+            'A vault is a separately encrypted database with its own password, e.g. one per family member. The start screen lists all vaults with their number of medications and entries. Tap the plus button to create a new vault; it unlocks right after creation. The vault menu offers rename, transfer to another device and delete.\n• Locking: The lock icon in the top bar locks the open vault and returns to the vault list. Changes are saved automatically and encrypted before that.\n• Biometric unlock: When unlocking, enable "Remember with biometrics on this device" to unlock later with fingerprint or face recognition. This requires a device and browser with passkey support (WebAuthn PRF). In Settings > Biometric Unlock you can remove all biometric pairings on this device. The password keeps working at any time.'
         },
         adding: {
           title: 'Managing Medications',
           content:
-            'Tap the "Add Medication" card at the bottom of the list to record a new medication. Alongside name and active ingredient, you can set the package size, current stock, daily dose, color tag, and custom notes.\nTapping any medication card expands it to reveal details, days remaining, empty date estimate, and editing options.'
+            'Tap "Add Medication" at the end of the list to record a new medication. Alongside name and active ingredient, you can set package size, current stock, dose, reason, intake instructions and notes.\n• Pill appearance: Choose color, shape (e.g. round, capsule, drops, inhaler, patch) and size so the card matches your real tablet.\n• Details: Tapping a card opens a bottom sheet with days remaining, empty date estimate and all actions.\n• Refill: "Refill +1 pack" in the details adds one package size to the stock. The toast offers Undo.\n• Delete: After deleting, the toast offers Undo for a few seconds.'
         },
         dose: {
           title: 'Dose Schedules & Fractions',
           content:
-            'You can set single daily amounts or flexible 4-slot schedules (Morning - Noon - Evening - Night, e.g. 1-0-1 or 1-1-1-1/2).\nFractions (e.g. 1/2, 3/4) and decimal doses (e.g. 0.5, 1.5) are fully supported and automatically calculated into your daily consumption.'
+            'You can set a single daily amount or a 4-slot schedule (Morning - Noon - Evening - Night, e.g. 1-0-1 or 1-1-1-1/2).\nFractions (e.g. 1/2, 3/4) and decimal doses (e.g. 0.5, 1.5) are supported and counted into your consumption. The dose keypad offers a fraction key.\n• Intake rhythm: Daily, weekly on selected weekdays, or every X days. Days remaining and automatic deductions respect the rhythm.'
         },
         display: {
           title: 'Display & Sort Modes',
           content:
-            'In App Preferences, you can customize the badge on medication cards:\n• Pills: Shows remaining tablet count.\n• Days: Shows calculated days of remaining supply.\n• Packages: Displays full and partial package symbols.\nYou can also sort your medication list alphabetically, by date added, or by shortest remaining days.'
+            'In Settings you can customize the badge on medication cards:\n• Pills: Shows remaining tablet count.\n• Days: Shows calculated days of remaining supply.\n• Packages: Displays full and partial package symbols.\nYou can also sort your medication list alphabetically, by date added, or by shortest remaining days. Further options: UI scale (small, normal, large), simple or comfortable vault list, dark mode (More tab) and language.'
         },
         tracking: {
           title: 'Automatic Daily Deductions',
           content:
-            'Every time you unlock your vault, MyMeds checks the elapsed days since your last session and automatically subtracts the required daily dose from each medication.\nA floating deduction badge provides instant visual confirmation of the subtracted units.'
+            'Every time you unlock your vault, MyMeds checks the elapsed days since your last session and automatically subtracts the required dose from each medication.\nA short badge shows how many units were subtracted.'
         },
         warnings: {
           title: 'Warning Thresholds & Overview Banner',
           content:
-            'The overview banner at the top shows the exact date your overall medication supply runs out.\nWhen a medication falls below the yellow (default: 21 days) or red warning limit (default: 7 days), the banner and card highlight in warning/error colors. You can customize these thresholds in Settings.'
+            'The overview banner at the top shows the date your overall medication supply runs out.\nWhen a medication falls below the yellow (default: 21 days) or red warning limit (default: 7 days), the banner and card switch to warning or error colors. You can customize these thresholds in Settings.\nIf your device supports app badges, the icon of the installed app shows the number of medications at or below the red limit.'
+        },
+        reminders: {
+          title: 'Intake Reminders',
+          content:
+            'In Settings > Daily Reminders, MyMeds sends notifications for medication intake on this device. Pick standard times (morning, noon, evening, night) or add custom times. "Send test notification" checks that notifications arrive.\nNotifications are generic and contain no medication names.\nAndroid: Allow notifications for MyMeds. For reliable reminders in the background, set battery usage to "Unrestricted" (App info > Battery usage).'
         },
         calendar: {
           title: 'Health Calendar & ICS Export',
           content:
-            'The Calendar tab tracks doctor visits, vaccinations, illnesses, and general health notes.\n• Timeline: Entries are organized into quarter sections with a dedicated "Today" divider.\n• Referral Tracking: For doctor appointments, you can track required referrals across three status stages ("Needed", "Obtained", "Submitted"). When having multiple appointments at the same clinic in the same quarter, a submitted referral automatically covers all subsequent visits in that quarter. An alert banner at the top of the calendar and the "Open referrals" filter highlight pending referrals.\n• Filtering: Use the filter button in the top bar to filter entries by type or pending referrals.\n• Calendar Export (.ics): Tap the calendar icon on any entry or restock warning to export an .ics file or share it directly into your device calendar (Google Calendar, Apple Calendar, Outlook).'
+            'The Calendar tab tracks doctor visits, vaccinations, illnesses, and general health notes. Entries have a date and an optional time.\n• Timeline: Entries are grouped into quarters with a "Today" divider. Entries on the same day are sorted by time.\n• Referral Tracking: For doctor appointments, you can track required referrals in three stages ("Needed", "Obtained", "Submitted"). With several appointments at the same practice in the same quarter, a submitted referral covers all following visits in that quarter. A banner at the top of the calendar highlights pending referrals.\n• Filtering: The filter chips above the timeline show only certain entry types or open referrals.\n• Links & tags: Add web links (e.g. to findings or the practice website) and treatment tags to an entry.\n• Calendar Export (.ics): Tap the calendar icon on an entry or restock warning to export an .ics file or share it into your device calendar (Google Calendar, Apple Calendar, Outlook). Entries with a time become a 60-minute appointment.'
+        },
+        sync: {
+          title: 'Device Sync (Transfer Vault)',
+          content:
+            'Under More > Device Sync you copy a vault to another device, e.g. from phone to tablet.\n1. On the sending device, open "Send Vault" and choose the vault. MyMeds shows a 6-digit code and a QR code.\n2. On the receiving device, open "Receive Vault" and enter the code or scan the QR code.\n3. Check the preview (name, number of medications and entries) and save the vault. If a vault with the same name exists, choose "Overwrite existing vault" or "Save as new copy".\nThe transfer runs over a public relay server (MQTT). It only sees the already encrypted vault, never your password or plain data. On the new device you unlock the vault with its existing password.\nIf the connection fails (e.g. blocked by a firewall), use "Copy Encrypted Code (Offline Fallback)" on the sender and paste the code on the receiver.\nSync copies a complete vault once. It does not merge changes; the most recent transfer wins.'
+        },
+        bmp: {
+          title: 'Medication Plan (BMP / DataMatrix)',
+          content:
+            'MyMeds reads and creates the German federal medication plan (Bundeseinheitlicher Medikationsplan) via its 2D barcode. Both functions are in the More tab.\n• Scan: Hold the DataMatrix code of the printed plan into the camera frame or upload a photo. Select the recognized medications and choose whether to add them or replace the existing ones.\n• Show: Select medications and display them as a DataMatrix code for your doctor or pharmacy. Optionally add first name, last name and birth date. You can save the code as PNG, share it, show it full screen or copy the XML.'
         },
         exportImport: {
           title: 'Backups & Data Management',
           content:
-            'Through the Navigation Drawer (Data Management), you can export your data as an unencrypted JSON backup file or import existing backups.\nThis is ideal for creating regular local backups or transferring your vaults to a new device.'
+            'Under More > Data Management, you export the open vault as a JSON backup file or import an existing backup. The backup is unencrypted, so store it in a safe place.\nBefore importing, MyMeds shows the backup date and the number of medications and entries. An import overwrites the current data of the vault and needs a typed confirmation.\nYou can also delete all medications and entries of a vault there.\n• Storage persistence: In Settings > Storage & Persistence, request persistent storage so the browser does not delete your vaults when space runs low. Installed apps get this permission more easily.'
         }
       },
       close: 'Close'
@@ -889,47 +909,67 @@ export const messages = {
         security: {
           title: 'Verschlüsselung & Datensicherheit',
           content:
-            'Alle sensiblen medizinischen Daten (Medikamente, Bestände, Termine, Notizen) werden nach modernsten Standards (AES-GCM 256-Bit) direkt auf deinem Endgerät in der lokalen IndexedDB verschlüsselt.\nEs gibt keinen Server und keine Cloud-Übertragung – deine Gesundheitsdaten gehören ausschließlich dir.\nWichtig: Das Tresor-Passwort kann nicht wiederhergestellt werden. Geht das Passwort verloren, sind auch deine Daten unwiderruflich verloren.'
+            'Alle sensiblen medizinischen Daten (Medikamente, Bestände, Termine, Notizen) liegen verschlüsselt (AES-GCM 256-Bit) in der lokalen IndexedDB deines Geräts. Den Schlüssel leitet MyMeds per PBKDF2 (100.000 Iterationen) aus deinem Tresor-Passwort ab.\nEs gibt keinen MyMeds-Server und kein Cloud-Konto. Daten verlassen das Gerät nur, wenn du ein Backup exportierst, eine Datei teilst oder die Geräte-Synchronisation nutzt. Der Sync überträgt nur den bereits verschlüsselten Tresor.\nWichtig: Das Tresor-Passwort kann nicht wiederhergestellt werden. Geht das Passwort verloren, sind auch deine Daten unwiderruflich verloren.'
         },
         basics: {
           title: 'Grundlagen & Offline-Nutzung',
           content:
-            'MyMeds ist eine Progressive Web App (PWA), die vollständig offline funktioniert. Du kannst die App auf deinem Smartphone oder Desktop installieren (über das Browsermenü "Zum Startbildschirm hinzufügen" oder "Installieren").'
+            'MyMeds ist eine Progressive Web App (PWA), die vollständig offline funktioniert. Installiere sie über das Browsermenü ("Zum Startbildschirm hinzufügen" oder "Installieren") auf Smartphone oder Desktop. Zusätzlich gibt es eine Android-App (ab Android 7.0).\n• Navigation: Die untere Leiste wechselt zwischen Medikamente, Kalender und Mehr. Unter Mehr findest du Einstellungen, Sync, Backup, BMP-Medikationsplan, dieses Handbuch, "Was gibt’s Neues" und Über.\n• App-Verknüpfungen: Lange auf das Symbol der installierten App drücken öffnet direkt Medikamente oder Kalender.\n• Updates: Unter Mehr > Auf Updates prüfen lädt MyMeds eine neue Version. "Was gibt’s Neues" listet die Änderungen jeder Version.'
+        },
+        vaults: {
+          title: 'Tresore, Sperren & Biometrie',
+          content:
+            'Ein Tresor ist eine eigene verschlüsselte Datenbank mit eigenem Passwort, z. B. einer pro Familienmitglied. Der Startbildschirm listet alle Tresore mit Anzahl der Medikamente und Einträge. Über den Plus-Button legst du einen neuen Tresor an, er ist danach sofort entsperrt. Über das Menü eines Tresors benennst du ihn um, überträgst ihn auf ein anderes Gerät oder löschst ihn.\n• Sperren: Das Schloss-Symbol in der oberen Leiste sperrt den offenen Tresor und führt zurück zur Tresor-Liste. Änderungen speichert MyMeds vorher automatisch und verschlüsselt.\n• Biometrisches Entsperren: Aktivierst du beim Entsperren "Auf diesem Gerät mit Biometrie merken", öffnest du den Tresor künftig per Fingerabdruck oder Gesichtserkennung. Dafür braucht es ein Gerät und einen Browser mit Passkey-Unterstützung (WebAuthn PRF). Unter Einstellungen > Biometrisches Entsperren entfernst du alle Kopplungen auf diesem Gerät. Das Passwort funktioniert jederzeit weiter.'
         },
         adding: {
           title: 'Medikamente erfassen & verwalten',
           content:
-            'Über die Karte "Medikament hinzufügen" trägst du neue Medikamente ein. Neben Name und Wirkstoff kannst du die Packungsgröße, den aktuellen Tablettenbestand, die Dosis, eine Farbmarkierung sowie individuelle Notizen hinterlegen.\nDurch Antippen einer Medikamentenkarte klappen die Detailinfos, die Resttage-Berechnung und die Bearbeitungsfunktionen auf.'
+            'Über "Medikament hinzufügen" am Ende der Liste trägst du ein neues Medikament ein. Neben Name und Wirkstoff hinterlegst du Packungsgröße, aktuellen Bestand, Dosis, Grund, Einnahmehinweise und Notizen.\n• Aussehen: Farbe, Form (z. B. rund, Kapsel, Tropfen, Inhalator, Pflaster) und Größe passt du an, damit die Karte deiner echten Tablette ähnelt.\n• Details: Antippen einer Karte öffnet ein Bottom Sheet mit Resttagen, voraussichtlichem Leer-Datum und allen Aktionen.\n• Nachfüllen: "+1 Packung nachfüllen" in den Details addiert eine Packungsgröße zum Bestand. Die Einblendung bietet Rückgängig an.\n• Löschen: Nach dem Löschen bietet die Einblendung einige Sekunden lang Rückgängig an.'
         },
         dose: {
           title: 'Dosis, Einnahmepläne & Bruchteile',
           content:
-            'Du kannst feste Tagesdosen oder flexible 4-fach-Einnahmepläne (Morgens - Mittags - Abends - Nachts, z. B. 1-0-1 oder 1-1-1-1/2) hinterlegen.\nAuch halbe oder viertel Tabletten (z. B. 0,5, 1,5 oder Brüche wie 1/2, 3/4) werden automatisch korrekt in den Tagesverbrauch eingerechnet.'
+            'Du kannst eine feste Tagesdosis oder einen 4-fach-Einnahmeplan (Morgens - Mittags - Abends - Nachts, z. B. 1-0-1 oder 1-1-1-1/2) hinterlegen.\nHalbe oder viertel Tabletten (z. B. 0,5, 1,5 oder Brüche wie 1/2, 3/4) rechnet MyMeds korrekt in den Verbrauch ein. Die Dosis-Tastatur hat dafür eine Bruch-Taste.\n• Einnahmerhythmus: Täglich, wöchentlich an ausgewählten Wochentagen oder alle X Tage. Resttage und automatischer Abzug berücksichtigen den Rhythmus.'
         },
         display: {
           title: 'Anzeige- & Sortiermodi',
           content:
-            'In den Einstellungen kannst du die Anzeige auf den Medikamentenkarten anpassen:\n• Pillen: Zeigt die verbleibende Tablettenanzahl.\n• Tage: Zeigt die verbleibende Reichweite in Tagen.\n• Packungen: Zeigt die Anzahl voller und angebrochener Packungen als Symbole.\nZudem lässt sich die Liste alphabetisch, nach Hinzufügedatum oder nach den geringsten Resttagen sortieren.'
+            'In den Einstellungen passt du die Anzeige auf den Medikamentenkarten an:\n• Pillen: Zeigt die verbleibende Tablettenanzahl.\n• Tage: Zeigt die verbleibende Reichweite in Tagen.\n• Packungen: Zeigt die Anzahl voller und angebrochener Packungen als Symbole.\nDie Liste lässt sich alphabetisch, nach Hinzufügedatum oder nach den geringsten Resttagen sortieren. Weitere Optionen: UI-Skalierung (klein, normal, groß), einfache oder komfortable Tresor-Liste, dunkler Modus (Mehr-Tab) und Sprache.'
         },
         tracking: {
           title: 'Automatischer Tagesabzug',
           content:
-            'Beim Entsperren des Tresors berechnet MyMeds automatisch die seit dem letzten Öffnen vergangenen Tage und zieht die entsprechende Dosis von jedem Medikament ab.\nEine kurze Einblendung am rechten Rand zeigt dir direkt, wie viele Einheiten abgezogen wurden.'
+            'Beim Entsperren des Tresors berechnet MyMeds die seit dem letzten Öffnen vergangenen Tage und zieht die entsprechende Dosis von jedem Medikament ab.\nEine kurze Einblendung zeigt dir, wie viele Einheiten abgezogen wurden.'
         },
         warnings: {
           title: 'Warnschwellen & Vorrats-Banner',
           content:
-            'Die Übersichtskarte am oberen Rand informiert dich auf einen Blick, bis zu welchem Datum dein gesamter Medikamentenvorrat ausreicht.\nSinkt ein Medikament unter die gelbe (Standard: 21 Tage) oder rote Warnschwelle (Standard: 7 Tage), wechselt die Farbmarkierung auf Gelb bzw. Rot. Die Schwellenwerte können in den Einstellungen individuell festgelegt werden.'
+            'Die Übersichtskarte am oberen Rand zeigt, bis zu welchem Datum dein gesamter Medikamentenvorrat reicht.\nSinkt ein Medikament unter die gelbe (Standard: 21 Tage) oder rote Warnschwelle (Standard: 7 Tage), wechselt die Farbmarkierung auf Gelb bzw. Rot. Die Schwellenwerte legst du in den Einstellungen fest.\nUnterstützt dein Gerät App-Badges, zeigt das Symbol der installierten App die Anzahl der Medikamente an oder unter der roten Schwelle.'
+        },
+        reminders: {
+          title: 'Einnahme-Erinnerungen',
+          content:
+            'Unter Einstellungen > Tägliche Erinnerungen schickt MyMeds auf diesem Gerät Benachrichtigungen zur Einnahme. Wähle Standardzeiten (morgens, mittags, abends, nachts) oder füge eigene Uhrzeiten hinzu. "Test-Benachrichtigung senden" prüft, ob Benachrichtigungen ankommen.\nDie Benachrichtigungen sind allgemein gehalten und nennen keine Medikamente.\nAndroid: Erlaube Benachrichtigungen für MyMeds. Damit Erinnerungen auch im Hintergrund pünktlich kommen, stelle die Akkunutzung auf "Nicht eingeschränkt" (App-Info > Akkunutzung).'
         },
         calendar: {
           title: 'Gesundheitskalender & ICS-Export',
           content:
-            'Im Reiter "Kalender" protokollierst und planst du Arztbesuche, Impfungen, Erkrankungen und Notizen.\n• Timeline: Termine sind nach Quartalen gegliedert und durch eine "Heute"-Trennlinie getrennt.\n• Überweisungstracking: Bei Arztterminen kannst du den Überweisungsstatus in drei Stufen erfassen ("Zu besorgen", "Liegt vor", "Abgegeben"). Bei mehreren Terminen in derselben Facharztpraxis im selben Quartal deckt eine abgegebene Überweisung automatisch alle weiteren Termine ab. Ein Hinweis-Banner oben im Kalender und der Filter „Offene Überweisungen“ erinnern dich rechtzeitig.\n• Filter: Über das Filtersymbol in der oberen Leiste kannst du gezielt nach bestimmten Eintragstypen oder offenen Überweisungen filtern.\n• Kalender-Export (.ics): Über das Kalendersymbol kannst du Termine oder Nachbestell-Erinnerungen direkt über die Teilen-Funktion in deinen Smartphone- oder Desktop-Kalender (Google Kalender, Apple Kalender, Outlook) exportieren.'
+            'Im Reiter "Kalender" protokollierst und planst du Arztbesuche, Impfungen, Erkrankungen und Notizen. Einträge haben ein Datum und eine optionale Uhrzeit.\n• Timeline: Einträge sind nach Quartalen gegliedert, eine "Heute"-Linie trennt Vergangenes und Kommendes. Einträge am selben Tag sind nach Uhrzeit sortiert.\n• Überweisungstracking: Bei Arztterminen erfasst du den Überweisungsstatus in drei Stufen ("Zu besorgen", "Liegt vor", "Abgegeben"). Bei mehreren Terminen in derselben Praxis im selben Quartal deckt eine abgegebene Überweisung alle weiteren Termine des Quartals ab. Ein Hinweis-Banner oben im Kalender erinnert an offene Überweisungen.\n• Filter: Die Filter-Chips über der Timeline zeigen nur bestimmte Eintragstypen oder offene Überweisungen.\n• Links & Tags: Hänge Web-Links (z. B. zu Befunden oder zur Praxis-Website) und Behandlungs-Tags an einen Eintrag.\n• Kalender-Export (.ics): Über das Kalendersymbol exportierst du Termine oder Nachbestell-Erinnerungen als .ics-Datei oder teilst sie direkt in deinen Kalender (Google Kalender, Apple Kalender, Outlook). Einträge mit Uhrzeit werden zum Termin mit 60 Minuten Dauer.'
+        },
+        sync: {
+          title: 'Geräte-Synchronisation (Tresor übertragen)',
+          content:
+            'Unter Mehr > Geräte-Synchronisation kopierst du einen Tresor auf ein anderes Gerät, z. B. vom Handy aufs Tablet.\n1. Auf dem sendenden Gerät "Tresor senden" öffnen und den Tresor wählen. MyMeds zeigt einen 6-stelligen Code und einen QR-Code.\n2. Auf dem empfangenden Gerät "Tresor empfangen" öffnen und den Code eingeben oder den QR-Code scannen.\n3. Vorschau prüfen (Name, Anzahl Medikamente und Einträge) und den Tresor speichern. Gibt es schon einen Tresor mit gleichem Namen, wählst du "Bestehenden Tresor überschreiben" oder "Als neue Kopie speichern".\nDie Übertragung läuft über einen öffentlichen Relay-Server (MQTT). Er sieht nur den bereits verschlüsselten Tresor, nie dein Passwort oder Klartext. Auf dem neuen Gerät entsperrst du den Tresor mit seinem bisherigen Passwort.\nKlappt die Verbindung nicht (z. B. wegen einer Firewall), nutze auf dem Sender "Verschlüsselten Code kopieren (Offline-Fallback)" und füge den Code auf dem Empfänger ein.\nDer Sync kopiert einen kompletten Tresor einmalig. Er führt keine Änderungen zusammen, die zuletzt übertragene Fassung gilt.'
+        },
+        bmp: {
+          title: 'Medikationsplan (BMP / DataMatrix)',
+          content:
+            'MyMeds liest und erzeugt den Bundeseinheitlichen Medikationsplan über seinen 2D-Code. Beide Funktionen findest du im Mehr-Tab.\n• Scannen: Halte den DataMatrix-Code des ausgedruckten Plans in den Kamerarahmen oder lade ein Foto hoch. Wähle die erkannten Medikamente aus und entscheide, ob sie zu den vorhandenen hinzukommen oder diese ersetzen.\n• Anzeigen: Wähle Medikamente aus und zeige sie als DataMatrix-Code für Arztpraxis oder Apotheke. Optional ergänzt du Vorname, Nachname und Geburtsdatum. Den Code kannst du als PNG speichern, teilen, im Vollbild zeigen oder als XML kopieren.'
         },
         exportImport: {
           title: 'Datensicherung & Import/Export',
           content:
-            'Über das Hauptmenü (Datenverwaltung) kannst du jederzeit eine unverschlüsselte JSON-Sicherungsdatei deiner Daten exportieren oder ein bestehendes Backup importieren.\nDies eignet sich ideal für regelmäßige lokale Backups oder den Umzug auf ein neues Endgerät.'
+            'Unter Mehr > Datenverwaltung exportierst du den offenen Tresor als JSON-Sicherungsdatei oder importierst ein bestehendes Backup. Die Sicherung ist unverschlüsselt, bewahre sie sicher auf.\nVor dem Import zeigt MyMeds Datum der Sicherung sowie Anzahl der Medikamente und Einträge. Ein Import überschreibt die aktuellen Daten des Tresors und braucht eine getippte Bestätigung.\nDort kannst du auch alle Medikamente und Einträge eines Tresors löschen.\n• Dauerhafter Speicher: Unter Einstellungen > Speicher & Persistenz beantragst du dauerhaften Speicher, damit der Browser deine Tresore bei Platzmangel nicht löscht. Installierte Apps erhalten diese Erlaubnis leichter.'
         }
       },
       close: 'Schließen'
