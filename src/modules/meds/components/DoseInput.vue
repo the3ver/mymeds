@@ -88,7 +88,6 @@ const onInput = (field, val) => {
           variant="outlined"
           density="comfortable"
           placeholder="0"
-          inputmode="decimal"
           :aria-label="t('med.doseMorning')"
           hide-details
           class="centered-input"
@@ -103,7 +102,6 @@ const onInput = (field, val) => {
           variant="outlined"
           density="comfortable"
           placeholder="0"
-          inputmode="decimal"
           :aria-label="t('med.doseNoon')"
           hide-details
           class="centered-input"
@@ -118,7 +116,6 @@ const onInput = (field, val) => {
           variant="outlined"
           density="comfortable"
           placeholder="0"
-          inputmode="decimal"
           :aria-label="t('med.doseEvening')"
           hide-details
           class="centered-input"
@@ -133,7 +130,6 @@ const onInput = (field, val) => {
           variant="outlined"
           density="comfortable"
           placeholder="0"
-          inputmode="decimal"
           :aria-label="t('med.doseNight')"
           hide-details
           class="centered-input"

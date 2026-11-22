@@ -30,6 +30,11 @@ describe('source guards', () => {
     expect(matches).toEqual([]);
   });
 
+  it('uses only spacing utilities Vuetify defines (0-16, whole steps); others like pb-24 silently do nothing', () => {
+    const matches = findMatches(/\bclass="[^"]*(?<![\w-])[mp][trblxyse]?-n?(1[7-9]|[2-9]\d|\d+\.\d+)(?![\w.])/);
+    expect(matches).toEqual([]);
+  });
+
   it('keeps the Android TWA version in step with package.json (release.sh syncs it)', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
     const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));

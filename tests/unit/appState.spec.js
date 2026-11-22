@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { state, unlock, lock } from '../../src/app-state';
 import * as dataService from '../../src/modules/common/utils/dataService';
+import { showSnackbar, snackbarState } from '../../src/modules/common/utils/snackbarService';
 
 vi.mock('../../src/modules/common/utils/dataService', () => ({
   saveAndLockDatabase: vi.fn().mockResolvedValue(true)
@@ -55,6 +56,17 @@ describe('app-state', () => {
   });
 
   describe('lock', () => {
+    it('drops a pending undo toast so its action cannot touch the next vault', async () => {
+      unlock(1, 'password', { meds: [{ name: 'Med 1' }], calendar: [] });
+      const onAction = vi.fn();
+      showSnackbar({ text: 'deleted', actionText: 'Undo', onAction });
+
+      await lock();
+
+      expect(snackbarState.open).toBe(false);
+      expect(snackbarState.onAction).toBeNull();
+    });
+
     it('should clear sensitive data and lock app', async () => {
       unlock(1, 'password', {
         meds: [{ name: 'Med 1' }],

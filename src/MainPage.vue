@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { state as appState } from './app-state';
 import MedDialog from './modules/meds/components/MedDialog.vue';
@@ -53,20 +53,22 @@ const pendingReferralsCount = computed(() => {
   return entries.filter((e) => isPendingReferral(e, entries, today)).length;
 });
 
+async function refreshCriticalBadges() {
+  try {
+    const settings = await getSettings();
+    redLimit.value = settings?.redLimit || 7;
+    await updateCriticalMedsBadge(appState.decryptedData?.meds, redLimit.value);
+  } catch (err) {
+    console.warn('[MainPage] Error updating critical meds badge:', err);
+  }
+}
+
 // Keep app badge updated when medications change
-watch(
-  () => appState.decryptedData?.meds,
-  async (meds) => {
-    try {
-      const settings = await getSettings();
-      redLimit.value = settings?.redLimit || 7;
-      await updateCriticalMedsBadge(meds, redLimit.value);
-    } catch (err) {
-      console.warn('[MainPage] Error updating badge on meds change:', err);
-    }
-  },
-  { deep: true }
-);
+watch(() => appState.decryptedData?.meds, refreshCriticalBadges, { deep: true });
+
+onUnmounted(() => {
+  window.removeEventListener('storage-limits-changed', refreshCriticalBadges);
+});
 
 onMounted(async () => {
   if (appState.pendingIntent === 'import') {
@@ -82,14 +84,8 @@ onMounted(async () => {
     bmpScanDialog.value = true;
   }
 
-  // Initial badge update for critical meds
-  try {
-    const settings = await getSettings();
-    redLimit.value = settings?.redLimit || 7;
-    await updateCriticalMedsBadge(appState.decryptedData?.meds, redLimit.value);
-  } catch (err) {
-    console.warn('[MainPage] Error updating badge on mount:', err);
-  }
+  window.addEventListener('storage-limits-changed', refreshCriticalBadges);
+  await refreshCriticalBadges();
 });
 
 // --- Component Logic ---
@@ -183,7 +179,7 @@ defineExpose({
   <div>
     <v-window v-model="activeTab" :touch="false" class="main-tab-window">
       <v-window-item value="meds" :transition="false" :reverse-transition="false">
-        <v-container class="main-content-container pb-24 pt-2">
+        <v-container class="main-content-container pb-fab pt-2">
           <MedList
             :items="appState.decryptedData.meds"
             :deductions="appState.deductions"

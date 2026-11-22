@@ -1,6 +1,7 @@
 import { reactive, watch } from 'vue';
 import * as dataService from './modules/common/utils/dataService';
 import { clearBadge } from './modules/common/utils/badgingService';
+import { dismissSnackbar } from './modules/common/utils/snackbarService';
 
 export const state = reactive({
   isLocked: true,
@@ -70,6 +71,8 @@ export function unlock(id, password, data, deductions = {}, name = null) {
 }
 
 export async function lock() {
+  // An undo toast acts on decryptedData; it must not outlive the vault it belongs to
+  dismissSnackbar();
   // Ensure the very last changes are saved before locking
   await saveState.flush();
 

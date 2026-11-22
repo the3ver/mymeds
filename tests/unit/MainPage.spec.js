@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createI18n } from 'vue-i18n';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -10,6 +10,7 @@ import { state as appState } from '../../src/app-state';
 import { snackbarState, triggerSnackbarAction, dismissSnackbar } from '../../src/modules/common/utils/snackbarService';
 import * as shortcutService from '../../src/modules/common/utils/shortcutService';
 import * as badgingService from '../../src/modules/common/utils/badgingService';
+import { getSettings } from '../../src/modules/common/utils/dataService';
 
 const loaded = vi.hoisted(() => ({ scanner: false }));
 
@@ -127,6 +128,27 @@ describe('MainPage.vue', () => {
     triggerSnackbarAction();
     expect(appState.decryptedData.meds.length).toBe(1);
     expect(appState.decryptedData.meds[0].name).toBe('Ibuprofen');
+  });
+
+  it('updates the meds tab badge when the red limit changes in settings', async () => {
+    // 10 pills at 1 per day = 10 days left: not critical at limit 7, critical at limit 14
+    appState.decryptedData.meds = [{ name: 'Ibuprofen', dose: '1-0-0', count: 10 }];
+    const wrapper = mountMainPage();
+    await flushPromises();
+    // Vuetify drops an inactive badge, but a leave transition can keep it in the DOM with content 0
+    const badgeCount = () => {
+      const badge = wrapper.find('[data-testid="nav-tab-meds"] .v-badge__badge');
+      return badge.exists() ? badge.text() : '0';
+    };
+    expect(badgeCount()).toBe('0');
+
+    getSettings.mockResolvedValue({ redLimit: 14 });
+    window.dispatchEvent(new Event('storage-limits-changed'));
+    await flushPromises();
+
+    expect(badgeCount()).toBe('1');
+    getSettings.mockResolvedValue({ redLimit: 7 });
+    wrapper.unmount();
   });
 
   it('renders 3-tab Material 3 bottom navigation including More tab', async () => {

@@ -20,6 +20,14 @@ describe('DoseInput.vue', () => {
     });
   };
 
+  it('keeps a keyboard with "/" so fractions like 1/2 can be typed on Android', () => {
+    const wrapper = mountComponent({ modelValue: '1/2-0-0' });
+    const modes = wrapper.findAll('input').map((input) => input.attributes('inputmode'));
+
+    expect(modes).toHaveLength(4);
+    modes.forEach((mode) => expect(['decimal', 'numeric']).not.toContain(mode));
+  });
+
   it('should initialize slots from modelValue formatted as 1-0-1', () => {
     const wrapper = mountComponent({ modelValue: '1-0-1' });
     const inputs = wrapper.findAll('input');

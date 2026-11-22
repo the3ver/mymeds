@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.10.21',
+    date: '2026-11-22',
+    title: {
+      de: 'Neues Design im Material-3-Stil',
+      en: 'New Material 3 Design'
+    },
+    highlights: {
+      de: [
+        'Untere Navigation mit Medikamenten, Kalender und dem neuen Mehr-Tab für Einstellungen, Sync, Backup und Handbuch',
+        'Medikamente und Kalendereinträge öffnen Details als Bottom Sheet, mit Nachfüllen um eine Packung und Rückgängig nach dem Löschen',
+        'Filter-Chips direkt im Kalender und Suche im Benutzerhandbuch',
+        'Brüche wie 1/2 lassen sich auf Android wieder in die Dosisfelder tippen'
+      ],
+      en: [
+        'Bottom navigation with medications, calendar and a new More tab for settings, sync, backup and the manual',
+        'Medications and calendar entries open details in a bottom sheet, with a one-pack refill and undo after deleting',
+        'Filter chips right in the calendar and search in the user manual',
+        'Fractions such as 1/2 can be typed into the dose fields on Android again'
+      ]
+    }
+  },
+  {
     version: '1.10.20',
     date: '2026-11-22',
     title: {

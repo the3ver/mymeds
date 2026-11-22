@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, nextTick } from 'vue';
 
 export const snackbarState = reactive({
   open: false,
@@ -8,6 +8,9 @@ export const snackbarState = reactive({
   actionText: '',
   onAction: null
 });
+
+// Bumped on every show/dismiss so a delayed reopen from an older call is dropped
+let generation = 0;
 
 /**
  * Show a global Material 3 snackbar, optionally with an Undo or secondary action button.
@@ -25,7 +28,11 @@ export function showSnackbar({ text, color = undefined, timeout = 4500, actionTe
   snackbarState.timeout = timeout;
   snackbarState.actionText = actionText;
   snackbarState.onAction = onAction;
-  snackbarState.open = true;
+  // Close for one tick first: VSnackbar only restarts its timer when the model changes
+  const current = ++generation;
+  nextTick(() => {
+    if (current === generation) snackbarState.open = true;
+  });
 }
 
 export function triggerSnackbarAction() {
@@ -38,6 +45,7 @@ export function triggerSnackbarAction() {
 }
 
 export function dismissSnackbar() {
+  generation++;
   snackbarState.open = false;
   snackbarState.onAction = null;
 }

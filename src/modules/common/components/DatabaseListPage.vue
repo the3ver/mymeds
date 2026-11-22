@@ -140,7 +140,7 @@ function onDatabaseUnlocked(result, password) {
 </script>
 
 <template>
-  <v-container class="db-list-container pb-24">
+  <v-container class="db-list-container pb-fab">
     <div v-if="databases.length > 0" class="d-flex align-center justify-space-between mb-3 px-1">
       <div class="text-overline font-weight-bold text-medium-emphasis">
         {{ t('app.databases') }} ({{ databases.length }})
@@ -175,7 +175,7 @@ function onDatabaseUnlocked(result, password) {
               </v-avatar>
               <div class="min-width-0 flex-grow-1">
                 <div class="text-subtitle-1 font-weight-bold text-truncate">{{ db.name }}</div>
-                <div class="d-flex align-center flex-wrap text-body-2 text-medium-emphasis ga-2 mt-0.5">
+                <div class="d-flex align-center flex-wrap text-body-2 text-medium-emphasis ga-2 mt-1">
                   <span>{{ db.medsCount }} {{ t('app.db.medsLabel', db.medsCount) }}</span>
                   <span aria-hidden="true">·</span>
                   <span>{{ db.calendarCount }} {{ t('app.db.entriesLabel', db.calendarCount) }}</span>
@@ -337,7 +337,7 @@ function onDatabaseUnlocked(result, password) {
 
     <v-card v-if="databases.length > 0" variant="tonal" color="secondary" rounded="xl" class="mt-4 pa-3">
       <div class="d-flex align-start ga-3 text-caption">
-        <v-icon color="primary" size="20" class="flex-shrink-0 mt-0.5">mdi-lock-check-outline</v-icon>
+        <v-icon color="primary" size="20" class="flex-shrink-0 mt-1">mdi-lock-check-outline</v-icon>
         <span>{{ t('app.zeroKnowledgeHint') }}</span>
       </div>
     </v-card>

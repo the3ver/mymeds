@@ -154,6 +154,11 @@ body {
   flex: 1 1 0 !important;
 }
 
+/* Room below the last list item so the FAB (and bottom nav) never cover it */
+.pb-fab {
+  padding-bottom: 144px !important;
+}
+
 /* M3 Sticky Fullscreen Dialog Topbar */
 .m3-fullscreen-toolbar {
   position: sticky !important;

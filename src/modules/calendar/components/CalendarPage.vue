@@ -438,7 +438,7 @@ defineExpose({
 </script>
 
 <template>
-  <v-container class="calendar-container pb-24 pt-2">
+  <v-container class="calendar-container pb-fab pt-2">
     <!-- Referral Alert Banner -->
     <v-alert
       v-if="pendingReferralsCount > 0"
