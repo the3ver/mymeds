@@ -161,6 +161,36 @@ describe('DatabaseListPage.vue', () => {
     expect(saveSpy).toHaveBeenCalledWith('comfortable');
   });
 
+  it('keeps the vault list header narrow enough for a 412px phone', async () => {
+    // A text label on the display toggle (313px at 16px root font) widened the page past 412px
+    // and pushed the settings icon and the create FAB off screen
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const wrapper = mount(DatabaseListPage, { global: { plugins: [vuetify, i18n], stubs: { VFab: true } } });
+    await flushPromises();
+
+    const toggleBtn = wrapper.find('[data-testid="toggle-vault-display-btn"]');
+    expect(toggleBtn.text()).toBe('');
+    expect(toggleBtn.attributes('aria-label')).toBe(messages.de.app.toggleVaultDisplayMode);
+  });
+
+  it('keeps each count on one line when the vault summary wraps', async () => {
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const wrapper = mount(DatabaseListPage, { global: { plugins: [vuetify, i18n], stubs: { VFab: true } } });
+    await flushPromises();
+
+    const summary = wrapper.find('[data-testid="vault-summary"]');
+    const parts = summary.findAll(':scope > span');
+    // No separator dot that can be left dangling at the end of a wrapped line
+    expect(parts.map((part) => part.text())).toEqual(['4 Medikamente', '2 Einträge']);
+    parts.forEach((part) => expect(part.classes()).toContain('text-no-wrap'));
+  });
+
   it('renders empty state when no vaults exist', async () => {
     vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([]);
     vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());

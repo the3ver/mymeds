@@ -142,22 +142,21 @@ function onDatabaseUnlocked(result, password) {
 <template>
   <v-container class="db-list-container pb-fab">
     <div v-if="databases.length > 0" class="d-flex align-center justify-space-between mb-3 px-1">
-      <div class="text-overline font-weight-bold text-medium-emphasis">
+      <div class="text-overline font-weight-bold text-medium-emphasis text-no-wrap">
         {{ t('app.databases') }} ({{ databases.length }})
       </div>
+      <!-- Icon only: a text label here is wider than a 412px phone and widens the whole page -->
       <v-btn
-        :prepend-icon="vaultDisplayMode === 'simple' ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline'"
+        :icon="vaultDisplayMode === 'simple' ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline'"
         variant="tonal"
         color="secondary"
-        rounded="pill"
         size="small"
+        class="flex-shrink-0"
         :title="t('app.toggleVaultDisplayMode')"
         :aria-label="t('app.toggleVaultDisplayMode')"
         @click="toggleVaultDisplayMode"
         data-testid="toggle-vault-display-btn"
-      >
-        {{ vaultDisplayMode === 'simple' ? t('app.vaultDisplayComfortable') : t('app.vaultDisplaySimple') }}
-      </v-btn>
+      ></v-btn>
     </div>
 
     <v-row dense>
@@ -175,10 +174,18 @@ function onDatabaseUnlocked(result, password) {
               </v-avatar>
               <div class="min-width-0 flex-grow-1">
                 <div class="text-subtitle-1 font-weight-bold text-truncate">{{ db.name }}</div>
-                <div class="d-flex align-center flex-wrap text-body-2 text-medium-emphasis ga-2 mt-1">
-                  <span>{{ db.medsCount }} {{ t('app.db.medsLabel', db.medsCount) }}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{{ db.calendarCount }} {{ t('app.db.entriesLabel', db.calendarCount) }}</span>
+                <div
+                  class="d-flex align-center flex-wrap text-body-2 text-medium-emphasis column-gap-3 mt-1"
+                  data-testid="vault-summary"
+                >
+                  <span class="text-no-wrap">
+                    <v-icon size="16" class="mr-1">mdi-pill</v-icon>{{ db.medsCount }}
+                    {{ t('app.db.medsLabel', db.medsCount) }}
+                  </span>
+                  <span class="text-no-wrap">
+                    <v-icon size="16" class="mr-1">mdi-calendar-check</v-icon>{{ db.calendarCount }}
+                    {{ t('app.db.entriesLabel', db.calendarCount) }}
+                  </span>
                 </div>
               </div>
             </div>

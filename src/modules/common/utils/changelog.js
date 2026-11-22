@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.22',
+    date: '2026-11-22',
+    title: {
+      de: 'Tresor-Liste passt wieder aufs Handy',
+      en: 'Vault List Fits the Phone Again'
+    },
+    highlights: {
+      de: [
+        'Der Ansichts-Umschalter der Tresor-Liste ist wieder ein Symbol, so bleiben Einstellungen und der Plus-Button auch bei großer Schrift sichtbar',
+        'Medikamente und Einträge eines Tresors stehen mit Symbolen untereinander statt mit hängendem Trennpunkt'
+      ],
+      en: [
+        'The vault list view toggle is an icon again, so settings and the plus button stay visible even with large text',
+        'A vault shows its medications and entries with icons instead of a dangling separator dot'
+      ]
+    }
+  },
+  {
     version: '1.10.21',
     date: '2026-11-22',
     title: {
