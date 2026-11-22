@@ -48,8 +48,7 @@ describe('App.vue', () => {
           },
           MainPage: {
             template: '<div data-testid="main-page"></div>'
-          },
-          NavDrawer: true // Stub the nav drawer completely
+          }
         }
       }
     });

@@ -258,9 +258,14 @@ async function handleCheckUpdates() {
       </v-list>
     </v-card>
 
-    <SettingsDialog v-model="settingsDialog" />
-    <SyncDialog v-model="syncDialog" :databases="databases" @vault-imported="emit('vault-imported', $event)" />
-    <HelpDialog v-model="helpDialog" />
+    <SettingsDialog v-if="settingsDialog" v-model="settingsDialog" />
+    <SyncDialog
+      v-if="syncDialog"
+      v-model="syncDialog"
+      :databases="databases"
+      @vault-imported="emit('vault-imported', $event)"
+    />
+    <HelpDialog v-if="helpDialog" v-model="helpDialog" />
     <AboutDialog
       v-model="aboutDialog"
       :is-checking-updates="isCheckingUpdates"

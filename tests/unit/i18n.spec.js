@@ -75,7 +75,6 @@ describe('i18n disclaimer translations', () => {
         expect(db.entriesLabel).toContain('|');
 
         const a11y = messages[locale]?.a11y;
-        expect(a11y.openMenu).toBeTruthy();
         expect(a11y.lockVault).toBeTruthy();
         expect(a11y.selectColor).toBeTruthy();
       });

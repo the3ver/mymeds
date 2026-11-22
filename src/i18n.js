@@ -573,7 +573,6 @@ export const messages = {
       persistFailed: 'Persistent storage could not be granted. Install MyMeds to home screen to allow this.'
     },
     a11y: {
-      openMenu: 'Open navigation menu',
       lockVault: 'Lock vault',
       selectColor: 'Select color {color}',
       switchCamera: 'Switch camera',
@@ -1156,7 +1155,6 @@ export const messages = {
         'Dauerhafter Speicher konnte nicht aktiviert werden. Installiere MyMeds auf dem Homescreen, um dies zu ermöglichen.'
     },
     a11y: {
-      openMenu: 'Navigationsmenü öffnen',
       lockVault: 'Tresor sperren',
       selectColor: 'Farbe {color} wählen',
       switchCamera: 'Kamera wechseln',

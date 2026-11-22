@@ -295,12 +295,6 @@
 .mdi-database::before {
   content: "\F01BC";
 }
-.mdi-sync::before {
-  content: "\F04E6";
-}
-.mdi-help-circle-outline::before {
-  content: "\F0625";
-}
 .mdi-package-variant-closed::before {
   content: "\F03D7";
 }
