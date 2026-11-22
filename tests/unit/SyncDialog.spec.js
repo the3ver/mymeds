@@ -50,6 +50,12 @@ describe('SyncDialog.vue', () => {
     expect(document.body.textContent).toContain('Tresor empfangen');
   });
 
+  it('keeps the Send/Receive tabs from shrinking when the content overflows', async () => {
+    mountComponent();
+    const tabs = document.body.querySelector('.sync-tabs');
+    expect(tabs.classList).toContain('flex-shrink-0');
+  });
+
   it('emits update:modelValue when closed', async () => {
     const wrapper = mountComponent();
     const closeBtn = document.body.querySelector('.close-sync-btn');

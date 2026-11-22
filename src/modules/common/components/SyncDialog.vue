@@ -8,7 +8,7 @@
   >
     <v-card color="background" rounded="0">
       <!-- Sticky M3 Top Toolbar -->
-      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar">
+      <v-toolbar color="surface" elevation="0" class="m3-fullscreen-toolbar flex-grow-0 flex-shrink-0">
         <v-btn
           icon="mdi-close"
           variant="text"
@@ -29,7 +29,7 @@
         bg-color="surface"
         grow
         :show-arrows="false"
-        class="border-b sync-tabs"
+        class="border-b flex-shrink-0 sync-tabs"
       >
         <v-tab value="send" class="sync-tab text-none">
           <v-icon icon="mdi-upload" size="small" class="mr-1" />

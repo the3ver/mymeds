@@ -5,6 +5,20 @@
 
 export const changelog = [
   {
+    version: '1.10.23',
+    date: '2026-11-22',
+    title: {
+      de: 'Sync-Umschalter wieder sichtbar',
+      en: 'Sync Tabs Visible Again'
+    },
+    highlights: {
+      de: [
+        'Der Umschalter Senden/Empfangen in der Geräte-Synchronisation bleibt auch in niedrigen Browserfenstern sichtbar'
+      ],
+      en: ['The Send/Receive tabs in device sync stay visible in short browser windows']
+    }
+  },
+  {
     version: '1.10.22',
     date: '2026-11-22',
     title: {
