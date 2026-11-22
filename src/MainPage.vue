@@ -179,9 +179,12 @@ defineExpose({
       app
       appear
       class="mb-14"
-      :aria-label="t('calendar.add')"
       @click="openCalendarAddDialog"
-    ></v-fab>
+    >
+      <!-- v-fab passes aria-label to its wrapper div, so the name goes into the button content -->
+      <v-icon icon="mdi-plus" />
+      <span class="d-sr-only">{{ t('calendar.add') }}</span>
+    </v-fab>
 
     <v-bottom-navigation v-model="activeTab" color="primary" grow class="main-bottom-nav">
       <v-btn value="meds">

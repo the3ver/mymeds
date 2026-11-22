@@ -356,9 +356,12 @@ function onDatabaseUnlocked(result, password) {
     app
     appear
     class="mb-4"
-    :aria-label="t('dialog.createDbTitle')"
     @click="handleCreateNew"
-  ></v-fab>
+  >
+    <!-- v-fab passes aria-label to its wrapper div, so the name goes into the button content -->
+    <v-icon icon="mdi-plus" />
+    <span class="d-sr-only">{{ t('dialog.createDbTitle') }}</span>
+  </v-fab>
 
   <CreateDatabaseDialog v-model="createDialog" @created="onDatabaseCreated" />
 

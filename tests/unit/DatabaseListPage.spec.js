@@ -227,4 +227,33 @@ describe('DatabaseListPage.vue', () => {
     expect(enWrapper.text()).toContain('1 Entry');
     expect(enWrapper.text()).not.toContain('1 Entries');
   });
+
+  it('gives the create-vault FAB button an accessible name', async () => {
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([]);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const wrapper = mount(
+      { template: '<v-layout><DatabaseListPage /></v-layout>', components: { DatabaseListPage } },
+      {
+        global: {
+          plugins: [vuetify, i18n],
+          stubs: {
+            CreateDatabaseDialog: true,
+            DatabaseUnlockDialog: true,
+            RenameDatabaseDialog: true,
+            SyncDialog: true,
+            ConfirmDialog: true
+          }
+        }
+      }
+    );
+    await new Promise((r) => setTimeout(r, 20));
+
+    // aria-label on <v-fab> lands on the wrapper div; the <button> itself needs the name
+    const fabBtn = wrapper.find('.v-fab button');
+    expect(fabBtn.exists()).toBe(true);
+    const name = fabBtn.attributes('aria-label') || fabBtn.text().trim();
+    expect(name).toBe(i18n.global.t('dialog.createDbTitle'));
+  });
 });

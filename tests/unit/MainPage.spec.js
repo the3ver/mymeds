@@ -135,4 +135,16 @@ describe('MainPage.vue', () => {
 
     expect(badgingService.updateCriticalMedsBadge).toHaveBeenCalled();
   });
+
+  it('gives the calendar add FAB button an accessible name', async () => {
+    shortcutService.consumeShortcutIntent.mockReturnValue({ tab: 'calendar', action: null });
+    const wrapper = mountMainPage();
+    await wrapper.vm.$nextTick();
+
+    // aria-label on <v-fab> lands on the wrapper div; the <button> itself needs the name
+    const fabBtn = wrapper.find('.v-fab button');
+    expect(fabBtn.exists()).toBe(true);
+    const name = fabBtn.attributes('aria-label') || fabBtn.text().trim();
+    expect(name).toBe('Eintrag hinzufügen');
+  });
 });

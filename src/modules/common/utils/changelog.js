@@ -5,6 +5,20 @@
 
 export const changelog = [
   {
+    version: '1.10.20',
+    date: '2026-11-22',
+    title: {
+      de: 'Plus-Buttons für Bildschirmleser benannt',
+      en: 'Plus Buttons Named for Screen Readers'
+    },
+    highlights: {
+      de: [
+        'Die runden Plus-Buttons in der Tresor-Liste und im Kalender werden von Bildschirmlesern jetzt mit ihrer Funktion angesagt'
+      ],
+      en: ['Screen readers now announce the purpose of the round plus buttons in the vault list and the calendar']
+    }
+  },
+  {
     version: '1.10.19',
     date: '2026-11-22',
     title: {
