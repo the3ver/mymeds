@@ -132,7 +132,7 @@ function onDatabaseCreated() {
 }
 
 function onDatabaseUnlocked(result, password) {
-  unlock(selectedDb.value.id, password, result.data, result.deductions);
+  unlock(selectedDb.value.id, password, result.data, result.deductions, selectedDb.value.name);
   unlockDialog.value = false;
 }
 </script>

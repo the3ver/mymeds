@@ -5,6 +5,7 @@ import { clearBadge } from './modules/common/utils/badgingService';
 export const state = reactive({
   isLocked: true,
   activeDatabaseId: null,
+  activeDatabaseName: null,
   activeDatabasePassword: null,
   decryptedData: {
     version: 1,
@@ -56,8 +57,9 @@ const saveState = debounce(async () => {
 watch(() => state.decryptedData, saveState, { deep: true });
 
 // --- State Management Functions ---
-export function unlock(id, password, data, deductions = {}) {
+export function unlock(id, password, data, deductions = {}, name = null) {
   state.activeDatabaseId = id;
+  state.activeDatabaseName = name;
   state.activeDatabasePassword = password;
   state.decryptedData.meds = data.meds || [];
   state.decryptedData.calendar = data.calendar || [];
@@ -72,6 +74,7 @@ export async function lock() {
   await saveState.flush();
 
   state.activeDatabaseId = null;
+  state.activeDatabaseName = null;
   state.activeDatabasePassword = null;
   state.decryptedData.meds = [];
   state.decryptedData.calendar = [];

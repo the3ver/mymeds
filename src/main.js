@@ -6,8 +6,7 @@ import { messages } from './i18n';
 import * as dataService from './modules/common/utils/dataService';
 
 // Vuetify
-import 'vuetify/styles';
-import { createVuetify } from 'vuetify';
+import { createAppVuetify } from './plugins/vuetify';
 import './styles/icons.css';
 
 async function initializeApp() {
@@ -23,11 +22,7 @@ async function initializeApp() {
   });
 
   // Create Vuetify instance and set the theme
-  const vuetify = createVuetify({
-    theme: {
-      defaultTheme: settings.theme
-    }
-  });
+  const vuetify = createAppVuetify(settings.theme);
 
   // Create and mount the Vue app
   const app = createApp(App);
