@@ -690,7 +690,7 @@ export const messages = {
       slotNight: 'Nachts',
       deleteTitle: 'Medikament löschen',
       deleteConfirm: 'Möchtest du dieses Medikament wirklich löschen?',
-      deleteConfirmNamed: 'Möchtest du „{name}“ wirklich löschen?',
+      deleteConfirmNamed: 'Möchtest du "{name}" wirklich löschen?',
       color: 'Farbe',
       colors: {
         white: 'Weiß',

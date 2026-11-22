@@ -119,4 +119,38 @@ describe('SyncDialog.vue', () => {
 
     expect(wrapper.emitted('vault-imported')).toBeTruthy();
   });
+
+  const isPersistent = (wrapper) => wrapper.findComponent({ name: 'VDialog' }).props('persistent');
+
+  it('is dismissable while idle', async () => {
+    const wrapper = mountComponent({ databases: [] });
+    await wrapper.vm.$nextTick();
+    expect(isPersistent(wrapper)).toBe(false);
+  });
+
+  it('stays dismissable while the sender only waits for a receiver', async () => {
+    const wrapper = mountComponent({ initialVaultId: 1 });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(wrapper.vm.senderStatus).toBe('waiting');
+    expect(isPersistent(wrapper)).toBe(false);
+  });
+
+  it('stays open while a receiver is connected to the sender', async () => {
+    vi.spyOn(syncService, 'startSenderSession').mockImplementation(({ onConnected }) => {
+      onConnected();
+      return { close: vi.fn() };
+    });
+    const wrapper = mountComponent({ initialVaultId: 1 });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(wrapper.vm.senderStatus).toBe('connecting');
+    expect(isPersistent(wrapper)).toBe(true);
+  });
+
+  it('stays open while a received vault awaits saving', async () => {
+    const wrapper = mountComponent({ databases: [] });
+    wrapper.vm.receivedVault = { name: 'Urlaub Tresor', medsCount: 1, calendarCount: 0 };
+    wrapper.vm.receiverStatus = 'received';
+    await wrapper.vm.$nextTick();
+    expect(isPersistent(wrapper)).toBe(true);
+  });
 });

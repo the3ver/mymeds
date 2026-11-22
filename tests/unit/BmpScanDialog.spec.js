@@ -129,4 +129,17 @@ describe('BmpScanDialog.vue', () => {
     expect(appState.decryptedData.meds).toHaveLength(1);
     expect(appState.decryptedData.meds[0].name).toBe('Pantoprazol 40mg');
   });
+
+  it('stays open in preview so detected meds are not lost by an outside tap', async () => {
+    const wrapper = mount(BmpScanDialog, {
+      props: { modelValue: true },
+      global: { plugins: [vuetify, i18n] }
+    });
+    const dialog = () => wrapper.findComponent({ name: 'VDialog' });
+    expect(dialog().props('persistent')).toBe(false);
+
+    wrapper.vm.step = 'preview';
+    await wrapper.vm.$nextTick();
+    expect(dialog().props('persistent')).toBe(true);
+  });
 });

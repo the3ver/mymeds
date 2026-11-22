@@ -2,7 +2,7 @@
   <v-dialog
     :model-value="modelValue"
     max-width="560px"
-    :persistent="receiverStatus === 'connecting' || receiverStatus === 'receiving'"
+    :persistent="isTransferActive"
     scrollable
     @update:model-value="(val) => !val && handleClose()"
   >
@@ -228,10 +228,12 @@
               </div>
               <div class="text-caption text-medium-emphasis">
                 <div>
-                  {{ t('app.db.meds') }}: <strong>{{ receivedVault.medsCount }}</strong>
+                  <strong>{{ receivedVault.medsCount }}</strong>
+                  {{ t('app.db.medsLabel', receivedVault.medsCount) }}
                 </div>
                 <div>
-                  {{ t('app.db.entries') }}: <strong>{{ receivedVault.calendarCount }}</strong>
+                  <strong>{{ receivedVault.calendarCount }}</strong>
+                  {{ t('app.db.entriesLabel', receivedVault.calendarCount) }}
                 </div>
                 <div v-if="receivedVault.modifiedAt">
                   {{ t('app.db.modified') }}: {{ formatTimestamp(receivedVault.modifiedAt) }}
@@ -332,6 +334,16 @@ const isReceiveCodeValid = computed(() => {
   const norm = syncService.normalizeSyncCode(receiveCode.value);
   return norm.length === 6;
 });
+
+// Block outside taps, ESC and back gesture while a transfer runs or a received vault is unsaved.
+// A waiting sender stays dismissable: reopening simply creates a new code.
+const isTransferActive = computed(
+  () =>
+    senderStatus.value === 'connecting' ||
+    receiverStatus.value === 'connecting' ||
+    receiverStatus.value === 'receiving' ||
+    !!receivedVault.value
+);
 
 const senderStatusText = computed(() => {
   if (senderStatus.value === 'waiting') return t('sync.waitingForReceiver');

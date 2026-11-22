@@ -265,6 +265,9 @@
 .mdi-tag-text-outline::before {
   content: "\F04FD";
 }
+.mdi-text-box-outline::before {
+  content: "\F09ED";
+}
 .mdi-open-in-new::before {
   content: "\F03CC";
 }

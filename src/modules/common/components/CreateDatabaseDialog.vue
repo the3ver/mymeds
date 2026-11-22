@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as dataService from '../utils/dataService';
 
@@ -14,6 +14,8 @@ const password = ref('');
 const passwordConfirm = ref('');
 const loading = ref(false);
 const error = ref(null);
+// Keep typed input from being lost by an outside tap
+const isDirty = computed(() => loading.value || !!(dbName.value || password.value || passwordConfirm.value));
 
 const close = () => emit('update:modelValue', false);
 
@@ -46,7 +48,7 @@ async function createDatabase() {
     :model-value="modelValue"
     @update:model-value="(val) => !val && close()"
     max-width="500px"
-    :persistent="loading"
+    :persistent="isDirty"
   >
     <v-card :loading="loading">
       <v-card-title>{{ t('dialog.createDbTitle') }}</v-card-title>

@@ -60,11 +60,12 @@ describe('DatabaseListPage.vue', () => {
 
     const text = wrapper.text();
     expect(text).toContain('Haupt-Tresor');
-    expect(text).toContain('4 Medikamente');
-    expect(text).toContain('2 Einträge');
-    expect(text).toContain('1 Medikament');
-    expect(text).not.toContain('1 Medikamente');
-    expect(text).toContain('0 Einträge');
+    // (?<!\d) keeps '1 Medikamente' from matching '11 Medikamente', '0 Einträge' from '10 Einträge'
+    expect(text).toMatch(/(?<!\d)4 Medikamente/);
+    expect(text).toMatch(/(?<!\d)2 Einträge/);
+    expect(text).toMatch(/(?<!\d)1 Medikament(?!e)/);
+    expect(text).not.toMatch(/(?<!\d)1 Medikamente/);
+    expect(text).toMatch(/(?<!\d)0 Einträge/);
     expect(text).not.toContain('Erstellt:');
     expect(text).not.toContain('Geändert:');
 

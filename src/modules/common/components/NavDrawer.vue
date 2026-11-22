@@ -231,6 +231,15 @@ const toggleTheme = () => {
             data-testid="about-version-item"
           ></v-list-item>
           <v-list-item
+            prepend-icon="mdi-text-box-outline"
+            append-icon="mdi-open-in-new"
+            :title="t('about.changelog')"
+            href="https://github.com/the3ver/mymeds/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="about-changelog-item"
+          ></v-list-item>
+          <v-list-item
             prepend-icon="mdi-github"
             append-icon="mdi-open-in-new"
             :title="t('about.github')"

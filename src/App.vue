@@ -127,10 +127,7 @@ function openCalendarFilter() {
   <v-app>
     <NavDrawer
       v-model="drawer"
-      @open-data="
-        dataDialog = true;
-        drawer = false;
-      "
+      @open-data="dataDialog = true"
       @open-whats-new="whatsNewDialog = true"
       @vault-imported="handleVaultImported"
     />

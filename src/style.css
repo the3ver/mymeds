@@ -19,19 +19,16 @@ body {
   width: 100%;
 }
 
-/* Ensure modal dialog cards always render with a solid, opaque surface in Light & Dark Mode */
-.v-dialog > .v-overlay__scrim {
-  z-index: 0;
-  opacity: 0.54;
+/* Darker dialog scrim via Vuetify's variable, so the fade transition keeps working */
+.v-overlay.v-dialog {
+  --v-overlay-opacity: 0.54;
 }
 
-.v-dialog > .v-overlay__content {
-  z-index: 1;
-}
-
+/* Ensure modal dialog cards always render with a solid, opaque surface in Light & Dark Mode.
+   No !important: color=/bg-* utilities on a card still win. */
 .v-dialog > .v-overlay__content > .v-card,
 .v-dialog > .v-overlay__content > form > .v-card {
-  background-color: rgb(var(--v-theme-surface)) !important;
+  background-color: rgb(var(--v-theme-surface));
   color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
   opacity: 1;
 }

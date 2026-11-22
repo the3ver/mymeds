@@ -3,7 +3,7 @@
     :model-value="modelValue"
     max-width="640px"
     scrollable
-    :persistent="isProcessingImage"
+    :persistent="isProcessingImage || step === 'preview'"
     @update:model-value="(val) => !val && handleClose()"
   >
     <v-card class="bmp-scan-dialog">

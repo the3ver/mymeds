@@ -5,6 +5,28 @@
 
 export const changelog = [
   {
+    version: '1.10.19',
+    date: '2026-11-22',
+    title: {
+      de: 'Bessere Darstellung auf schmalen Handys',
+      en: 'Better Layout on Narrow Phones'
+    },
+    highlights: {
+      de: [
+        'Dialoge, Buttons und Dosis-Eingabe passen jetzt auch auf schmale Displays wie das Pixel 9',
+        'Die BMP-DataMatrix wird in fester Größe angezeigt und lässt sich zuverlässig scannen',
+        'Sync, BMP-Scan und Tresor-Anlage schließen nicht mehr durch einen Tipp daneben, solange ungespeicherte Daten offen sind',
+        'Mehrzahl-Formen, Farbnamen und Bildschirmleser-Beschriftungen ergänzt'
+      ],
+      en: [
+        'Dialogs, buttons and dose input now fit narrow screens such as the Pixel 9',
+        'The BMP DataMatrix renders at a fixed size and scans reliably',
+        'Sync, BMP scan and vault creation no longer close on an outside tap while unsaved data is open',
+        'Added plural forms, color names and screen reader labels'
+      ]
+    }
+  },
+  {
     version: '1.10.18',
     date: '2026-11-07',
     title: {

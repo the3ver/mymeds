@@ -191,5 +191,9 @@ describe('NavDrawer.vue', () => {
     expect(versionItem?.querySelector('.mdi-open-in-new')).toBeNull();
     expect(githubItem?.querySelector('.mdi-open-in-new')).not.toBeNull();
     expect(licenseItem?.querySelector('.mdi-open-in-new')).not.toBeNull();
+
+    const changelogItem = document.body.querySelector('[data-testid="about-changelog-item"]');
+    expect(changelogItem?.getAttribute('href')).toBe('https://github.com/the3ver/mymeds/releases');
+    expect(changelogItem?.textContent).toContain('Änderungsprotokoll');
   });
 });
