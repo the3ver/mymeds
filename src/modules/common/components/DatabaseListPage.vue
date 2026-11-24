@@ -384,6 +384,7 @@ function onDatabaseUnlocked(result, password) {
   <RenameDatabaseDialog v-model="renameDialog" :current-name="selectedDb?.name" @save="handleSaveName" />
 
   <SyncDialog
+    v-if="syncDialog"
     v-model="syncDialog"
     :initial-vault-id="syncDbId"
     :databases="databases"

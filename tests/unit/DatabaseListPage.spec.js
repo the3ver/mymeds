@@ -271,6 +271,22 @@ describe('DatabaseListPage.vue', () => {
     expect(enWrapper.text()).not.toContain('1 Entries');
   });
 
+  it('mounts the sync dialog only once sync is opened (it pulls in MQTT and QR code)', async () => {
+    vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue(mockDatabases);
+    vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
+    vi.spyOn(biometricService, 'getActiveBiometricVaultIds').mockResolvedValue(new Set());
+
+    const wrapper = mount(DatabaseListPage, { global: { plugins: [vuetify, i18n], stubs: { VFab: true } } });
+    await flushPromises();
+    expect(wrapper.findComponent({ name: 'SyncDialog' }).exists()).toBe(false);
+
+    wrapper.vm.handleSyncClick(mockDatabases[0]);
+    await flushPromises();
+    const dialog = wrapper.findComponent({ name: 'SyncDialog' });
+    expect(dialog.exists()).toBe(true);
+    expect(dialog.attributes('initial-vault-id')).toBe(String(mockDatabases[0].id));
+  });
+
   it('gives the create-vault FAB button an accessible name', async () => {
     vi.spyOn(dataService, 'getDatabaseList').mockResolvedValue([]);
     vi.spyOn(dataService, 'getSettings').mockResolvedValue({ vaultDisplayMode: 'simple' });
