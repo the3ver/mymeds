@@ -5,6 +5,7 @@ import App from './App.vue';
 import { messages } from './i18n';
 import * as dataService from './modules/common/utils/dataService';
 import { applyUiScale } from './modules/common/utils/uiScale';
+import { syncDocumentLang } from './modules/common/utils/documentLang';
 
 // Vuetify
 import { createAppVuetify } from './plugins/vuetify';
@@ -21,6 +22,7 @@ async function initializeApp() {
     fallbackLocale: 'en',
     messages
   });
+  syncDocumentLang(i18n);
 
   // Create Vuetify instance and set the theme
   const vuetify = createAppVuetify(settings.theme);

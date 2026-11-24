@@ -3,11 +3,11 @@ import { applyUiScale } from '../../src/modules/common/utils/uiScale';
 
 describe('applyUiScale', () => {
   it.each([
-    ['small', '14px'],
-    ['normal', '16px'],
-    ['large', '18px'],
-    [undefined, '16px'],
-    ['bogus', '16px']
+    ['small', '15.5px'],
+    ['normal', '17.5px'],
+    ['large', '20px'],
+    [undefined, '17.5px'],
+    ['bogus', '17.5px']
   ])('sets root font size for %s to %s', (scale, expected) => {
     const root = document.createElement('html');
     applyUiScale(scale, root);
@@ -16,7 +16,7 @@ describe('applyUiScale', () => {
 
   it('defaults to document.documentElement', () => {
     applyUiScale('large');
-    expect(document.documentElement.style.fontSize).toBe('18px');
+    expect(document.documentElement.style.fontSize).toBe('20px');
     document.documentElement.style.fontSize = '';
   });
 });

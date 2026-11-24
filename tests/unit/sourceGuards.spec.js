@@ -35,6 +35,24 @@ describe('source guards', () => {
     expect(matches).toEqual([]);
   });
 
+  it('sizes custom text in rem (follows the UI scale) and not below 0.75rem (Vuetify text-caption)', () => {
+    const cssFiles = readdirSync(SRC, { recursive: true })
+      .filter((name) => String(name).endsWith('.css'))
+      .map((name) => join(SRC, String(name)));
+    const offenders = [...sourceFiles(), ...cssFiles].flatMap((file) =>
+      readFileSync(file, 'utf8')
+        .split('\n')
+        .map((line, i) => {
+          const m = line.match(/font-size:\s*([\d.]+)(px|rem|em)\b/);
+          if (!m) return null;
+          const tooSmall = m[2] === 'px' || parseFloat(m[1]) < 0.75;
+          return tooSmall ? `${relative(ROOT, file)}:${i + 1} ${m[0]}` : null;
+        })
+        .filter(Boolean)
+    );
+    expect(offenders).toEqual([]);
+  });
+
   it('keeps the Android TWA version in step with package.json (release.sh syncs it)', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
     const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));

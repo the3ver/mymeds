@@ -5,6 +5,26 @@
 
 export const changelog = [
   {
+    version: '1.10.25',
+    date: '2026-11-24',
+    title: {
+      de: 'Größere Schrift',
+      en: 'Larger Text'
+    },
+    highlights: {
+      de: [
+        'Alle drei Darstellungsgrößen (Klein, Normal, Groß) zeigen Text rund 10 % größer',
+        'Kleine Beschriftungen wie Dosis-Chips, Einnahmezeiten und Vorratskacheln sind besser lesbar',
+        'Lange deutsche Wörter werden jetzt mit Bindestrich getrennt statt mitten im Wort umbrochen'
+      ],
+      en: [
+        'All three display sizes (small, normal, large) show text about 10% larger',
+        'Small labels such as dose chips, intake times and supply tiles are easier to read',
+        'Long words now break with a hyphen instead of mid-word'
+      ]
+    }
+  },
+  {
     version: '1.10.24',
     date: '2026-11-22',
     title: {

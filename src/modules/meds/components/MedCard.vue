@@ -258,17 +258,17 @@ function handleRefill() {
 
         <v-card-text class="pt-3 pb-4">
           <div class="stat-grid mb-4">
-            <div class="stat-tile pa-2 rounded-xl text-center">
+            <div class="stat-tile py-2 px-1 rounded-xl text-center">
               <div class="text-h6 font-weight-bold">{{ item.count }}</div>
               <div class="stat-tile-label text-medium-emphasis">{{ t('app.showPills') }}</div>
             </div>
-            <div class="stat-tile pa-2 rounded-xl text-center">
+            <div class="stat-tile py-2 px-1 rounded-xl text-center">
               <div class="text-h6 font-weight-bold" :class="statusColor ? `text-${statusColor}` : ''">
                 {{ daysRemaining !== null ? daysRemaining : t('med.na') }}
               </div>
               <div class="stat-tile-label text-medium-emphasis">{{ t('med.daysRemaining') }}</div>
             </div>
-            <div class="stat-tile pa-2 rounded-xl text-center">
+            <div class="stat-tile py-2 px-1 rounded-xl text-center">
               <div class="text-h6 font-weight-bold">{{ item.packageSize || t('med.na') }}</div>
               <div class="stat-tile-label text-medium-emphasis">{{ t('med.packageSize') }}</div>
             </div>
@@ -344,7 +344,7 @@ function handleRefill() {
   color: rgb(var(--v-theme-on-surface));
   padding: 2px 8px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
 }
 .stat-grid {
   display: grid;
@@ -356,7 +356,7 @@ function handleRefill() {
   min-width: 0;
 }
 .stat-tile-label {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   line-height: 1.25;
   overflow-wrap: break-word;
   hyphens: auto;

@@ -154,7 +154,7 @@ const onInput = (field, val) => {
   min-width: 0;
 }
 .dose-slot-label {
-  font-size: 0.75rem !important;
+  font-size: 0.8125rem !important;
   line-height: 1.25;
   margin-top: 4px;
 }
