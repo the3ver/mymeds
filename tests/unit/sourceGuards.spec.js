@@ -61,6 +61,14 @@ describe('source guards', () => {
     expect(htmlRule).toMatch(/overscroll-behavior-y:\s*(contain|none)/);
   });
 
+  it('deploys Pages in its own job with a retry (deploy-pages may not see a just-uploaded artifact)', () => {
+    const yml = readFileSync(join(ROOT, '.github/workflows/release.yml'), 'utf8');
+    const deployJob = yml.split(/\n {2}deploy:\n/)[1] ?? '';
+    expect(deployJob).toMatch(/needs: build-pages/);
+    expect(deployJob).not.toMatch(/upload-pages-artifact/);
+    expect(deployJob.match(/uses: actions\/deploy-pages@/g)).toHaveLength(2);
+  });
+
   it('keeps the Android TWA version in step with package.json (release.sh syncs it)', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
     const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));
