@@ -126,6 +126,28 @@ describe('SyncDialog.vue', () => {
     expect(wrapper.emitted('vault-imported')).toBeTruthy();
   });
 
+  it('cancels its pending close timer when unmounted', async () => {
+    // A timer that outlives the component re-renders after test teardown,
+    // when jsdom is gone ("window is not defined" in a later test file).
+    const wrapper = mountComponent({ databases: [] });
+    wrapper.vm.receivedPayload = { type: 'mymeds-vault-sync', version: 1, vault: { name: 'X' } };
+    wrapper.vm.receivedVault = { name: 'X' };
+    vi.spyOn(syncService, 'importVaultFromSync').mockResolvedValue(7);
+    vi.useFakeTimers();
+    try {
+      await wrapper.vm.handleSaveReceivedVault();
+      expect(wrapper.emitted('vault-imported')).toBeTruthy();
+      const { vm } = wrapper;
+      expect(vm.successMessage).not.toBe('');
+      wrapper.unmount();
+      vi.runAllTimers();
+      // handleClose() would reset the message; Vue drops emits after unmount, state is the signal
+      expect(vm.successMessage).not.toBe('');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   const isPersistent = (wrapper) => wrapper.findComponent({ name: 'VDialog' }).props('persistent');
 
   it('is dismissable while idle', async () => {

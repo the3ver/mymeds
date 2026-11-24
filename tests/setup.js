@@ -23,3 +23,9 @@ const mockVisualViewport = {
 };
 window.visualViewport = mockVisualViewport;
 globalThis.visualViewport = mockVisualViewport;
+
+// Unmount every mounted wrapper after each test. A component left mounted keeps
+// its timers alive; they can fire after jsdom teardown ("window is not defined").
+import { afterEach } from 'vitest';
+import { enableAutoUnmount } from '@vue/test-utils';
+enableAutoUnmount(afterEach);

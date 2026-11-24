@@ -403,6 +403,16 @@ function handleClose() {
   emit('update:modelValue', false);
 }
 
+// Feedback timers, cleared on unmount so none fires into a destroyed component
+const pendingTimers = new Set();
+function later(fn, ms) {
+  const id = setTimeout(() => {
+    pendingTimers.delete(id);
+    fn();
+  }, ms);
+  pendingTimers.add(id);
+}
+
 function cleanupSessions() {
   if (senderSession) {
     senderSession.close();
@@ -459,7 +469,7 @@ async function copySyncCode() {
   try {
     await navigator.clipboard.writeText(currentSyncCode.value);
     codeCopied.value = true;
-    setTimeout(() => {
+    later(() => {
       codeCopied.value = false;
     }, 3000);
   } catch (e) {
@@ -476,7 +486,7 @@ async function copyEncryptedPayload() {
     const jsonString = JSON.stringify(payload);
     await navigator.clipboard.writeText(jsonString);
     successMessage.value = t('sync.encryptedTextCopied');
-    setTimeout(() => {
+    later(() => {
       successMessage.value = '';
     }, 4000);
   } catch (err) {
@@ -573,7 +583,7 @@ async function handleSaveReceivedVault() {
     successMessage.value = t('sync.importSuccess', { name: receivedVault.value.name });
 
     // Close after short feedback
-    setTimeout(() => {
+    later(() => {
       handleClose();
     }, 1200);
   } catch (err) {
@@ -645,6 +655,8 @@ watch(
 
 onUnmounted(() => {
   cleanupSessions();
+  pendingTimers.forEach(clearTimeout);
+  pendingTimers.clear();
 });
 </script>
 
