@@ -4,6 +4,7 @@ import './style.css';
 import App from './App.vue';
 import { messages } from './i18n';
 import * as dataService from './modules/common/utils/dataService';
+import { applyUiScale } from './modules/common/utils/uiScale';
 
 // Vuetify
 import { createAppVuetify } from './plugins/vuetify';
@@ -31,10 +32,7 @@ async function initializeApp() {
   app.mount('#app');
 
   // Apply UI scale after app is mounted
-  const root = document.documentElement;
-  if (settings.uiScale === 'small') root.style.fontSize = '14px';
-  else if (settings.uiScale === 'large') root.style.fontSize = '18px';
-  else root.style.fontSize = '16px';
+  applyUiScale(settings.uiScale);
 }
 
 initializeApp().catch((error) => {

@@ -6,6 +6,7 @@ import * as biometricService from '../utils/biometricSessionService';
 import * as reminderService from '../utils/reminderService';
 import * as storageService from '../utils/storagePersistenceService';
 import * as hapticService from '../utils/hapticService';
+import { applyUiScale } from '../utils/uiScale';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const props = defineProps({
@@ -218,10 +219,7 @@ watch(sortMode, (val) => {
 
 watch(uiScale, (val) => {
   dataService.saveUiScale(val);
-  const root = document.documentElement;
-  if (val === 'small') root.style.fontSize = '14px';
-  else if (val === 'large') root.style.fontSize = '18px';
-  else root.style.fontSize = '16px';
+  applyUiScale(val);
 });
 
 watch([yellowLimit, redLimit], () => {
