@@ -15,11 +15,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* No pull-to-refresh: a reload locks the vault. html is the root scroller
+   (Vuetify sets overflow-y: scroll), so the rule must sit here, not on body. */
+html {
+  overscroll-behavior-y: contain;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overscroll-behavior-y: contain;
 }
 
 #app {

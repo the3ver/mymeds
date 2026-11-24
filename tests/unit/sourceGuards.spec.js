@@ -53,6 +53,14 @@ describe('source guards', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('disables pull-to-refresh on html, the root scroller (a reload locks the vault)', () => {
+    // Vuetify sets html { overflow-y: scroll }, so Chrome reads overscroll-behavior
+    // for the viewport from html only; the same rule on body has no effect.
+    const css = readFileSync(join(SRC, 'style.css'), 'utf8');
+    const htmlRule = css.match(/(?:^|\n)html\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(htmlRule).toMatch(/overscroll-behavior-y:\s*(contain|none)/);
+  });
+
   it('keeps the Android TWA version in step with package.json (release.sh syncs it)', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
     const twa = JSON.parse(readFileSync(join(ROOT, 'twa-manifest.json'), 'utf8'));

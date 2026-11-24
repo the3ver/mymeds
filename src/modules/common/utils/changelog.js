@@ -5,6 +5,18 @@
 
 export const changelog = [
   {
+    version: '1.10.26',
+    date: '2026-11-24',
+    title: {
+      de: 'Kein Neuladen beim Herunterziehen',
+      en: 'No Reload on Pull-Down'
+    },
+    highlights: {
+      de: ['Herunterziehen am Listenanfang lädt die App nicht mehr neu und schließt den Tresor nicht mehr'],
+      en: ['Pulling down at the top of a list no longer reloads the app and locks the vault']
+    }
+  },
+  {
     version: '1.10.25',
     date: '2026-11-24',
     title: {
