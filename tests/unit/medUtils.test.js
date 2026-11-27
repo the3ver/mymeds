@@ -2,8 +2,37 @@ import {
   checkAndUpdateDailyDose,
   parseDose,
   calculateDaysRemaining,
-  getStatusColor
+  getStatusColor,
+  consumptionBetween
 } from '../../src/modules/meds/utils/medUtils';
+
+describe('consumptionBetween', () => {
+  const from = new Date(2026, 0, 5); // Monday
+  const to = new Date(2026, 0, 19); // Monday, 14 days later
+
+  it('multiplies the daily dose by the days in (from, to]', () => {
+    expect(consumptionBetween({ dose: '1-0-1' }, from, to)).toBe(28);
+  });
+
+  it('counts only the scheduled weekdays', () => {
+    const item = { dose: '1', schedule: { type: 'weekly', days: [1, 3, 5] } };
+    // Wed, Fri, Mon, Wed, Fri, Mon after Jan 5
+    expect(consumptionBetween(item, from, to)).toBe(6);
+  });
+
+  it('counts every X days from the start date', () => {
+    const item = { dose: '2', schedule: { type: 'interval', intervalDays: 7, startDate: '2026-01-05' } };
+    expect(consumptionBetween(item, from, to)).toBe(4);
+  });
+
+  it('ignores the time of day', () => {
+    expect(consumptionBetween({ dose: '1' }, new Date(2026, 0, 5, 23, 0), new Date(2026, 0, 6, 1, 0))).toBe(1);
+  });
+
+  it('returns 0 without a dose', () => {
+    expect(consumptionBetween({ dose: '0-0-0' }, from, to)).toBe(0);
+  });
+});
 
 describe('checkAndUpdateDailyDose', () => {
   const today = new Date('2023-10-27T10:00:00.000Z');

@@ -88,7 +88,17 @@ const countMatchingDays = (lastDate, todayDate, matches) => {
   return count;
 };
 
-const calculateItemDeduction = (item, lastDate, todayDate, diffDays) => {
+/**
+ * Units an item consumes on the days in (fromDate, toDate], following its schedule
+ * (daily, weekly days, every X days). Times of day are ignored.
+ */
+export const consumptionBetween = (item, fromDate, toDate) => {
+  const lastDate = new Date(fromDate);
+  lastDate.setHours(0, 0, 0, 0);
+  const todayDate = new Date(toDate);
+  todayDate.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil(Math.abs(todayDate.getTime() - lastDate.getTime()) / MS_PER_DAY);
+
   const dose = parseDose(item.dose);
   if (!dose || dose <= 0) return 0;
 
@@ -147,7 +157,7 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
 
     if (diffDays >= 1) {
       const updatedItems = savedItems.map((item) => {
-        const totalDeduction = calculateItemDeduction(item, lastDate, todayDate, diffDays);
+        const totalDeduction = consumptionBetween(item, lastDate, todayDate);
 
         if (totalDeduction > 0) {
           deductions[item.name] = totalDeduction;
