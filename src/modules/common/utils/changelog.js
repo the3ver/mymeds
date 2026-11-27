@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.29',
+    date: '2026-11-27',
+    title: {
+      de: 'Noch größere Schrift',
+      en: 'Even Larger Text'
+    },
+    highlights: {
+      de: [
+        'Alle drei Darstellungsgrößen zeigen Text noch einmal rund 10 % größer',
+        'Bearbeiten und Löschen stehen bei großer Schrift untereinander statt über den Rand hinaus'
+      ],
+      en: [
+        'All three display sizes show text about 10% larger again',
+        'Edit and delete stack on top of each other with large text instead of running off screen'
+      ]
+    }
+  },
+  {
     version: '1.10.26',
     date: '2026-11-24',
     title: {

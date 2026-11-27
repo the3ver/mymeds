@@ -3,9 +3,9 @@
  * custom CSS) scale with it.
  */
 export const UI_SCALE_FONT_SIZES = {
-  small: '15.5px',
-  normal: '17.5px',
-  large: '20px'
+  small: '17px',
+  normal: '19.25px',
+  large: '22px'
 };
 
 export const applyUiScale = (scale, root = document.documentElement) => {

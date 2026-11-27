@@ -303,7 +303,7 @@ function handleRefill() {
             {{ t('med.quickRefill', { size: item.packageSize }) }}
           </v-btn>
 
-          <div class="d-flex ga-2">
+          <div class="d-flex flex-wrap ga-2">
             <v-btn
               class="flex-grow-1"
               variant="tonal"
@@ -316,6 +316,7 @@ function handleRefill() {
               {{ t('dialog.edit') }}
             </v-btn>
             <v-btn
+              class="flex-grow-1"
               variant="tonal"
               color="error"
               size="large"

@@ -97,6 +97,20 @@ describe('MedCard.vue', () => {
     expect(wrapper.emitted('delete').length).toBe(1);
   });
 
+  it('lets the edit and delete buttons wrap instead of overflowing a 412px phone at large scale', async () => {
+    // At the large UI scale (22px root) both buttons need 352px of a 348px row
+    const wrapper = mountComponent();
+    await wrapper.findComponent(components.VCard).trigger('click');
+
+    const buttons = wrapper
+      .findAllComponents(components.VBtn)
+      .filter((btn) => ['mdi-pencil', 'mdi-delete'].includes(btn.props('prependIcon')));
+    expect(buttons).toHaveLength(2);
+    const row = buttons[0].element.parentElement;
+    expect(row.classList).toContain('flex-wrap');
+    buttons.forEach((btn) => expect(btn.classes()).toContain('flex-grow-1'));
+  });
+
   it('should display schedule chip for weekly and interval medications', () => {
     const weeklyWrapper = mountComponent({
       item: {
