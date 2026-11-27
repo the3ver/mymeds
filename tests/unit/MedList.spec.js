@@ -184,4 +184,20 @@ describe('MedList.vue', () => {
       expect(firstCardChip.text()).toContain(messages.de.med.unitDays);
     });
   });
+
+  it('opens the prescription planner from the overview card with meds and calendar entries', async () => {
+    const calendarEntries = [{ type: 'doctor', date: '2099-01-01', title: 'Hausarzt' }];
+    const wrapper = mountComponent({ calendarEntries });
+    await flushPromises();
+    expect(wrapper.findComponent({ name: 'PrescriptionDialog' }).exists()).toBe(false);
+
+    const btn = wrapper.find('[data-testid="open-prescription-btn"]');
+    expect(btn.attributes('aria-label')).toBe(messages.de.prescription.open);
+    await btn.trigger('click');
+
+    const dialog = wrapper.findComponent({ name: 'PrescriptionDialog' });
+    expect(dialog.exists()).toBe(true);
+    expect(dialog.props('meds')).toEqual(sampleMeds);
+    expect(dialog.props('calendarEntries')).toEqual(calendarEntries);
+  });
 });

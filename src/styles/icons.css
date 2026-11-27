@@ -220,6 +220,15 @@
 .mdi-key-alert::before {
   content: "\F1983";
 }
+.mdi-export::before {
+  content: "\F0207";
+}
+.mdi-import::before {
+  content: "\F02FA";
+}
+.mdi-delete-sweep::before {
+  content: "\F05E9";
+}
 .mdi-view-agenda-outline::before {
   content: "\F11D8";
 }
@@ -252,15 +261,6 @@
 }
 .mdi-lock-check-outline::before {
   content: "\F16A8";
-}
-.mdi-export::before {
-  content: "\F0207";
-}
-.mdi-import::before {
-  content: "\F02FA";
-}
-.mdi-delete-sweep::before {
-  content: "\F05E9";
 }
 .mdi-download::before {
   content: "\F01DA";
@@ -388,6 +388,12 @@
 .mdi-alert-outline::before {
   content: "\F002A";
 }
+.mdi-prescription::before {
+  content: "\F0706";
+}
 .mdi-sort::before {
   content: "\F04BA";
+}
+.mdi-stethoscope::before {
+  content: "\F04D9";
 }

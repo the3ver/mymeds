@@ -117,6 +117,7 @@ export async function getSettings() {
     redLimit: await getSetting('redLimit', 7),
     showOverview: await getSetting('showOverview', true),
     vaultDisplayMode: await getSetting('vaultDisplayMode', 'simple'),
+    prescriptionBufferDays: await getSetting('prescriptionBufferDays', 7),
     disclaimerVersion,
     disclaimerAccepted: disclaimerVersion >= CURRENT_DISCLAIMER_VERSION,
     lastSeenChangelogVersion: await getSetting('lastSeenChangelogVersion', '')
@@ -157,6 +158,7 @@ export const saveVaultDisplayMode = (mode) => setSetting('vaultDisplayMode', mod
 export const saveYellowLimit = (limit) => setSetting('yellowLimit', limit);
 export const saveRedLimit = (limit) => setSetting('redLimit', limit);
 export const saveShowOverview = (show) => setSetting('showOverview', show);
+export const savePrescriptionBufferDays = (days) => setSetting('prescriptionBufferDays', days);
 export const saveDisclaimerVersion = (version = CURRENT_DISCLAIMER_VERSION) => setSetting('disclaimerVersion', version);
 export const saveDisclaimerAccepted = (accepted) => saveDisclaimerVersion(accepted ? CURRENT_DISCLAIMER_VERSION : 0);
 export const saveLastSeenChangelogVersion = (version) => setSetting('lastSeenChangelogVersion', version);

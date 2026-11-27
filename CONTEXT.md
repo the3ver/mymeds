@@ -46,6 +46,14 @@ _Avoid_: Restlaufzeit, Haltbarkeit, Frist, Tage
 Die farbliche Dringlichkeitsstufe eines Medikaments (Grün für gedeckt, Gelb für Nachbestellung empfohlen, Rot für kritisch niedrig) basierend auf benutzerdefinierten Reichweiten-Schwellenwerten.
 _Avoid_: Ampel, Alarmstufe, Status
 
+**Rezept**:
+Eine ärztliche Arzneimittelverordnung (Kassenrezept, Muster 16) mit höchstens drei Verordnungszeilen; eine Zeile nennt Packungsanzahl, Medikament und Packungsgröße (z. B. `2 x Prograf 1 mg (50 St.)`).
+_Avoid_: Verordnung, Überweisung
+
+**Rezeptbedarf**:
+Die aus Bestand, Dosierungsschema und Packungsgröße berechnete Zahl an Packungen pro Medikament, damit der Bestand bis zu einem gewählten Stichtag plus Puffer reicht, aufgeteilt auf Rezepte zu je höchstens drei Zeilen.
+_Avoid_: Nachbestellung, Bestellliste, Einkaufsliste
+
 ### Termine & Kalender
 
 **Kalendereintrag**:

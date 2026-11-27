@@ -5,6 +5,7 @@ import * as dataService from '../../common/utils/dataService';
 import MedCard from './MedCard.vue';
 import CalendarDialog from '../../common/components/CalendarDialog.vue';
 import ConfirmDialog from '../../common/components/ConfirmDialog.vue';
+import PrescriptionDialog from './PrescriptionDialog.vue';
 import { parseDose, calculateDaysRemaining, getStatusColor } from '../utils/medUtils';
 
 const props = defineProps({
@@ -15,6 +16,10 @@ const props = defineProps({
   deductions: {
     type: Object,
     default: () => ({})
+  },
+  calendarEntries: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -26,6 +31,7 @@ const displayMode = ref('pills');
 const yellowLimit = ref(21);
 const redLimit = ref(7);
 const calendarDialog = ref(false);
+const prescriptionDialog = ref(false);
 const confirmDeleteDialog = ref(false);
 const medIndexToDelete = ref(-1);
 
@@ -194,13 +200,23 @@ const calendarDateFormatted = computed(() => {
             }}
           </div>
         </div>
-        <v-btn
-          icon="mdi-calendar-plus"
-          variant="text"
-          size="default"
-          :aria-label="t('calendar.title')"
-          @click="calendarDialog = true"
-        ></v-btn>
+        <div class="d-flex flex-shrink-0">
+          <v-btn
+            icon="mdi-prescription"
+            variant="text"
+            size="default"
+            :aria-label="t('prescription.open')"
+            data-testid="open-prescription-btn"
+            @click="prescriptionDialog = true"
+          ></v-btn>
+          <v-btn
+            icon="mdi-calendar-plus"
+            variant="text"
+            size="default"
+            :aria-label="t('calendar.title')"
+            @click="calendarDialog = true"
+          ></v-btn>
+        </div>
       </div>
     </v-card>
 
@@ -260,6 +276,13 @@ const calendarDateFormatted = computed(() => {
       @edit="emit('edit', item.originalIndex)"
       @delete="requestDelete(item.originalIndex)"
       @refill="emit('refill', item.originalIndex)"
+    />
+
+    <PrescriptionDialog
+      v-if="prescriptionDialog"
+      v-model="prescriptionDialog"
+      :meds="items"
+      :calendar-entries="calendarEntries"
     />
 
     <CalendarDialog

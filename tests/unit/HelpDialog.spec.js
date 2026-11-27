@@ -23,7 +23,7 @@ describe('HelpDialog.vue', () => {
     });
   };
 
-  it('should render all 13 user manual sections', async () => {
+  it('should render all 14 user manual sections', async () => {
     const wrapper = mountComponent();
     await wrapper.vm.$nextTick();
 
@@ -42,6 +42,7 @@ describe('HelpDialog.vue', () => {
     expect(bodyText).toContain('Einnahme-Erinnerungen');
     expect(bodyText).toContain('Geräte-Synchronisation (Tresor übertragen)');
     expect(bodyText).toContain('Medikationsplan (BMP / DataMatrix)');
+    expect(bodyText).toContain('Rezeptbedarf bis zum nächsten Termin');
   });
 
   it('has the same help sections in German and English', () => {

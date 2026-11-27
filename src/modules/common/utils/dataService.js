@@ -94,6 +94,7 @@ export const saveVaultDisplayMode = dbAdapter.saveVaultDisplayMode;
 export const saveYellowLimit = dbAdapter.saveYellowLimit;
 export const saveRedLimit = dbAdapter.saveRedLimit;
 export const saveShowOverview = dbAdapter.saveShowOverview;
+export const savePrescriptionBufferDays = dbAdapter.savePrescriptionBufferDays;
 export const saveDisclaimerAccepted = dbAdapter.saveDisclaimerAccepted;
 export const saveDisclaimerVersion = dbAdapter.saveDisclaimerVersion;
 export const saveLastSeenChangelogVersion = dbAdapter.saveLastSeenChangelogVersion;

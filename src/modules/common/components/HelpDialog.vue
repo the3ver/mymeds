@@ -20,6 +20,7 @@ const sections = [
   { key: 'display', icon: 'mdi-view-list-outline' },
   { key: 'tracking', icon: 'mdi-check-decagram-outline' },
   { key: 'warnings', icon: 'mdi-alert-circle-outline' },
+  { key: 'prescriptions', icon: 'mdi-prescription' },
   { key: 'reminders', icon: 'mdi-bell-outline' },
   { key: 'calendar', icon: 'mdi-calendar-clock' },
   { key: 'sync', icon: 'mdi-sync' },

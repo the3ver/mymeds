@@ -347,6 +347,11 @@ export const messages = {
           content:
             'The overview banner at the top shows the date your overall medication supply runs out.\nWhen a medication falls below the yellow (default: 21 days) or red warning limit (default: 7 days), the banner and card switch to warning or error colors. You can customize these thresholds in Settings.\nIf your device supports app badges, the icon of the installed app shows the number of medications at or below the red limit.'
         },
+        prescriptions: {
+          title: 'Prescriptions Needed Before an Appointment',
+          content:
+            'The prescription icon in the overview banner of the medication list calculates how many packages to ask your doctor for.\n1. Choose the date your medications should last until, e.g. your next appointment. Upcoming doctor appointments from the calendar appear as chips; the next one is preselected.\n2. Buffer: extra days after that date, because the pharmacy may need to order (default 7). MyMeds remembers your value.\n3. MyMeds computes per medication: consumption until date plus buffer, minus stock, rounded up to whole packages. Weekly and every-X-days schedules count only intake days. Medications that last are left out.\n• One prescription holds at most 3 medications; the one that runs out first comes first.\n• Use − and + to change the number of packages. At 0 a medication moves to "Not requested".\n• Without a package size MyMeds shows the missing units instead.\n• Copy or share the list, e.g. to send it to the practice.'
+        },
         reminders: {
           title: 'Intake Reminders',
           content:
@@ -579,6 +584,31 @@ export const messages = {
       batteryOptimizationTitle: 'Important for Android / Pixel users',
       batteryOptimizationText:
         'To ensure reminders arrive reliably on time in the background, set battery usage for MyMeds to "Unrestricted" in Android App Info (App info -> Battery usage -> Unrestricted).'
+    },
+    prescription: {
+      open: 'Prescriptions needed until a date',
+      title: 'Prescriptions needed',
+      close: 'Close',
+      intro:
+        'Shows how many packages to ask your doctor for so that every medication lasts until the chosen date. Calculated from stock, intake schedule and package size. One prescription holds at most 3 medications.',
+      lastUntil: 'Last until',
+      bufferDays: 'Buffer (days)',
+      bufferInvalid: '0 to 365 days',
+      nextAppointments: 'Next doctor appointments',
+      chooseDate: 'Choose the date your medications should last until.',
+      noneNeeded: 'All medications last until {date}. No prescription needed.',
+      heading: 'Prescription {number}',
+      packageOf: 'Package of {size}',
+      missingPackageSize: '{units} units missing, package size not set',
+      line: '{packages} x {name} ({size} units)',
+      lineNoPackage: '{name}: {units} units (package size not set)',
+      fewer: 'One package less of {name}',
+      more: 'One package more of {name}',
+      excluded: 'Not requested (tap to add)',
+      copy: 'Copy',
+      share: 'Share',
+      copied: 'Copied to clipboard',
+      copyFailed: 'Copying failed'
     },
     storage: {
       title: 'Storage & Persistence',
@@ -946,6 +976,11 @@ export const messages = {
           content:
             'Die Übersichtskarte am oberen Rand zeigt, bis zu welchem Datum dein gesamter Medikamentenvorrat reicht.\nSinkt ein Medikament unter die gelbe (Standard: 21 Tage) oder rote Warnschwelle (Standard: 7 Tage), wechselt die Farbmarkierung auf Gelb bzw. Rot. Die Schwellenwerte legst du in den Einstellungen fest.\nUnterstützt dein Gerät App-Badges, zeigt das Symbol der installierten App die Anzahl der Medikamente an oder unter der roten Schwelle.'
         },
+        prescriptions: {
+          title: 'Rezeptbedarf bis zum nächsten Termin',
+          content:
+            'Das Rezept-Symbol im Vorrats-Banner der Medikamentenliste berechnet, wie viele Packungen du beim Arzt anfragen musst.\n1. Wähle das Datum, bis zu dem die Medikamente reichen sollen, z. B. deinen nächsten Termin. Kommende Arzttermine aus dem Kalender erscheinen als Chips, der nächste ist vorausgewählt.\n2. Puffer: zusätzliche Tage nach dem Datum, weil die Apotheke eventuell bestellen muss (Standard 7). MyMeds merkt sich deinen Wert.\n3. MyMeds rechnet pro Medikament: Verbrauch bis Datum plus Puffer, minus Bestand, aufgerundet auf ganze Packungen. Bei wöchentlichem Rhythmus oder alle X Tage zählen nur die Einnahmetage. Medikamente, die reichen, fallen heraus.\n• Auf ein Rezept passen höchstens 3 Medikamente, das zuerst leere steht vorn.\n• Mit − und + änderst du die Zahl der Packungen. Bei 0 wandert ein Medikament zu "Nicht anfordern".\n• Ohne Packungsgröße zeigt MyMeds die fehlende Stückzahl.\n• Kopiere oder teile die Liste, z. B. um sie an die Praxis zu schicken.'
+        },
         reminders: {
           title: 'Einnahme-Erinnerungen',
           content:
@@ -1179,6 +1214,31 @@ export const messages = {
       batteryOptimizationTitle: 'Wichtig für Android- / Pixel-Nutzer',
       batteryOptimizationText:
         'Damit Erinnerungen im Hintergrund zuverlässig pünktlich ankommen, stelle in den Android-App-Einstellungen die Akkunutzung für MyMeds auf „Nicht eingeschränkt“ (App-Info -> Akkunutzung der App -> Nicht eingeschränkt).'
+    },
+    prescription: {
+      open: 'Rezeptbedarf bis zu einem Datum',
+      title: 'Rezeptbedarf',
+      close: 'Schließen',
+      intro:
+        'Zeigt, wie viele Packungen du beim Arzt anfragen musst, damit jedes Medikament bis zum gewählten Datum reicht. Berechnet aus Bestand, Einnahmeschema und Packungsgröße. Auf ein Rezept passen höchstens 3 Medikamente.',
+      lastUntil: 'Reichen bis',
+      bufferDays: 'Puffer (Tage)',
+      bufferInvalid: '0 bis 365 Tage',
+      nextAppointments: 'Nächste Arzttermine',
+      chooseDate: 'Wähle das Datum, bis zu dem deine Medikamente reichen sollen.',
+      noneNeeded: 'Alle Medikamente reichen bis {date}. Kein Rezept nötig.',
+      heading: 'Rezept {number}',
+      packageOf: 'Packung à {size} St.',
+      missingPackageSize: '{units} St. fehlen, Packungsgröße nicht hinterlegt',
+      line: '{packages} x {name} ({size} St.)',
+      lineNoPackage: '{name}: {units} St. (Packungsgröße nicht hinterlegt)',
+      fewer: 'Eine Packung weniger {name}',
+      more: 'Eine Packung mehr {name}',
+      excluded: 'Nicht anfordern (antippen zum Hinzufügen)',
+      copy: 'Kopieren',
+      share: 'Teilen',
+      copied: 'In die Zwischenablage kopiert',
+      copyFailed: 'Kopieren fehlgeschlagen'
     },
     storage: {
       title: 'Speicher & Persistenz',

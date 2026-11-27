@@ -183,6 +183,7 @@ defineExpose({
           <MedList
             :items="appState.decryptedData.meds"
             :deductions="appState.deductions"
+            :calendar-entries="appState.decryptedData.calendar"
             @edit="openEditDialog"
             @delete="deleteItem"
             @refill="refillItem"

@@ -8,15 +8,19 @@ export const changelog = [
     version: '1.10.29',
     date: '2026-11-27',
     title: {
-      de: 'Noch größere Schrift',
-      en: 'Even Larger Text'
+      de: 'Rezeptbedarf und größere Schrift',
+      en: 'Prescriptions Needed and Larger Text'
     },
     highlights: {
       de: [
+        'Neu: Rezeptbedarf. Das Rezept-Symbol im Vorrats-Banner zeigt, wie viele Packungen du bis zu einem Datum brauchst, aufgeteilt auf Rezepte mit höchstens 3 Medikamenten',
+        'Bei der Zeitumstellung im Herbst wird nicht mehr die doppelte Tagesdosis abgezogen',
         'Alle drei Darstellungsgrößen zeigen Text noch einmal rund 10 % größer',
         'Bearbeiten und Löschen stehen bei großer Schrift untereinander statt über den Rand hinaus'
       ],
       en: [
+        'New: prescriptions needed. The prescription icon in the overview banner shows how many packages you need until a date, split into prescriptions of at most 3 medications',
+        'The end of daylight saving time no longer deducts a double daily dose',
         'All three display sizes show text about 10% larger again',
         'Edit and delete stack on top of each other with large text instead of running off screen'
       ]
