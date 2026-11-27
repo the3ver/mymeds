@@ -5,6 +5,24 @@
 
 export const changelog = [
   {
+    version: '1.10.30',
+    date: '2026-11-27',
+    title: {
+      de: 'Rezepte-Button und Übersichtskarte',
+      en: 'Prescriptions Button and Overview Card'
+    },
+    highlights: {
+      de: [
+        'Der Rezeptbedarf öffnet sich jetzt über den Button "Rezepte" neben der Sortierung',
+        'Die Übersichtskarte über der Medikamentenliste lässt sich in den Einstellungen ausblenden'
+      ],
+      en: [
+        'Prescriptions needed now opens from the "Prescriptions" button next to the sort button',
+        'The overview card above the medication list can be hidden in Settings'
+      ]
+    }
+  },
+  {
     version: '1.10.29',
     date: '2026-11-27',
     title: {

@@ -32,6 +32,7 @@ const yellowLimit = ref(21);
 const redLimit = ref(7);
 const calendarDialog = ref(false);
 const prescriptionDialog = ref(false);
+const showOverview = ref(true);
 const confirmDeleteDialog = ref(false);
 const medIndexToDelete = ref(-1);
 
@@ -61,6 +62,7 @@ async function updateSettings() {
   if (settings?.displayMode) displayMode.value = settings.displayMode;
   if (settings?.yellowLimit !== undefined) yellowLimit.value = settings.yellowLimit;
   if (settings?.redLimit !== undefined) redLimit.value = settings.redLimit;
+  if (typeof settings?.showOverview === 'boolean') showOverview.value = settings.showOverview;
 }
 
 async function setDisplayMode(mode) {
@@ -92,12 +94,14 @@ onMounted(() => {
   window.addEventListener('storage-sort-mode-changed', updateSettings);
   window.addEventListener('storage-display-mode-changed', updateSettings);
   window.addEventListener('storage-limits-changed', updateSettings);
+  window.addEventListener('storage-overview-changed', updateSettings);
 });
 
 onUnmounted(() => {
   window.removeEventListener('storage-sort-mode-changed', updateSettings);
   window.removeEventListener('storage-display-mode-changed', updateSettings);
   window.removeEventListener('storage-limits-changed', updateSettings);
+  window.removeEventListener('storage-overview-changed', updateSettings);
 });
 
 const sortedItems = computed(() => {
@@ -186,7 +190,14 @@ const calendarDateFormatted = computed(() => {
 <template>
   <div v-if="items.length > 0">
     <!-- M3 High-Contrast Overview Status Banner -->
-    <v-card v-if="overviewData" class="mb-3" :color="overviewData.status || 'success'" variant="tonal" rounded="xl">
+    <v-card
+      v-if="overviewData && showOverview"
+      data-testid="overview-card"
+      class="mb-3"
+      :color="overviewData.status || 'success'"
+      variant="tonal"
+      rounded="xl"
+    >
       <div class="d-flex align-center justify-space-between pa-3 ga-2">
         <div class="d-flex align-center ga-3 min-width-0">
           <v-icon size="22" class="flex-shrink-0">
@@ -200,23 +211,13 @@ const calendarDateFormatted = computed(() => {
             }}
           </div>
         </div>
-        <div class="d-flex flex-shrink-0">
-          <v-btn
-            icon="mdi-prescription"
-            variant="text"
-            size="default"
-            :aria-label="t('prescription.open')"
-            data-testid="open-prescription-btn"
-            @click="prescriptionDialog = true"
-          ></v-btn>
-          <v-btn
-            icon="mdi-calendar-plus"
-            variant="text"
-            size="default"
-            :aria-label="t('calendar.title')"
-            @click="calendarDialog = true"
-          ></v-btn>
-        </div>
+        <v-btn
+          icon="mdi-calendar-plus"
+          variant="text"
+          size="default"
+          :aria-label="t('calendar.title')"
+          @click="calendarDialog = true"
+        ></v-btn>
       </div>
     </v-card>
 
@@ -255,17 +256,31 @@ const calendarDateFormatted = computed(() => {
         </v-btn>
       </div>
 
-      <v-btn
-        size="small"
-        variant="tonal"
-        color="secondary"
-        rounded="pill"
-        prepend-icon="mdi-sort"
-        @click="cycleSortMode"
-        data-testid="quick-sort-btn"
-      >
-        {{ sortLabel }}
-      </v-btn>
+      <div class="d-flex flex-wrap ga-2">
+        <v-btn
+          size="small"
+          variant="tonal"
+          color="secondary"
+          rounded="pill"
+          prepend-icon="mdi-sort"
+          @click="cycleSortMode"
+          data-testid="quick-sort-btn"
+        >
+          {{ sortLabel }}
+        </v-btn>
+        <v-btn
+          size="small"
+          variant="tonal"
+          color="secondary"
+          rounded="pill"
+          prepend-icon="mdi-prescription"
+          :title="t('prescription.open')"
+          data-testid="open-prescription-btn"
+          @click="prescriptionDialog = true"
+        >
+          {{ t('prescription.button') }}
+        </v-btn>
+      </div>
     </div>
 
     <MedCard

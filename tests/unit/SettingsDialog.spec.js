@@ -166,7 +166,7 @@ describe('SettingsDialog.vue', () => {
     const wrapper = mountComponent();
     await flushPromises();
 
-    const switchInput = document.body.querySelector('.v-switch input');
+    const switchInput = document.body.querySelector('.reminder-switch input');
     expect(switchInput).not.toBeNull();
     switchInput.click();
     await flushPromises();
@@ -187,7 +187,7 @@ describe('SettingsDialog.vue', () => {
     await wrapper.setProps({ modelValue: true });
     await flushPromises();
 
-    const switchAfterReopen = document.body.querySelector('.v-switch input');
+    const switchAfterReopen = document.body.querySelector('.reminder-switch input');
     expect(switchAfterReopen.checked).toBe(true);
 
     wrapper.unmount();
@@ -205,7 +205,7 @@ describe('SettingsDialog.vue', () => {
     const wrapper = mountComponent();
     await flushPromises();
 
-    const switchInput = document.body.querySelector('.v-switch input');
+    const switchInput = document.body.querySelector('.reminder-switch input');
     expect(switchInput).not.toBeNull();
     switchInput.click();
     await flushPromises();
@@ -304,6 +304,26 @@ describe('SettingsDialog.vue', () => {
 
     expect(hapticService.setHapticsEnabled).toHaveBeenCalledWith(false);
 
+    wrapper.unmount();
+  });
+
+  it('shows the overview card switch and saves a change for the med list', async () => {
+    dataService.getSettings.mockResolvedValue({ ...(await dataService.getSettings()), showOverview: true });
+    const listener = vi.fn();
+    window.addEventListener('storage-overview-changed', listener);
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(dataService.saveShowOverview).not.toHaveBeenCalled();
+    const switchInput = document.body.querySelector('.overview-switch input');
+    expect(switchInput).not.toBeNull();
+    expect(switchInput.checked).toBe(true);
+    switchInput.click();
+    await flushPromises();
+
+    expect(dataService.saveShowOverview).toHaveBeenCalledWith(false);
+    expect(listener).toHaveBeenCalled();
+    window.removeEventListener('storage-overview-changed', listener);
     wrapper.unmount();
   });
 });

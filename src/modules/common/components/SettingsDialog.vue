@@ -24,6 +24,7 @@ const sortMode = ref('added');
 const uiScale = ref('normal');
 const yellowLimit = ref(21);
 const redLimit = ref(7);
+const showOverview = ref(true);
 const confirmResetDialog = ref(false);
 const confirmClearBiometricsDialog = ref(false);
 const biometricsClearedSnackbar = ref(false);
@@ -113,6 +114,7 @@ async function loadSettings() {
     uiScale.value = settings.uiScale;
     yellowLimit.value = settings.yellowLimit;
     redLimit.value = settings.redLimit;
+    showOverview.value = settings.showOverview !== false;
 
     // Check reminders support
     isReminderSupported.value = reminderService.isReminderSupported();
@@ -207,6 +209,12 @@ watch(displayMode, (val) => {
   window.dispatchEvent(new Event('storage-display-mode-changed'));
 });
 
+watch(showOverview, (val) => {
+  if (isLoadingSettings) return;
+  dataService.saveShowOverview(val);
+  window.dispatchEvent(new Event('storage-overview-changed'));
+});
+
 watch(vaultDisplayMode, (val) => {
   dataService.saveVaultDisplayMode(val);
   window.dispatchEvent(new Event('storage-vault-display-mode-changed'));
@@ -251,6 +259,7 @@ const resetSettings = async () => {
   uiScale.value = 'normal';
   yellowLimit.value = 21;
   redLimit.value = 7;
+  showOverview.value = true;
   hapticsEnabled.value = true;
   hapticService.setHapticsEnabled(true);
 
@@ -347,6 +356,13 @@ const close = () => {
                 </template>
               </v-radio>
             </v-radio-group>
+            <v-switch
+              v-model="showOverview"
+              color="primary"
+              :label="t('app.showOverview')"
+              hide-details
+              class="overview-switch"
+            ></v-switch>
           </div>
 
           <!-- Vault Display Mode -->
@@ -462,7 +478,7 @@ const close = () => {
               color="primary"
               :label="t('reminders.enable')"
               hide-details
-              class="mb-4"
+              class="mb-4 reminder-switch"
               @update:model-value="toggleReminders"
             ></v-switch>
 

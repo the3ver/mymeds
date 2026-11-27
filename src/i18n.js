@@ -350,7 +350,7 @@ export const messages = {
         prescriptions: {
           title: 'Prescriptions Needed Before an Appointment',
           content:
-            'The prescription icon in the overview banner of the medication list calculates how many packages to ask your doctor for.\n1. Choose the date your medications should last until, e.g. your next appointment. Upcoming doctor appointments from the calendar appear as chips; the next one is preselected.\n2. Buffer: extra days after that date, because the pharmacy may need to order (default 7). MyMeds remembers your value.\n3. MyMeds computes per medication: consumption until date plus buffer, minus stock, rounded up to whole packages. Weekly and every-X-days schedules count only intake days. Medications that last are left out.\n• One prescription holds at most 3 medications; the one that runs out first comes first.\n• Use − and + to change the number of packages. At 0 a medication moves to "Not requested".\n• Without a package size MyMeds shows the missing units instead.\n• Copy or share the list, e.g. to send it to the practice.'
+            'The "Prescriptions" button next to the sort button above the medication list calculates how many packages to ask your doctor for.\n1. Choose the date your medications should last until, e.g. your next appointment. Upcoming doctor appointments from the calendar appear as chips; the next one is preselected.\n2. Buffer: extra days after that date, because the pharmacy may need to order (default 7). MyMeds remembers your value.\n3. MyMeds computes per medication: consumption until date plus buffer, minus stock, rounded up to whole packages. Weekly and every-X-days schedules count only intake days. Medications that last are left out.\n• One prescription holds at most 3 medications; the one that runs out first comes first.\n• Use − and + to change the number of packages. At 0 a medication moves to "Not requested".\n• Without a package size MyMeds shows the missing units instead.\n• Copy or share the list, e.g. to send it to the practice.'
         },
         reminders: {
           title: 'Intake Reminders',
@@ -587,6 +587,7 @@ export const messages = {
     },
     prescription: {
       open: 'Prescriptions needed until a date',
+      button: 'Prescriptions',
       title: 'Prescriptions needed',
       close: 'Close',
       intro:
@@ -979,7 +980,7 @@ export const messages = {
         prescriptions: {
           title: 'Rezeptbedarf bis zum nächsten Termin',
           content:
-            'Das Rezept-Symbol im Vorrats-Banner der Medikamentenliste berechnet, wie viele Packungen du beim Arzt anfragen musst.\n1. Wähle das Datum, bis zu dem die Medikamente reichen sollen, z. B. deinen nächsten Termin. Kommende Arzttermine aus dem Kalender erscheinen als Chips, der nächste ist vorausgewählt.\n2. Puffer: zusätzliche Tage nach dem Datum, weil die Apotheke eventuell bestellen muss (Standard 7). MyMeds merkt sich deinen Wert.\n3. MyMeds rechnet pro Medikament: Verbrauch bis Datum plus Puffer, minus Bestand, aufgerundet auf ganze Packungen. Bei wöchentlichem Rhythmus oder alle X Tage zählen nur die Einnahmetage. Medikamente, die reichen, fallen heraus.\n• Auf ein Rezept passen höchstens 3 Medikamente, das zuerst leere steht vorn.\n• Mit − und + änderst du die Zahl der Packungen. Bei 0 wandert ein Medikament zu "Nicht anfordern".\n• Ohne Packungsgröße zeigt MyMeds die fehlende Stückzahl.\n• Kopiere oder teile die Liste, z. B. um sie an die Praxis zu schicken.'
+            'Der Button "Rezepte" neben der Sortierung über der Medikamentenliste berechnet, wie viele Packungen du beim Arzt anfragen musst.\n1. Wähle das Datum, bis zu dem die Medikamente reichen sollen, z. B. deinen nächsten Termin. Kommende Arzttermine aus dem Kalender erscheinen als Chips, der nächste ist vorausgewählt.\n2. Puffer: zusätzliche Tage nach dem Datum, weil die Apotheke eventuell bestellen muss (Standard 7). MyMeds merkt sich deinen Wert.\n3. MyMeds rechnet pro Medikament: Verbrauch bis Datum plus Puffer, minus Bestand, aufgerundet auf ganze Packungen. Bei wöchentlichem Rhythmus oder alle X Tage zählen nur die Einnahmetage. Medikamente, die reichen, fallen heraus.\n• Auf ein Rezept passen höchstens 3 Medikamente, das zuerst leere steht vorn.\n• Mit − und + änderst du die Zahl der Packungen. Bei 0 wandert ein Medikament zu "Nicht anfordern".\n• Ohne Packungsgröße zeigt MyMeds die fehlende Stückzahl.\n• Kopiere oder teile die Liste, z. B. um sie an die Praxis zu schicken.'
         },
         reminders: {
           title: 'Einnahme-Erinnerungen',
@@ -1217,6 +1218,7 @@ export const messages = {
     },
     prescription: {
       open: 'Rezeptbedarf bis zu einem Datum',
+      button: 'Rezepte',
       title: 'Rezeptbedarf',
       close: 'Schließen',
       intro:

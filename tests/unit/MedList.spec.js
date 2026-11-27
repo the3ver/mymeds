@@ -185,14 +185,28 @@ describe('MedList.vue', () => {
     });
   });
 
-  it('opens the prescription planner from the overview card with meds and calendar entries', async () => {
+  it('hides the overview card when it is switched off in settings', async () => {
+    dataService.getSettings.mockResolvedValue({ sortMode: 'added', yellowLimit: 21, redLimit: 7, showOverview: false });
+    const wrapper = mountComponent();
+    await flushPromises();
+    expect(wrapper.find('[data-testid="overview-card"]').exists()).toBe(false);
+
+    dataService.getSettings.mockResolvedValue({ sortMode: 'added', yellowLimit: 21, redLimit: 7, showOverview: true });
+    window.dispatchEvent(new Event('storage-overview-changed'));
+    await flushPromises();
+    expect(wrapper.find('[data-testid="overview-card"]').exists()).toBe(true);
+  });
+
+  it('opens the prescription planner from the list controls, also without overview card', async () => {
+    dataService.getSettings.mockResolvedValue({ sortMode: 'added', yellowLimit: 21, redLimit: 7, showOverview: false });
     const calendarEntries = [{ type: 'doctor', date: '2099-01-01', title: 'Hausarzt' }];
     const wrapper = mountComponent({ calendarEntries });
     await flushPromises();
     expect(wrapper.findComponent({ name: 'PrescriptionDialog' }).exists()).toBe(false);
 
     const btn = wrapper.find('[data-testid="open-prescription-btn"]');
-    expect(btn.attributes('aria-label')).toBe(messages.de.prescription.open);
+    expect(btn.text()).toBe(messages.de.prescription.button);
+    expect(wrapper.find('[data-testid="overview-card"] [data-testid="open-prescription-btn"]').exists()).toBe(false);
     await btn.trigger('click');
 
     const dialog = wrapper.findComponent({ name: 'PrescriptionDialog' });
