@@ -97,7 +97,8 @@ export const consumptionBetween = (item, fromDate, toDate) => {
   lastDate.setHours(0, 0, 0, 0);
   const todayDate = new Date(toDate);
   todayDate.setHours(0, 0, 0, 0);
-  const diffDays = Math.ceil(Math.abs(todayDate.getTime() - lastDate.getTime()) / MS_PER_DAY);
+  // Round, not ceil: midnight to midnight spans 23 or 25 hours across a DST switch
+  const diffDays = Math.round(Math.abs(todayDate.getTime() - lastDate.getTime()) / MS_PER_DAY);
 
   const dose = parseDose(item.dose);
   if (!dose || dose <= 0) return 0;
@@ -153,7 +154,7 @@ export const checkAndUpdateDailyDose = (savedItems, lastUpdateDate, currentDate 
     todayDate.setHours(0, 0, 0, 0);
 
     const diffTime = Math.abs(todayDate.getTime() - lastDate.getTime());
-    const diffDays = Math.ceil(diffTime / MS_PER_DAY);
+    const diffDays = Math.round(diffTime / MS_PER_DAY);
 
     if (diffDays >= 1) {
       const updatedItems = savedItems.map((item) => {

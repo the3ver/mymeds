@@ -29,12 +29,23 @@ describe('consumptionBetween', () => {
     expect(consumptionBetween({ dose: '1' }, new Date(2026, 0, 5, 23, 0), new Date(2026, 0, 6, 1, 0))).toBe(1);
   });
 
+  it('counts the 25-hour day at the end of daylight saving time as one day', () => {
+    // Europe/Berlin (vitest.config.js): clocks go back on 2026-10-25
+    expect(consumptionBetween({ dose: '1' }, new Date(2026, 9, 25), new Date(2026, 9, 26))).toBe(1);
+  });
+
   it('returns 0 without a dose', () => {
     expect(consumptionBetween({ dose: '0-0-0' }, from, to)).toBe(0);
   });
 });
 
 describe('checkAndUpdateDailyDose', () => {
+  it('deducts one day across the end of daylight saving time, not two', () => {
+    const items = [{ name: 'A', count: 10, dose: '1' }];
+    const result = checkAndUpdateDailyDose(items, new Date(2026, 9, 25).toDateString(), new Date(2026, 9, 26, 8));
+    expect(result.updatedItems[0].count).toBe(9);
+  });
+
   const today = new Date('2023-10-27T10:00:00.000Z');
   const yesterday = new Date('2023-10-26T10:00:00.000Z');
   const twoDaysAgo = new Date('2023-10-25T10:00:00.000Z');
